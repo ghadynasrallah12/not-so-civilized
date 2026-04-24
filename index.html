@@ -1,0 +1,1669 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Not So Civilized</title>
+    <style>
+      :root {
+        --bg: #f2eee1;
+        --text-dark: #171717;
+        --text-light: #f4f2eb;
+        --accent: #d7c39a;
+        --section-bg: #0f0f12;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+        background: var(--section-bg);
+        color: var(--text-light);
+      }
+
+      .hero {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+        background: #000;
+      }
+
+      .hero video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at right center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.7));
+        pointer-events: none;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2rem clamp(1rem, 4vw, 3rem);
+        color: var(--text-light);
+      }
+
+      .hero-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 40;
+        padding: 2rem clamp(1rem, 4vw, 3rem) 0;
+        background: transparent;
+      }
+
+      .site-header .hero-top {
+        pointer-events: none;
+      }
+
+      .logo {
+        font-weight: 700;
+        font-family: "Andale Mono", "AndaleMono", monospace;
+      }
+
+      .center-tagline {
+        text-align: center;
+        flex: 1;
+        opacity: 0.9;
+        font-style: italic;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      .clock {
+        opacity: 0.9;
+        letter-spacing: 0.12em;
+        white-space: nowrap;
+        font-family: "Andale Mono", "AndaleMono", monospace;
+      }
+
+      .main-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: clamp(4.55rem, 7.8vw, 7.15rem);
+        margin: auto 0;
+      }
+
+      .main-nav a {
+        color: var(--text-light);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: clamp(0.8rem, 1.7vw, 1rem);
+        opacity: 0.92;
+        transition: opacity 0.2s ease;
+        font-family: "Andale Mono", "AndaleMono", monospace;
+      }
+
+      .main-nav a:hover {
+        opacity: 1;
+      }
+
+      .hero-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 1rem;
+      }
+
+      .wordmark {
+        margin: 0;
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .wordmark-logo {
+        margin: 0;
+        line-height: 0;
+      }
+
+      .wordmark-logo img {
+        width: clamp(105px, 12vw, 180px);
+        height: auto;
+        display: block;
+      }
+
+      .tagline {
+        margin: 0;
+        font-size: clamp(1rem, 2.2vw, 1.6rem);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-family: "Aka and Kamu", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      .section {
+        width: 100%;
+        min-height: 100vh;
+        padding: clamp(4rem, 8vw, 6rem) clamp(1.25rem, 6vw, 8rem);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .section:nth-of-type(odd) {
+        background: #141418;
+      }
+
+      .section:nth-of-type(even) {
+        background: #0f0f12;
+      }
+
+      .section h2 {
+        margin: 0 0 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: clamp(1.4rem, 3vw, 2rem);
+      }
+
+      .section p {
+        margin: 0;
+        max-width: 70ch;
+        line-height: 1.7;
+        color: rgba(244, 242, 235, 0.85);
+      }
+
+      .about-section {
+        padding: 0;
+        border-top: none;
+        background: #030303;
+      }
+
+      .about-layout {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 41% 59%;
+        position: relative;
+      }
+
+      .about-image {
+        position: relative;
+        background-image: url("assets/web/homepage/optimized/about-web.jpg");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .about-image::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18));
+      }
+
+      .about-copy {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+        gap: clamp(3rem, 8vw, 8.5rem);
+        padding: 3rem 0 3rem clamp(1.2rem, 6vw, 4rem);
+        background: #050505;
+        position: relative;
+      }
+
+      .about-block {
+        margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+        padding-right: 0;
+        text-align: right;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: clamp(0.76rem, 0.98vw, 0.96rem);
+        line-height: 1.14;
+        color: rgba(244, 242, 235, 0.95);
+        font-family: "Andale Mono", "AndaleMono", monospace;
+      }
+
+      .about-logo {
+        position: absolute;
+        left: clamp(1rem, 4vw, 3rem);
+        bottom: 2rem;
+        line-height: 0;
+        z-index: 4;
+      }
+
+      .about-logo img {
+        width: clamp(105px, 12vw, 180px);
+        height: auto;
+        display: block;
+      }
+
+      .services-section {
+        padding: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        background: #050507;
+      }
+
+      .services-layout {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .service-band {
+        position: relative;
+        flex: 1 1 33.33%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 2.8rem clamp(1.2rem, 4vw, 3rem);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        transition: flex 0.5s ease;
+      }
+
+      .service-band:first-child {
+        border-top: none;
+      }
+
+      .service-band:hover {
+        flex: 1.55 1 33.33%;
+      }
+
+      .service-band::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        z-index: 0;
+        transform: scale(1);
+        transition: transform 0.6s ease;
+      }
+
+      .service-band:hover::before {
+        transform: scale(1.02);
+      }
+
+      .service-band::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(9, 9, 12, 0.85) 0%, rgba(8, 8, 10, 0.65) 45%, rgba(8, 8, 10, 0.84) 100%);
+        z-index: 0;
+      }
+
+      .service-band.consultancy::before {
+        background-image: linear-gradient(140deg, #2a323b 0%, #1f252d 100%);
+      }
+
+      .service-band.creation::before {
+        background-image: url("assets/web/homepage/optimized/concept-creation-development-web.jpg");
+      }
+
+      .service-band.execution::before {
+        background-image: url("assets/web/homepage/optimized/creative-execution-web.jpg");
+      }
+
+      .service-left,
+      .service-right {
+        position: relative;
+        z-index: 1;
+      }
+
+      .service-left {
+        max-width: min(68ch, 78%);
+      }
+
+      .service-title {
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        line-height: 0.95;
+        font-size: clamp(1.2rem, 3vw, 2.4rem);
+      }
+
+      .service-right {
+        flex-shrink: 0;
+      }
+
+      .service-time {
+        font-size: clamp(0.8rem, 1.1vw, 1rem);
+      }
+
+      .service-extra {
+        margin: 0.8rem 0 0;
+        max-width: 56ch;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+        transform: translateY(12px);
+        transition:
+          opacity 0.35s ease,
+          transform 0.35s ease,
+          max-height 0.45s ease;
+        color: rgba(244, 242, 235, 0.92);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        line-height: 1.28;
+        font-size: clamp(0.72rem, 0.9vw, 0.95rem);
+      }
+
+      .service-band:hover .service-extra {
+        opacity: 1;
+        max-height: 9rem;
+        transform: translateY(0);
+      }
+
+      .projects-section {
+        position: relative;
+        padding: 0;
+        border-top: none;
+        overflow: hidden;
+        background: #060607;
+      }
+
+      .projects-carousel-view {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .projects-track {
+        display: flex;
+        height: 100vh;
+        width: max-content;
+        will-change: transform;
+      }
+
+      .project-card {
+        position: relative;
+        flex: 0 0 25vw;
+        width: 25vw;
+        min-width: 25vw;
+        overflow: hidden;
+        border-left: 1px solid rgba(0, 0, 0, 0.5);
+        border-right: 1px solid rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+      }
+
+      .project-card video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1);
+        transition: transform 0.55s ease;
+      }
+
+      .project-card:hover video {
+        transform: scale(1.06);
+      }
+
+      .project-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2rem clamp(1rem, 4vw, 3rem);
+        pointer-events: none;
+      }
+
+      .project-center-text {
+        align-self: flex-end;
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-right: clamp(14vw, 18vw, 22vw);
+        text-transform: uppercase;
+        line-height: 0.92;
+        font-size: clamp(1.7rem, 4.7vw, 3.9rem);
+        font-weight: 700;
+        text-align: right;
+        white-space: pre-line;
+      }
+
+      .project-nav {
+        position: absolute;
+        inset: auto 0 7.2rem;
+        z-index: 3;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 clamp(1rem, 6vw, 6rem);
+        pointer-events: none;
+      }
+
+      .project-arrow {
+        pointer-events: auto;
+        border: 0;
+        background: transparent;
+        color: #fff;
+        font-size: clamp(2.2rem, 5vw, 3.2rem);
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0.85;
+        transition: opacity 0.2s ease;
+      }
+
+      .project-arrow:hover {
+        opacity: 1;
+      }
+
+      .project-static-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 1rem;
+        pointer-events: none;
+      }
+
+      .projects-detail-view {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: minmax(320px, 54%) 1fr;
+        transform: translateY(100%);
+        opacity: 0;
+        transition:
+          transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.8s ease;
+        background: #040406;
+      }
+
+      .projects-section.detail-open .projects-detail-view {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .projects-section.detail-open .projects-carousel-view {
+        pointer-events: none;
+      }
+
+      .project-detail-copy {
+        position: relative;
+        padding: 6.4rem clamp(1.6rem, 6vw, 3.8rem) 5.2rem;
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 0.94) 68%, rgba(0, 0, 0, 0.35) 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 1.4rem;
+        overflow: hidden;
+        z-index: 2;
+      }
+
+      .project-detail-copy::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: -11vw;
+        width: min(14vw, 220px);
+        height: 100%;
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 100%);
+        pointer-events: none;
+      }
+
+      .project-detail-title {
+        margin: 0;
+        text-transform: uppercase;
+        line-height: 0.88;
+        letter-spacing: 0.01em;
+        font-family: "Arial Narrow", "Helvetica Neue Condensed", Impact, sans-serif;
+        font-size: clamp(3.1rem, 5.8vw, 5.8rem);
+        font-weight: 700;
+      }
+
+      .project-detail-text {
+        margin: 0;
+        max-width: 45ch;
+        text-transform: uppercase;
+        letter-spacing: 0.11em;
+        font-size: clamp(0.86rem, 1.05vw, 1.05rem);
+        line-height: 1.07;
+        font-family: "Arial Narrow", "Helvetica Neue Condensed", Arial, sans-serif;
+        transform: translateY(90px);
+        opacity: 0;
+      }
+
+      .projects-section.detail-open .project-detail-text {
+        animation: domino-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation-delay: 0.16s;
+      }
+
+      .project-detail-close {
+        margin-top: auto;
+        align-self: flex-start;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: transparent;
+        color: #f4f2eb;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.55rem 0.9rem;
+        font-size: 0.72rem;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease;
+      }
+
+      .project-detail-close:hover {
+        background: #ffffff;
+        color: #000000;
+      }
+
+      .project-detail-media {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background: #030303;
+      }
+
+      .project-detail-video-wrap {
+        flex: 1;
+        min-height: 0;
+        position: relative;
+      }
+
+      .project-detail-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .project-detail-mute,
+      .project-detail-replay,
+      .project-detail-play-toggle {
+        position: absolute;
+        z-index: 16;
+        border: 0;
+        background: transparent;
+        color: #ffffff;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        opacity: 0.88;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+      }
+
+      .project-detail-mute:hover,
+      .project-detail-replay:hover,
+      .project-detail-play-toggle:hover {
+        opacity: 1;
+      }
+
+      .project-detail-mute:focus-visible,
+      .project-detail-replay:focus-visible,
+      .project-detail-play-toggle:focus-visible {
+        outline: 1px solid rgba(255, 255, 255, 0.85);
+        outline-offset: 2px;
+      }
+
+      .project-detail-mute {
+        top: 1rem;
+        right: 1rem;
+        width: 1.85rem;
+        height: 1.85rem;
+        padding: 0.1rem;
+      }
+
+      .project-detail-replay {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 2.7rem;
+        height: 2.7rem;
+        padding: 0.2rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+
+      .project-detail-replay.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .project-detail-play-toggle {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 2.9rem;
+        height: 2.9rem;
+        padding: 0.2rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+
+      .project-detail-play-toggle.show {
+        opacity: 1;
+      }
+
+      .control-icon {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .control-icon path,
+      .control-icon line,
+      .control-icon polyline,
+      .control-icon polygon {
+        stroke: #ffffff;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+
+      .project-detail-timeline {
+        position: absolute;
+        left: 50%;
+        bottom: 2rem;
+        transform: translateX(-50%);
+        width: min(74vw, 1050px);
+        display: flex;
+        align-items: center;
+        z-index: 14;
+        pointer-events: auto;
+      }
+
+      .project-progress-bar {
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.24);
+        position: relative;
+        cursor: pointer;
+      }
+
+      .project-progress-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0%;
+        background: #f4f2eb;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+      }
+
+      .journal-section {
+        position: relative;
+        min-height: 100vh;
+        padding: 0;
+        overflow: hidden;
+        background: #020202;
+      }
+
+      .journal-layout {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 44% 56%;
+      }
+
+      .journal-left {
+        padding: 3rem clamp(1.2rem, 4vw, 3rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .journal-quote {
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: clamp(1rem, 1.4vw, 1.35rem);
+        max-width: 24ch;
+      }
+
+      .journal-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 0.7rem;
+      }
+
+      .journal-collage {
+        position: relative;
+        min-height: 100vh;
+      }
+
+      .journal-tile {
+        position: absolute;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        background: #0d0d0d;
+        transition:
+          transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+          width 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 1.1s ease;
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 0.95;
+        will-change: transform, width, opacity;
+      }
+
+      .journal-tile video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .journal-section.swallowed .journal-tile {
+        transform: translateY(140px) scale(0.09);
+        width: 6% !important;
+        opacity: 0;
+      }
+
+      .journal-dare {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.7);
+        margin: 0;
+        font-size: clamp(2rem, 8vw, 7rem);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 8;
+      }
+
+      .journal-section.dare-burst .journal-dare {
+        animation: dare-pump 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes dare-pump {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.55);
+        }
+        35% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.17);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      @keyframes domino-rise {
+        from {
+          opacity: 0;
+          transform: translateY(90px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .about-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .about-image {
+          min-height: 44vh;
+        }
+
+        .about-copy {
+          min-height: 56vh;
+          justify-content: start;
+          padding-top: 2rem;
+        }
+
+        .about-block {
+          text-align: left;
+        }
+
+        .services-layout {
+          min-height: auto;
+        }
+
+        .service-band,
+        .service-band:hover {
+          flex: none;
+          min-height: 33.33vh;
+          padding-top: 2rem;
+          padding-bottom: 2rem;
+        }
+
+        .service-title {
+          font-size: clamp(1.05rem, 5vw, 1.65rem);
+        }
+
+        .service-extra {
+          opacity: 1;
+          max-height: 9rem;
+          transform: none;
+        }
+
+        .project-card {
+          flex: 0 0 100vw;
+          width: 100vw;
+          min-width: 100vw;
+        }
+
+        .project-center-text {
+          margin-right: clamp(0.5rem, 4vw, 1.5rem);
+          font-size: clamp(1.5rem, 10vw, 2.8rem);
+        }
+
+        .journal-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .journal-left {
+          min-height: 35vh;
+        }
+
+        .journal-collage {
+          min-height: 65vh;
+        }
+
+        .projects-detail-view {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto minmax(0, 1fr);
+        }
+
+        .project-detail-copy {
+          gap: 1.2rem;
+          padding-top: 3rem;
+          padding-bottom: 1.5rem;
+        }
+
+        .project-detail-media {
+          margin-left: 0;
+          width: 100%;
+        }
+
+        .project-detail-text {
+          max-width: none;
+        }
+
+        .project-detail-timeline {
+          width: min(92vw, 92vw);
+          bottom: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="hero-top">
+        <div class="logo">The ! To All Your ?</div>
+        <div class="center-tagline">[ WHOEVER DARES JOINS ]</div>
+        <div class="clock">[09:34:56]</div>
+      </div>
+    </header>
+    <main>
+      <section class="hero" id="home">
+        <video id="bg-video" autoplay loop playsinline muted>
+          <source src="assets/web/homepage/optimized/homepage-video-web.mp4" type="video/mp4" />
+        </video>
+
+        <div class="hero-content">
+          <nav class="main-nav" aria-label="Main">
+            <a href="#about">About</a>
+            <a href="#services">Services</a>
+            <a href="#projects">Projects</a>
+            <a href="#journal">Journal</a>
+            <a href="#standards">Standards</a>
+            <a href="#contact">Contact Us</a>
+          </nav>
+
+          <div class="hero-bottom">
+            <h1 class="wordmark-logo">
+              <img src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png" alt="Not So Civilized" />
+            </h1>
+            <p class="tagline">Dare.</p>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="section about-section" id="about">
+        <div class="about-layout">
+          <div class="about-image" aria-hidden="true"></div>
+          <div class="about-logo">
+            <img src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png" alt="Not So Civilized" />
+          </div>
+          <div class="about-copy">
+            <p class="about-block">
+              Not So Civilised<br />
+              Is A Creative Studio Specialized In<br />
+              Concept Creation And Execution.
+            </p>
+            <p class="about-block">
+              We Believe That There Is No Brand<br />
+              Without A Story No Case Without A<br />
+              Reason And No Product Without<br />
+              Character.
+            </p>
+            <p class="about-block">
+              We Work Closely With Brands As A<br />
+              Thinking Partner Helping Define<br />
+              Direction Build Campaigns And Bring<br />
+              Them To Life With Clarity And Purpose.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section services-section" id="services">
+        <div class="services-layout">
+          <article class="service-band consultancy">
+            <div class="service-left">
+              <h2 class="service-title">Creative<br />Consultancy</h2>
+              <p class="service-extra">
+                Brand positioning, communication audits, and strategic frameworks to define how your
+                concept should move with precision.
+              </p>
+            </div>
+            <div class="service-right">
+              <div class="clock service-time">[ 09:34:56 ]</div>
+            </div>
+          </article>
+
+          <article class="service-band creation">
+            <div class="service-left">
+              <h2 class="service-title">Concept Creation<br />&amp; Development</h2>
+              <p class="service-extra">
+                We translate ideas into visual systems, campaign structures, and story direction ready
+                for rollout across digital and physical channels.
+              </p>
+            </div>
+            <div class="service-right">
+              <div class="clock service-time">[ 09:34:56 ]</div>
+            </div>
+          </article>
+
+          <article class="service-band execution">
+            <div class="service-left">
+              <h2 class="service-title">Creative<br />Execution</h2>
+              <p class="service-extra">
+                End-to-end production and launch support, built to carry the original idea into real
+                deliverables with consistency and impact.
+              </p>
+            </div>
+            <div class="service-right">
+              <div class="clock service-time">[ 09:34:56 ]</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section projects-section" id="projects">
+        <div class="projects-carousel-view">
+          <div class="projects-track" id="projects-track">
+            <article class="project-card" data-project-index="0">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/aki-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="1">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/oil-gaz-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="2">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/naggiar-film-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="3">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/elissar-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="4">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/naggiar-artist-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="5">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/sami-web-lite.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="6">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/mj-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="7">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/irrelevant-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="8">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/orient-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="9">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/pop-up-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="10">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/soar-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+            <article class="project-card" data-project-index="11">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/bokja-web.mp4" type="video/mp4" />
+              </video>
+            </article>
+          </div>
+
+          <div class="project-overlay">
+            <div class="project-center-text">- SOME -&#10;OF&#10;(THEM)</div>
+
+            <div class="project-static-footer">
+              <h2 class="wordmark">Not So Civilized</h2>
+              <p class="tagline">Dare.</p>
+            </div>
+          </div>
+
+          <div class="project-nav">
+            <button class="project-arrow" id="projects-prev" aria-label="Previous project">&larr;</button>
+            <button class="project-arrow" id="projects-next" aria-label="Next project">&rarr;</button>
+          </div>
+        </div>
+
+        <div class="projects-detail-view" id="projects-detail">
+          <div class="project-detail-copy">
+            <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
+            <p class="project-detail-text" id="project-detail-text">
+              A CALL TO REORIENT. ORIENT CAN MEAN SEVERAL DIFFERENT THINGS. AS A VERB "TO ORIENT" IS TO
+              POSITION OR ALIGN SOMETHING IN A PARTICULAR DIRECTION.
+            </p>
+            <button class="project-detail-close" id="project-detail-close">Back To Projects</button>
+          </div>
+          <div class="project-detail-media">
+            <div class="project-detail-video-wrap">
+              <video
+                id="project-detail-video"
+                class="project-detail-video"
+                autoplay
+                playsinline
+                preload="auto"
+              >
+                <source src="assets/web/PROJECT/optimized/aki-web.mp4" type="video/mp4" />
+              </video>
+              <button id="project-detail-mute" class="project-detail-mute" type="button" aria-label="Mute">
+                <svg id="mute-icon-on" class="control-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 10v4h4l5 4V6l-5 4H3z"></path>
+                  <path d="M16 9c1.2 1.2 1.2 4.8 0 6"></path>
+                  <path d="M18.8 6.7c2.7 2.7 2.7 8 0 10.7"></path>
+                </svg>
+                <svg id="mute-icon-off" class="control-icon" viewBox="0 0 24 24" aria-hidden="true" style="display: none">
+                  <path d="M3 10v4h4l5 4V6l-5 4H3z"></path>
+                  <line x1="16" y1="8" x2="21" y2="13"></line>
+                  <line x1="21" y1="8" x2="16" y2="13"></line>
+                </svg>
+              </button>
+              <button id="project-detail-play-toggle" class="project-detail-play-toggle" type="button" aria-label="Pause">
+                <svg id="play-toggle-pause" class="control-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <line x1="8.5" y1="6" x2="8.5" y2="18"></line>
+                  <line x1="15.5" y1="6" x2="15.5" y2="18"></line>
+                </svg>
+                <svg id="play-toggle-play" class="control-icon" viewBox="0 0 24 24" aria-hidden="true" style="display: none">
+                  <polygon points="8,6 18,12 8,18 8,6"></polygon>
+                </svg>
+              </button>
+              <button id="project-detail-replay" class="project-detail-replay" type="button" aria-label="Replay">
+                <svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <polyline points="8 7 4 7 4 11"></polyline>
+                  <path d="M5.5 7.2A8 8 0 1 1 4 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="project-detail-timeline">
+            <div class="project-progress-bar" id="project-progress-bar" role="slider" aria-label="Video progress">
+              <div class="project-progress-fill" id="project-progress-fill"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section journal-section" id="journal">
+        <div class="journal-layout">
+          <div class="journal-left">
+            <p class="journal-quote">" Get Lost In Our Journal "</p>
+
+            <div class="journal-bottom">
+              <h2 class="wordmark">Not So Civilized</h2>
+              <div class="center-tagline">[ Whoever Dares Joins ]</div>
+            </div>
+          </div>
+
+          <div class="journal-collage" id="journal-collage">
+            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/p1-web.mp4" type="video/mp4" /></video></article>
+            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/p2-web.mp4" type="video/mp4" /></video></article>
+            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/p3-web.mp4" type="video/mp4" /></video></article>
+            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/homepage-video-web.mp4" type="video/mp4" /></video></article>
+            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/p2-web.mp4" type="video/mp4" /></video></article>
+          </div>
+          <h3 class="journal-dare">DARE</h3>
+        </div>
+      </section>
+
+      <section class="section" id="standards">
+        <h2>Standards</h2>
+        <p>
+          Define your values and workflow principles. This makes expectations clear for collaborators and
+          clients.
+        </p>
+      </section>
+
+      <section class="section" id="contact">
+        <h2>Contact Us</h2>
+        <p>
+          Add your preferred contact details and response window. Keep this section straightforward and
+          easy to act on.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const clockElements = document.querySelectorAll(".clock");
+
+      let clockTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const timeFormatter = () =>
+        new Intl.DateTimeFormat("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+          timeZone: clockTimeZone,
+        });
+
+      const updateClock = () => {
+        const time = timeFormatter().format(new Date());
+        clockElements.forEach((clockElement) => {
+          clockElement.textContent = `[ ${time} ]`;
+        });
+      };
+
+      const initClockLocation = async () => {
+        try {
+          const response = await fetch("https://ipapi.co/json/");
+          if (!response.ok) throw new Error("Location lookup failed");
+          const data = await response.json();
+          if (data?.timezone) clockTimeZone = data.timezone;
+        } catch (error) {
+          clockTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        } finally {
+          updateClock();
+          setInterval(updateClock, 1000);
+        }
+      };
+
+      initClockLocation();
+
+      const projectData = [
+        {
+          title: "AKI",
+          text: "PROJECT AKI.",
+          video: "assets/web/PROJECT/optimized/aki-web.mp4",
+        },
+        {
+          title: "OIL & GAZ",
+          text: "PROJECT OIL & GAZ.",
+          video: "assets/web/PROJECT/optimized/oil-gaz-web.mp4",
+        },
+        {
+          title: "NAGGIAR FILM",
+          text: "PROJECT NAGGIAR FILM.",
+          video: "assets/web/PROJECT/optimized/naggiar-film-web.mp4",
+        },
+        {
+          title: "ELISSAR",
+          text: "PROJECT ELISSAR.",
+          video: "assets/web/PROJECT/optimized/elissar-web.mp4",
+        },
+        {
+          title: "NAGGIAR ARTIST",
+          text: "PROJECT NAGGIAR ARTIST.",
+          video: "assets/web/PROJECT/optimized/naggiar-artist-web.mp4",
+        },
+        {
+          title: "SAMI",
+          text: "PROJECT SAMI.",
+          video: "assets/web/PROJECT/optimized/sami-web-lite.mp4",
+        },
+        {
+          title: "MJ",
+          text: "PROJECT MJ.",
+          video: "assets/web/PROJECT/optimized/mj-web.mp4",
+        },
+        {
+          title: "IRRELEVANT",
+          text: "PROJECT IRRELEVANT.",
+          video: "assets/web/PROJECT/optimized/irrelevant-web.mp4",
+        },
+        {
+          title: "ORIENT",
+          text: "PROJECT ORIENT.",
+          video: "assets/web/PROJECT/optimized/orient-web.mp4",
+        },
+        {
+          title: "POP UP",
+          text: "PROJECT POP UP.",
+          video: "assets/web/PROJECT/optimized/pop-up-web.mp4",
+        },
+        {
+          title: "SOAR",
+          text: "PROJECT SOAR.",
+          video: "assets/web/PROJECT/optimized/soar-web.mp4",
+        },
+        {
+          title: "BOKJA",
+          text: "PROJECT BOKJA.",
+          video: "assets/web/PROJECT/optimized/bokja-web.mp4",
+        },
+      ];
+
+      const projectsSection = document.querySelector(".projects-section");
+      const projectsTrack = document.getElementById("projects-track");
+      const nextButton = document.getElementById("projects-next");
+      const prevButton = document.getElementById("projects-prev");
+      const detailTitle = document.getElementById("project-detail-title");
+      const detailText = document.getElementById("project-detail-text");
+      const detailVideo = document.getElementById("project-detail-video");
+      const detailClose = document.getElementById("project-detail-close");
+      const progressBar = document.getElementById("project-progress-bar");
+      const progressFill = document.getElementById("project-progress-fill");
+      const detailMuteButton = document.getElementById("project-detail-mute");
+      const detailPlayToggleButton = document.getElementById("project-detail-play-toggle");
+      const detailReplayButton = document.getElementById("project-detail-replay");
+      const muteIconOn = document.getElementById("mute-icon-on");
+      const muteIconOff = document.getElementById("mute-icon-off");
+      const playTogglePauseIcon = document.getElementById("play-toggle-pause");
+      const playTogglePlayIcon = document.getElementById("play-toggle-play");
+      const detailVideoWrap = document.querySelector(".project-detail-video-wrap");
+      const projectsCarouselView = document.querySelector(".projects-carousel-view");
+      const journalSection = document.querySelector(".journal-section");
+      const journalTiles = Array.from(document.querySelectorAll(".journal-tile"));
+
+      let carouselOffset = 0;
+      let lastFrameTime = 0;
+      let lastVideoSyncTime = 0;
+      let isProjectsInView = false;
+      let detailProgressFrameId = null;
+      let journalInView = false;
+      let journalCycleInterval = null;
+      let journalCollapseTimeout = null;
+      let journalBurstTimeout = null;
+      const baseCarouselSpeed = 24; // px per second
+
+      const getCarouselLoopWidth = () => projectsTrack.scrollWidth / 2;
+
+      const normalizeCarouselOffset = () => {
+        const loopWidth = getCarouselLoopWidth();
+        if (!loopWidth) return;
+        carouselOffset = ((carouselOffset % loopWidth) + loopWidth) % loopWidth;
+      };
+
+      const renderProjectPosition = () => {
+        projectsTrack.style.transform = `translateX(-${carouselOffset}px)`;
+      };
+
+      const nudgeCarousel = (direction = 1) => {
+        const panelWidth = window.innerWidth > 900 ? window.innerWidth / 4 : window.innerWidth;
+        carouselOffset += direction * panelWidth;
+        normalizeCarouselOffset();
+        renderProjectPosition();
+      };
+
+      const runCarouselFrame = (timestamp) => {
+        if (!lastFrameTime) lastFrameTime = timestamp;
+        const deltaMs = timestamp - lastFrameTime;
+        lastFrameTime = timestamp;
+
+        if (isProjectsInView && !projectsSection.classList.contains("detail-open")) {
+          carouselOffset += (baseCarouselSpeed * deltaMs) / 1000;
+          normalizeCarouselOffset();
+          renderProjectPosition();
+        }
+
+        if (timestamp - lastVideoSyncTime > 250) {
+          lastVideoSyncTime = timestamp;
+          syncCarouselVideoPlayback();
+        }
+
+        window.requestAnimationFrame(runCarouselFrame);
+      };
+
+      const startContinuousCarousel = () => {
+        const originalCards = Array.from(projectsTrack.children);
+        originalCards.forEach((card) => {
+          const clone = card.cloneNode(true);
+          projectsTrack.appendChild(clone);
+        });
+        renderProjectPosition();
+        window.requestAnimationFrame(runCarouselFrame);
+      };
+
+      const openProjectDetail = (index) => {
+        const project = projectData[index];
+        if (!project) return;
+
+        detailTitle.textContent = project.title;
+        detailText.textContent = project.text;
+        detailVideo.src = project.video;
+        detailVideo.load();
+        projectsSection.classList.add("detail-open");
+        detailVideo.currentTime = 0;
+        detailVideo.muted = false;
+        muteIconOn.style.display = "block";
+        muteIconOff.style.display = "none";
+        detailMuteButton.setAttribute("aria-label", "Mute");
+        playTogglePauseIcon.style.display = "block";
+        playTogglePlayIcon.style.display = "none";
+        detailPlayToggleButton.setAttribute("aria-label", "Pause");
+        detailPlayToggleButton.classList.remove("show");
+        detailReplayButton.classList.remove("show");
+        progressFill.style.width = "0%";
+        const autoPlayAttempt = detailVideo.play();
+        if (autoPlayAttempt && typeof autoPlayAttempt.catch === "function") {
+          autoPlayAttempt.catch(() => {});
+        }
+        syncCarouselVideoPlayback();
+      };
+
+      const closeProjectDetail = () => {
+        projectsSection.classList.remove("detail-open");
+        detailVideo.pause();
+        detailVideo.currentTime = 0;
+        detailReplayButton.classList.remove("show");
+        progressFill.style.width = "0%";
+        if (detailProgressFrameId) {
+          cancelAnimationFrame(detailProgressFrameId);
+          detailProgressFrameId = null;
+        }
+        syncCarouselVideoPlayback();
+      };
+
+      const updateDetailProgressSmooth = () => {
+        if (!projectsSection.classList.contains("detail-open") || detailVideo.paused || detailVideo.ended) {
+          detailProgressFrameId = null;
+          return;
+        }
+
+        const progress = detailVideo.duration ? (detailVideo.currentTime / detailVideo.duration) * 100 : 0;
+        progressFill.style.width = `${progress}%`;
+        detailProgressFrameId = requestAnimationFrame(updateDetailProgressSmooth);
+      };
+
+      const startDetailProgressLoop = () => {
+        if (detailProgressFrameId) return;
+        detailProgressFrameId = requestAnimationFrame(updateDetailProgressSmooth);
+      };
+
+      const syncCarouselVideoPlayback = () => {
+        const cards = Array.from(projectsTrack.querySelectorAll(".project-card"));
+        const detailOpen = projectsSection.classList.contains("detail-open");
+        const viewRect = projectsCarouselView.getBoundingClientRect();
+
+        cards.forEach((card) => {
+          const video = card.querySelector("video");
+          if (!video) return;
+
+          if (!isProjectsInView || detailOpen) {
+            video.pause();
+            return;
+          }
+
+          const rect = card.getBoundingClientRect();
+          const visibleWidth = Math.max(0, Math.min(rect.right, viewRect.right) - Math.max(rect.left, viewRect.left));
+          const visibilityRatio = visibleWidth / Math.max(rect.width, 1);
+
+          if (visibilityRatio > 0.25) {
+            const playAttempt = video.play();
+            if (playAttempt && typeof playAttempt.catch === "function") {
+              playAttempt.catch(() => {});
+            }
+          } else {
+            video.pause();
+          }
+        });
+      };
+
+      const randomizeJournalTiles = () => {
+        const presets = [
+          { left: 6, top: 5, width: 30, ratio: 1.15, rot: -1.2 },
+          { left: 36, top: 18, width: 34, ratio: 1.04, rot: 1.3 },
+          { left: 58, top: 7, width: 28, ratio: 0.74, rot: -0.6 },
+          { left: 44, top: 49, width: 30, ratio: 0.98, rot: 0.9 },
+          { left: 72, top: 41, width: 26, ratio: 1.35, rot: -1.1 },
+        ];
+
+        journalTiles.forEach((tile, index) => {
+          const preset = presets[index % presets.length];
+          const jitterX = (Math.random() - 0.5) * 6;
+          const jitterY = (Math.random() - 0.5) * 8;
+          const jitterW = (Math.random() - 0.5) * 4;
+          const jitterRot = (Math.random() - 0.5) * 3;
+
+          const width = Math.max(20, Math.min(38, preset.width + jitterW));
+          const left = Math.max(2, Math.min(78, preset.left + jitterX));
+          const top = Math.max(2, Math.min(75, preset.top + jitterY));
+          const height = width * preset.ratio;
+
+          tile.style.left = `${left}%`;
+          tile.style.top = `${top}%`;
+          tile.style.width = `${width}%`;
+          tile.style.height = `${height}%`;
+          tile.style.transform = `rotate(${preset.rot + jitterRot}deg)`;
+          tile.style.opacity = "0.95";
+        });
+      };
+
+      const syncJournalVideoPlayback = () => {
+        journalTiles.forEach((tile) => {
+          const video = tile.querySelector("video");
+          if (!video) return;
+          if (!journalInView || journalSection.classList.contains("swallowed")) {
+            video.pause();
+            return;
+          }
+          const playAttempt = video.play();
+          if (playAttempt && typeof playAttempt.catch === "function") {
+            playAttempt.catch(() => {});
+          }
+        });
+      };
+
+      const runJournalCycle = () => {
+        journalSection.classList.remove("dare-burst");
+        journalSection.classList.add("swallowed");
+        syncJournalVideoPlayback();
+
+        clearTimeout(journalBurstTimeout);
+        journalBurstTimeout = setTimeout(() => {
+          journalSection.classList.remove("swallowed");
+          randomizeJournalTiles();
+          journalSection.classList.add("dare-burst");
+          syncJournalVideoPlayback();
+        }, 1000);
+      };
+
+      const startJournalAnimationLoop = () => {
+        if (journalCycleInterval) return;
+        randomizeJournalTiles();
+        syncJournalVideoPlayback();
+
+        clearTimeout(journalCollapseTimeout);
+        journalCollapseTimeout = setTimeout(() => {
+          runJournalCycle();
+        }, 10000);
+
+        journalCycleInterval = setInterval(() => {
+          runJournalCycle();
+        }, 11000);
+      };
+
+      const stopJournalAnimationLoop = () => {
+        clearTimeout(journalCollapseTimeout);
+        clearTimeout(journalBurstTimeout);
+        clearInterval(journalCycleInterval);
+        journalCollapseTimeout = null;
+        journalBurstTimeout = null;
+        journalCycleInterval = null;
+        journalSection.classList.remove("swallowed", "dare-burst");
+        syncJournalVideoPlayback();
+      };
+
+      nextButton.addEventListener("click", () => nudgeCarousel(1));
+
+      prevButton.addEventListener("click", () => nudgeCarousel(-1));
+
+      projectsTrack.addEventListener("click", (event) => {
+        const projectCard = event.target.closest(".project-card");
+        if (!projectCard) return;
+        const index = Number(projectCard.dataset.projectIndex || 0);
+        openProjectDetail(index);
+      });
+
+      detailClose.addEventListener("click", closeProjectDetail);
+
+      detailVideo.addEventListener("play", startDetailProgressLoop);
+      detailVideo.addEventListener("play", () => {
+        playTogglePauseIcon.style.display = "block";
+        playTogglePlayIcon.style.display = "none";
+        detailPlayToggleButton.setAttribute("aria-label", "Pause");
+        detailPlayToggleButton.classList.remove("show");
+      });
+
+      detailVideo.addEventListener("pause", () => {
+        if (detailProgressFrameId) {
+          cancelAnimationFrame(detailProgressFrameId);
+          detailProgressFrameId = null;
+        }
+        if (!detailVideo.ended && projectsSection.classList.contains("detail-open")) {
+          playTogglePauseIcon.style.display = "none";
+          playTogglePlayIcon.style.display = "block";
+          detailPlayToggleButton.setAttribute("aria-label", "Play");
+          detailPlayToggleButton.classList.add("show");
+        }
+      });
+
+      detailVideo.addEventListener("ended", () => {
+        if (detailProgressFrameId) {
+          cancelAnimationFrame(detailProgressFrameId);
+          detailProgressFrameId = null;
+        }
+        progressFill.style.width = "100%";
+        detailReplayButton.classList.add("show");
+        detailPlayToggleButton.classList.remove("show");
+      });
+
+      detailMuteButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        detailVideo.muted = !detailVideo.muted;
+        muteIconOn.style.display = detailVideo.muted ? "none" : "block";
+        muteIconOff.style.display = detailVideo.muted ? "block" : "none";
+        detailMuteButton.setAttribute("aria-label", detailVideo.muted ? "Unmute" : "Mute");
+      });
+
+      detailVideoWrap.addEventListener("click", () => {
+        if (detailVideo.paused || detailVideo.ended) {
+          detailReplayButton.classList.remove("show");
+          const playAttempt = detailVideo.play();
+          if (playAttempt && typeof playAttempt.catch === "function") {
+            playAttempt.catch(() => {});
+          }
+          return;
+        }
+
+        detailVideo.pause();
+      });
+
+      detailPlayToggleButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (detailVideo.paused || detailVideo.ended) {
+          detailReplayButton.classList.remove("show");
+          const playAttempt = detailVideo.play();
+          if (playAttempt && typeof playAttempt.catch === "function") {
+            playAttempt.catch(() => {});
+          }
+          return;
+        }
+        detailVideo.pause();
+      });
+
+      detailReplayButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        detailVideo.currentTime = 0;
+        detailReplayButton.classList.remove("show");
+        const replayAttempt = detailVideo.play();
+        if (replayAttempt && typeof replayAttempt.catch === "function") {
+          replayAttempt.catch(() => {});
+        }
+      });
+
+      progressBar.addEventListener("click", (event) => {
+        if (!detailVideo.duration) return;
+        const barRect = progressBar.getBoundingClientRect();
+        const clickRatio = (event.clientX - barRect.left) / barRect.width;
+        const boundedRatio = Math.max(0, Math.min(1, clickRatio));
+        detailVideo.currentTime = boundedRatio * detailVideo.duration;
+        const progress = detailVideo.duration ? (detailVideo.currentTime / detailVideo.duration) * 100 : 0;
+        progressFill.style.width = `${progress}%`;
+      });
+
+      window.addEventListener("resize", () => {
+        normalizeCarouselOffset();
+        renderProjectPosition();
+      });
+
+      const projectsObserver = new IntersectionObserver(
+        (entries) => {
+          const [entry] = entries;
+          isProjectsInView = entry.isIntersecting && entry.intersectionRatio > 0.35;
+          syncCarouselVideoPlayback();
+        },
+        { threshold: [0, 0.35, 0.65, 1] }
+      );
+      projectsObserver.observe(projectsSection);
+
+      const journalObserver = new IntersectionObserver(
+        (entries) => {
+          const [entry] = entries;
+          journalInView = entry.isIntersecting && entry.intersectionRatio > 0.3;
+          if (journalInView) {
+            startJournalAnimationLoop();
+          } else {
+            stopJournalAnimationLoop();
+          }
+        },
+        { threshold: [0, 0.3, 0.6, 1] }
+      );
+      journalObserver.observe(journalSection);
+
+      startContinuousCarousel();
+    </script>
+  </body>
+</html>

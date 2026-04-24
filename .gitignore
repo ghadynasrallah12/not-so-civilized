@@ -1,0 +1,12 @@
+node_modules
+.vercel
+.DS_Store
+
+# Source masters (huge); site uses optimized/ only
+assets/web/PROJECT/*
+!assets/web/PROJECT/optimized/
+assets/web/homepage/*
+!assets/web/homepage/optimized/
+
+# Local high-bitrate backups kept next to optimized exports
+**/*-original-backup*.mp4
