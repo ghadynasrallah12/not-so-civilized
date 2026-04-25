@@ -4,13 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Not So Civilized</title>
+    <link href="https://fonts.cdnfonts.com/css/dan-hand" rel="stylesheet" />
+    <link href="https://fonts.cdnfonts.com/css/aku-kamu" rel="stylesheet" />
     <style>
       :root {
         --bg: #f2eee1;
         --text-dark: #171717;
-        --text-light: #f4f2eb;
+        --text-light: #ffffff;
         --accent: #d7c39a;
         --section-bg: #0f0f12;
+        --contact-surface: #f5f2eb;
+      }
+
+      @font-face {
+        font-family: "Nokia Expanded";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src:
+          url("assets/fonts/nokia-expanded.woff2") format("woff2"),
+          url("assets/fonts/nokia-expanded.woff") format("woff"),
+          local("Nokia Expanded"),
+          local("Nokia Expanded Regular"),
+          local("NokiaExpanded");
       }
 
       * {
@@ -26,6 +42,21 @@
         font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
         background: var(--section-bg);
         color: var(--text-light);
+      }
+
+      html.projects-detail-open,
+      body.projects-detail-open {
+        overflow: hidden;
+        overscroll-behavior: none;
+        height: 100%;
+      }
+
+      body.projects-detail-open {
+        position: fixed;
+        left: 0;
+        right: 0;
+        width: 100%;
+        touch-action: none;
       }
 
       .hero {
@@ -84,6 +115,17 @@
 
       .site-header .hero-top {
         pointer-events: none;
+      }
+
+      .site-header .hero-top a {
+        pointer-events: auto;
+        cursor: pointer;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .site-header .hero-top a:hover {
+        opacity: 1;
       }
 
       .logo {
@@ -149,10 +191,19 @@
         line-height: 0;
       }
 
+      .wordmark-logo a {
+        display: block;
+        line-height: 0;
+      }
+
       .wordmark-logo img {
         width: clamp(105px, 12vw, 180px);
         height: auto;
         display: block;
+      }
+
+      .wordmark-logo a:hover img {
+        opacity: 0.92;
       }
 
       .tagline {
@@ -160,7 +211,17 @@
         font-size: clamp(1rem, 2.2vw, 1.6rem);
         font-weight: 700;
         text-transform: uppercase;
-        font-family: "Aka and Kamu", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family: "Aku & Kamu" !important;
+      }
+
+      a.tagline {
+        color: inherit;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      a.tagline:hover {
+        opacity: 0.88;
       }
 
       .section {
@@ -189,7 +250,148 @@
         margin: 0;
         max-width: 70ch;
         line-height: 1.7;
-        color: rgba(244, 242, 235, 0.85);
+        color: #ffffff;
+      }
+
+      .contact-section.section,
+      section.contact-section {
+        position: relative;
+        z-index: 2;
+        margin: -14px 0 0;
+        padding: 14px 0 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100%;
+        background: var(--contact-surface) !important;
+        color: #0a0a0a;
+        border-top: none;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        isolation: isolate;
+        box-sizing: border-box;
+      }
+
+      section#standards.section {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .contact-bar {
+        position: relative;
+        z-index: 6;
+        flex: 0 0 auto;
+        height: 4px;
+        width: 100%;
+        background: #0a0a0a;
+      }
+
+      .contact-main {
+        position: relative;
+        z-index: 5;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: clamp(5rem, 14vw, 7rem) clamp(1.25rem, 5vw, 2.5rem) clamp(2rem, 6vw, 3rem);
+        gap: clamp(1.25rem, 3vw, 2rem);
+        overflow-x: hidden;
+      }
+
+      .contact-section .contact-title {
+        margin: 0;
+        max-width: none;
+        width: 100%;
+        text-align: center;
+        white-space: nowrap;
+        font-size: clamp(0.72rem, 3.15vw, 2.55rem);
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        font-family: "Aku & Kamu" !important;
+        color: #0a0a0a;
+      }
+
+      .contact-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.55rem;
+        font-family: "Dan Hand", "Dan's Hand", "Segoe Print", "Bradley Hand ITC", cursive;
+        font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+        line-height: 1.45;
+        color: #0a0a0a;
+      }
+
+      .contact-details .contact-line {
+        display: block;
+        transform-origin: center;
+      }
+
+      .contact-details .contact-line--email {
+        transform: translateX(-1.1rem) rotate(-2.2deg);
+      }
+
+      .contact-details .contact-line--phone {
+        transform: translateX(0.85rem) rotate(1.4deg);
+      }
+
+      .contact-details .contact-line--social {
+        transform: translateX(-0.35rem) rotate(-1.6deg);
+      }
+
+      .contact-details a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .contact-details a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .contact-footer-logo {
+        position: relative;
+        z-index: 5;
+        flex: 0 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 4vw, 2rem) clamp(2rem, 5vw, 3.5rem);
+      }
+
+      .contact-footer-logo a {
+        display: block;
+        line-height: 0;
+      }
+
+      .contact-footer-logo img {
+        width: clamp(140px, 22vw, 220px);
+        height: auto;
+        display: block;
+      }
+
+      .contact-footer-logo a:hover img {
+        opacity: 0.88;
+      }
+
+      body.contact-in-view .site-header {
+        color: #0a0a0a;
+      }
+
+      body.contact-in-view .site-header .hero-top a,
+      body.contact-in-view .site-header .hero-top a.logo,
+      body.contact-in-view .site-header .hero-top a.center-tagline {
+        color: #0a0a0a;
+        opacity: 1;
+      }
+
+      body.contact-in-view .site-header .clock {
+        color: #0a0a0a;
+        opacity: 1;
       }
 
       .about-section {
@@ -216,23 +418,35 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18));
+        z-index: 1;
+        pointer-events: none;
+        background: linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0) 32%,
+          rgba(5, 5, 5, 0.12) 52%,
+          rgba(5, 5, 5, 0.45) 72%,
+          rgba(5, 5, 5, 0.82) 90%,
+          #050505 100%
+        );
       }
 
       .about-copy {
         display: flex;
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-end;
         justify-content: center;
         gap: clamp(3rem, 8vw, 8.5rem);
-        padding: 3rem 0 3rem clamp(1.2rem, 6vw, 4rem);
+        padding: calc(3rem + 20px) 140px 3rem clamp(1.2rem, 6vw, 4rem);
         background: #050505;
         position: relative;
+        z-index: 2;
+        box-shadow: -3.5rem 0 4.5rem 0 rgba(5, 5, 5, 0.5);
       }
 
       .about-block {
         margin: 0;
-        width: 100%;
+        width: min(100%, 46rem);
         box-sizing: border-box;
         padding-right: 0;
         text-align: right;
@@ -240,7 +454,7 @@
         letter-spacing: 0.08em;
         font-size: clamp(0.76rem, 0.98vw, 0.96rem);
         line-height: 1.14;
-        color: rgba(244, 242, 235, 0.95);
+        color: #ffffff;
         font-family: "Andale Mono", "AndaleMono", monospace;
       }
 
@@ -252,10 +466,19 @@
         z-index: 4;
       }
 
+      .about-logo a {
+        display: block;
+        line-height: 0;
+      }
+
       .about-logo img {
         width: clamp(105px, 12vw, 180px);
         height: auto;
         display: block;
+      }
+
+      .about-logo a:hover img {
+        opacity: 0.92;
       }
 
       .services-section {
@@ -276,7 +499,7 @@
         overflow: hidden;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
         gap: 1rem;
         padding: 2.8rem clamp(1.2rem, 4vw, 3rem);
         border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -315,41 +538,51 @@
       }
 
       .service-band.consultancy::before {
-        background-image: linear-gradient(140deg, #2a323b 0%, #1f252d 100%);
+        background-color: #1f2326;
+        background-image: none;
+      }
+
+      .service-band.consultancy::after {
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, transparent 52%, rgba(0, 0, 0, 0.14) 100%);
       }
 
       .service-band.creation::before {
-        background-image: url("assets/web/homepage/optimized/concept-creation-development-web.jpg");
+        background-color: #0c0c0e;
+        background-image: url("assets/web/homepage/optimized/creative-execution-web.jpg");
+        background-size: 100% auto;
+        background-position: center 10%;
+        background-repeat: no-repeat;
+        filter: brightness(1.22) contrast(1.16) saturate(1.12);
       }
 
       .service-band.execution::before {
-        background-image: url("assets/web/homepage/optimized/creative-execution-web.jpg");
+        background-color: #0c0c0e;
+        background-image: url("assets/web/homepage/optimized/concept-creation-development-web.jpg");
+        background-size: 100% auto;
+        background-position: center 25%;
+        background-repeat: no-repeat;
+        filter: brightness(1.18) contrast(1.14) saturate(1.12);
       }
 
-      .service-left,
-      .service-right {
-        position: relative;
-        z-index: 1;
+      .service-band.creation::after,
+      .service-band.execution::after {
+        background: linear-gradient(90deg, rgba(9, 9, 12, 0.52) 0%, rgba(8, 8, 10, 0.38) 45%, rgba(8, 8, 10, 0.5) 100%);
       }
 
       .service-left {
-        max-width: min(68ch, 78%);
+        position: relative;
+        z-index: 1;
+        max-width: min(72ch, 92%);
       }
 
-      .service-title {
+      .service-band h2.service-title {
         margin: 0;
+        font-weight: 400;
         text-transform: uppercase;
         letter-spacing: 0.04em;
         line-height: 0.95;
-        font-size: clamp(1.2rem, 3vw, 2.4rem);
-      }
-
-      .service-right {
-        flex-shrink: 0;
-      }
-
-      .service-time {
-        font-size: clamp(0.8rem, 1.1vw, 1rem);
+        font-size: min(calc(23pt * 0.65), max(calc(0.875rem * 0.65), calc(2vw * 0.65)));
+        font-family: "Nokia Expanded", "Arial Narrow", "Franklin Gothic Medium", sans-serif;
       }
 
       .service-extra {
@@ -363,7 +596,7 @@
           opacity 0.35s ease,
           transform 0.35s ease,
           max-height 0.45s ease;
-        color: rgba(244, 242, 235, 0.92);
+        color: #ffffff;
         text-transform: uppercase;
         letter-spacing: 0.07em;
         line-height: 1.28;
@@ -386,13 +619,16 @@
 
       .projects-carousel-view {
         position: relative;
+        height: 100vh;
         min-height: 100vh;
         overflow: hidden;
       }
 
       .projects-track {
         display: flex;
-        height: 100vh;
+        align-items: stretch;
+        height: 100%;
+        min-height: 100vh;
         width: max-content;
         will-change: transform;
       }
@@ -402,6 +638,9 @@
         flex: 0 0 25vw;
         width: 25vw;
         min-width: 25vw;
+        align-self: stretch;
+        min-height: 100%;
+        height: 100%;
         overflow: hidden;
         border-left: 1px solid rgba(0, 0, 0, 0.5);
         border-right: 1px solid rgba(0, 0, 0, 0.5);
@@ -409,6 +648,8 @@
       }
 
       .project-card video {
+        position: relative;
+        z-index: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -420,13 +661,131 @@
         transform: scale(1.06);
       }
 
+      .project-card-hover {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      .project-card-hover-bg {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        height: 30%;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.95) 0%,
+          rgba(255, 255, 255, 0.86) 58%,
+          rgba(255, 255, 255, 0.35) 100%
+        );
+        -webkit-backdrop-filter: blur(2.6px);
+        backdrop-filter: blur(2.6px);
+        transform: translateY(100%);
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .project-card-hover-bg::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.42s ease 0.1s;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.52) 0%,
+          rgba(0, 0, 0, 0.2) 36%,
+          rgba(0, 0, 0, 0) 100%
+        );
+      }
+
+      .project-card:hover .project-card-hover-bg {
+        transform: translateY(0);
+      }
+
+      .project-card:hover .project-card-hover-bg::after {
+        opacity: 1;
+      }
+
+      .project-card-hover-inner {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 30%;
+        z-index: 2;
+        box-sizing: border-box;
+        display: block;
+        padding: 0;
+        opacity: 0;
+        transition: opacity 0.35s ease 0.12s;
+      }
+
+      .project-card:hover .project-card-hover-inner {
+        opacity: 1;
+      }
+
+      .project-card-hover-title {
+        position: absolute;
+        top: clamp(0.5rem, 1.35vw, 0.9rem);
+        left: clamp(0.75rem, 2.2vw, 1.35rem);
+        right: clamp(5.75rem, 15vw, 10rem);
+        margin: 0;
+        color: #0e0e10;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: clamp(1.05rem, 2.2vw, 1.65rem);
+        font-weight: 700;
+        font-family: "Delirium NCV", "Delirium", "Andale Mono", "AndaleMono", monospace;
+        line-height: 1.1;
+        max-width: none;
+      }
+
+      .project-card-hover-logo {
+        position: absolute;
+        right: clamp(0.65rem, 1.8vw, 1.1rem);
+        bottom: clamp(0.55rem, 1.5vw, 0.95rem);
+        width: clamp(88px, 11vw, 150px);
+        height: auto;
+        display: block;
+        object-fit: contain;
+        filter: brightness(0) saturate(100%);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .project-card-hover-bg,
+        .project-card-hover-inner,
+        .project-card-hover-bg::after {
+          transition: none;
+        }
+
+        .project-card:hover .project-card-hover-bg {
+          transform: translateY(0);
+        }
+
+        .project-card:hover .project-card-hover-bg::after {
+          opacity: 1;
+        }
+
+        .project-card:hover .project-card-hover-inner {
+          opacity: 1;
+        }
+      }
+
       .project-overlay {
         position: absolute;
         inset: 0;
-        z-index: 2;
+        z-index: 1;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: center;
         padding: 2rem clamp(1rem, 4vw, 3rem);
         pointer-events: none;
       }
@@ -442,15 +801,17 @@
         font-weight: 700;
         text-align: right;
         white-space: pre-line;
+        color: #ffffff;
+        mix-blend-mode: difference;
       }
 
       .project-nav {
         position: absolute;
         inset: auto 0 7.2rem;
-        z-index: 3;
+        z-index: 4;
         display: flex;
         justify-content: space-between;
-        padding: 0 clamp(1rem, 6vw, 6rem);
+        padding: 0 clamp(1.25rem, 8vw, 7.5rem);
         pointer-events: none;
       }
 
@@ -458,8 +819,9 @@
         pointer-events: auto;
         border: 0;
         background: transparent;
-        color: #fff;
-        font-size: clamp(2.2rem, 5vw, 3.2rem);
+        color: #ffffff;
+        mix-blend-mode: difference;
+        font-size: clamp(3rem, 7.5vw, 4.6rem);
         line-height: 1;
         cursor: pointer;
         opacity: 0.85;
@@ -470,31 +832,32 @@
         opacity: 1;
       }
 
-      .project-static-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: end;
-        gap: 1rem;
-        pointer-events: none;
-      }
-
       .projects-detail-view {
-        position: absolute;
+        position: fixed;
         inset: 0;
-        z-index: 10;
+        z-index: 38;
         display: grid;
-        grid-template-columns: minmax(320px, 54%) 1fr;
-        transform: translateY(100%);
+        grid-template-columns: 50% 50%;
+        min-height: 0;
+        height: 100vh;
+        height: 100dvh;
+        width: 100%;
         opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
         transition:
-          transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 0.8s ease;
-        background: #040406;
+          opacity 0.55s ease,
+          visibility 0.55s step-end;
+        background: #000000;
       }
 
       .projects-section.detail-open .projects-detail-view {
-        transform: translateY(0);
         opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transition:
+          opacity 0.55s ease,
+          visibility 0s step-start;
       }
 
       .projects-section.detail-open .projects-carousel-view {
@@ -503,45 +866,61 @@
 
       .project-detail-copy {
         position: relative;
-        padding: 6.4rem clamp(1.6rem, 6vw, 3.8rem) 5.2rem;
-        background: linear-gradient(90deg, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 0.94) 68%, rgba(0, 0, 0, 0.35) 100%);
+        box-sizing: border-box;
+        min-height: 0;
+        height: 100%;
+        align-self: stretch;
+        padding: clamp(9rem, 18vh, 12.5rem) clamp(1.8rem, 6vw, 4.1rem) clamp(6.25rem, 14vh, 9rem);
+        background: linear-gradient(90deg, #000000 0%, #000000 52%, rgba(0, 0, 0, 0.92) 78%, rgba(0, 0, 0, 0.45) 100%);
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         gap: 1.4rem;
-        overflow: hidden;
-        z-index: 2;
+        overflow-x: hidden;
+        overflow-y: auto;
+        z-index: 5;
+        opacity: 0;
+        transform: translateX(-2rem);
+        transition:
+          opacity 0.5s ease 0.08s,
+          transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.06s;
+      }
+
+      .projects-section.detail-open .project-detail-copy {
+        opacity: 1;
+        transform: translateX(0);
       }
 
       .project-detail-copy::after {
         content: "";
         position: absolute;
         top: 0;
-        right: -11vw;
-        width: min(14vw, 220px);
+        right: -18vw;
+        width: min(22vw, 340px);
         height: 100%;
-        background: linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 100%);
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.28) 48%, rgba(0, 0, 0, 0) 100%);
         pointer-events: none;
+        z-index: 1;
       }
 
       .project-detail-title {
         margin: 0;
         text-transform: uppercase;
-        line-height: 0.88;
-        letter-spacing: 0.01em;
-        font-family: "Arial Narrow", "Helvetica Neue Condensed", Impact, sans-serif;
-        font-size: clamp(3.1rem, 5.8vw, 5.8rem);
+        line-height: 0.9;
+        letter-spacing: 0;
+        font-family: "Delirium NCV", "Delirium", "Arial Narrow", "Helvetica Neue Condensed", Impact, sans-serif;
+        font-size: clamp(3.45rem, 6.35vw, 6.65rem);
         font-weight: 700;
       }
 
       .project-detail-text {
-        margin: 0;
-        max-width: 45ch;
+        margin: 0.7rem 0 0;
+        max-width: 39ch;
         text-transform: uppercase;
-        letter-spacing: 0.11em;
-        font-size: clamp(0.86rem, 1.05vw, 1.05rem);
-        line-height: 1.07;
-        font-family: "Arial Narrow", "Helvetica Neue Condensed", Arial, sans-serif;
+        letter-spacing: 0.072em;
+        font-size: clamp(0.76rem, 0.88vw, 0.9rem);
+        line-height: 1.08;
+        font-family: "Andale Mono", "AndaleMono", monospace;
         transform: translateY(90px);
         opacity: 0;
       }
@@ -552,16 +931,18 @@
       }
 
       .project-detail-close {
-        margin-top: auto;
-        align-self: flex-start;
+        position: absolute;
+        left: clamp(1.8rem, 6vw, 4.1rem);
+        bottom: clamp(4rem, 8.5vh, 5.4rem);
         border: 1px solid rgba(255, 255, 255, 0.4);
         background: transparent;
-        color: #f4f2eb;
+        color: #ffffff;
         text-transform: uppercase;
         letter-spacing: 0.1em;
         padding: 0.55rem 0.9rem;
         font-size: 0.72rem;
         cursor: pointer;
+        z-index: 8;
         transition: background 0.2s ease, color 0.2s ease;
       }
 
@@ -574,26 +955,97 @@
         position: relative;
         display: flex;
         flex-direction: column;
+        box-sizing: border-box;
+        min-height: 0;
+        height: 100%;
+        align-self: stretch;
         background: #030303;
+        z-index: 1;
+        opacity: 0;
+        transform: scale(1.2) translateX(16vw);
+        transform-origin: 18% 50%;
+        transition:
+          opacity 0.55s ease 0.06s,
+          transform 1.2s cubic-bezier(0.25, 0.9, 0.32, 1) 0.04s;
+      }
+
+      .projects-section.detail-open .project-detail-media {
+        opacity: 1;
+        transform: scale(1) translateX(0);
+      }
+
+      .project-detail-media::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: clamp(5rem, 24vw, 15rem);
+        z-index: 6;
+        pointer-events: none;
+        background: linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.98) 0%,
+          rgba(0, 0, 0, 0.82) 28%,
+          rgba(0, 0, 0, 0.45) 58%,
+          rgba(0, 0, 0, 0) 100%
+        );
+      }
+
+      .project-detail-media::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: clamp(3.75rem, 18vw, 10.5rem);
+        z-index: 6;
+        pointer-events: none;
+        background: linear-gradient(270deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.48) 42%, rgba(0, 0, 0, 0) 100%);
       }
 
       .project-detail-video-wrap {
         flex: 1;
         min-height: 0;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .project-detail-video {
         width: 100%;
         height: 100%;
+        max-width: 100%;
+        max-height: 100%;
         object-fit: cover;
+        object-position: center;
+        transform: scale(1.08) translateX(3%);
+        transform-origin: 70% 50%;
+        transition: transform 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .projects-section.detail-open .project-detail-video {
+        transform: scale(1) translateX(0);
+      }
+
+      .project-detail-media-bottom {
+        position: fixed;
+        left: 50%;
+        bottom: clamp(2rem, 4.8vh, 3.25rem);
+        transform: translateX(-50%);
+        width: min(calc(100% - 4rem), 1240px);
+        z-index: 42;
+        padding: 0;
+        background: none;
+        pointer-events: none;
       }
 
       .project-detail-mute,
       .project-detail-replay,
       .project-detail-play-toggle {
         position: absolute;
-        z-index: 16;
+        z-index: 26;
         border: 0;
         background: transparent;
         color: #ffffff;
@@ -618,28 +1070,33 @@
       }
 
       .project-detail-mute {
-        top: 1rem;
-        right: 1rem;
-        width: 1.85rem;
-        height: 1.85rem;
-        padding: 0.1rem;
+        top: auto;
+        left: auto;
+        bottom: clamp(0.85rem, 2vh, 1.25rem);
+        right: clamp(0.75rem, 2vw, 1.15rem);
+        width: 2.15rem;
+        height: 2.15rem;
+        padding: 0.15rem;
+        z-index: 28;
       }
 
       .project-detail-replay {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 2.7rem;
-        height: 2.7rem;
-        padding: 0.2rem;
+        width: 2.85rem;
+        height: 2.85rem;
+        padding: 0.22rem;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.2s ease;
+        z-index: 28;
+        transition: opacity 0.25s ease, transform 0.25s ease;
       }
 
       .project-detail-replay.show {
         opacity: 1;
         pointer-events: auto;
+        transform: translate(-50%, -50%) scale(1.05);
       }
 
       .project-detail-play-toggle {
@@ -676,14 +1133,15 @@
       }
 
       .project-detail-timeline {
-        position: absolute;
-        left: 50%;
-        bottom: 2rem;
-        transform: translateX(-50%);
-        width: min(74vw, 1050px);
+        position: relative;
+        left: auto;
+        bottom: auto;
+        transform: none;
+        width: 100%;
+        max-width: 100%;
         display: flex;
         align-items: center;
-        z-index: 14;
+        z-index: 1;
         pointer-events: auto;
       }
 
@@ -693,6 +1151,7 @@
         background: rgba(255, 255, 255, 0.24);
         position: relative;
         cursor: pointer;
+        pointer-events: auto;
       }
 
       .project-progress-fill {
@@ -703,25 +1162,67 @@
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
       }
 
+      @media (prefers-reduced-motion: reduce) {
+        .projects-detail-view {
+          transition: opacity 0.22s ease, visibility 0.22s step-end;
+        }
+
+        .projects-section.detail-open .projects-detail-view {
+          transition: opacity 0.22s ease, visibility 0s step-start;
+        }
+
+        .project-detail-copy {
+          transform: none;
+          transition: opacity 0.22s ease;
+        }
+
+        .project-detail-media {
+          transform: none;
+          transform-origin: center center;
+          transition: opacity 0.22s ease;
+        }
+
+        .project-detail-video {
+          transform: none;
+        }
+      }
+
       .journal-section {
         position: relative;
         min-height: 100vh;
+        height: 100vh;
+        height: 100dvh;
         padding: 0;
+        border-top: none;
         overflow: hidden;
-        background: #020202;
+        background: #000000 !important;
       }
 
       .journal-layout {
+        position: relative;
         min-height: 100vh;
+        height: 100vh;
+        height: 100dvh;
         display: grid;
         grid-template-columns: 44% 56%;
+        overflow: hidden;
       }
 
       .journal-left {
-        padding: 3rem clamp(1.2rem, 4vw, 3rem);
+        box-sizing: border-box;
+        min-height: 0;
+        height: 100%;
+        padding: clamp(5rem, 11vh, 6.5rem) clamp(1.2rem, 4vw, 3rem) 3rem;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        overflow-y: auto;
+      }
+
+      .journal-quote-wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        min-height: 0;
       }
 
       .journal-quote {
@@ -730,76 +1231,234 @@
         letter-spacing: 0.08em;
         font-size: clamp(1rem, 1.4vw, 1.35rem);
         max-width: 24ch;
+        font-family: "Andale Mono", "AndaleMono", monospace;
       }
 
       .journal-bottom {
+        flex: 0 0 auto;
         display: flex;
-        justify-content: space-between;
-        align-items: end;
-        gap: 0.7rem;
+        justify-content: flex-start;
+        align-items: flex-end;
+        gap: clamp(0.75rem, 2vw, 1.5rem);
+        width: 100%;
+      }
+
+      .journal-bottom-logo {
+        flex-shrink: 0;
+        line-height: 0;
+      }
+
+      .journal-bottom-logo a {
+        display: block;
+      }
+
+      .journal-bottom-logo img {
+        width: clamp(110px, 15vw, 180px);
+        height: auto;
+        display: block;
+      }
+
+      .journal-bottom-logo a:hover img {
+        opacity: 0.9;
+      }
+
+      .journal-bottom-tagline {
+        margin: 0;
+        margin-left: auto;
+        margin-right: clamp(0, 0.5vw, 0.35rem);
+        padding-left: 62px;
+        padding-right: 62px;
+        text-align: right;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        line-height: 1.35;
+        font-size: clamp(0.68rem, 1.05vw, 0.82rem);
+        font-style: italic;
+        font-weight: 500;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #ffffff;
+        max-width: none;
+        flex: 0 0 auto;
       }
 
       .journal-collage {
         position: relative;
-        min-height: 100vh;
+        min-height: 0;
+        height: 100%;
+        background: #000000;
       }
 
-      .journal-tile {
-        position: absolute;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+      .journal-scroll {
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        padding: clamp(0.75rem, 2vw, 1.25rem) clamp(0.25rem, 1vw, 0.65rem) clamp(2rem, 4vh, 3rem);
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 0.35rem 0.45rem;
+        background: #000000;
+        scrollbar-color: rgba(255, 255, 255, 0.22) #000000;
+      }
+
+      .journal-scroll::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .journal-scroll::-webkit-scrollbar-track {
+        background: #000000;
+      }
+
+      .journal-scroll::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
+
+      .journal-item {
+        position: relative;
+        flex: 0 0 auto;
+        display: block;
         overflow: hidden;
-        background: #0d0d0d;
-        transition:
-          transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
-          width 1.1s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 1.1s ease;
-        transform: translate3d(0, 0, 0) scale(1);
-        opacity: 0.95;
-        will-change: transform, width, opacity;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: #000000;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
+        box-sizing: border-box;
+        width: var(--journal-w, 68%);
+        height: var(--journal-h, 28vh);
+        max-width: 100%;
+        margin: 0;
+        z-index: 1;
       }
 
-      .journal-tile video {
+      .journal-item img {
+        display: block;
         width: 100%;
         height: 100%;
+        min-height: 0;
         object-fit: cover;
-      }
-
-      .journal-section.swallowed .journal-tile {
-        transform: translateY(140px) scale(0.09);
-        width: 6% !important;
-        opacity: 0;
-      }
-
-      .journal-dare {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.7);
-        margin: 0;
-        font-size: clamp(2rem, 8vw, 7rem);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        opacity: 0;
         pointer-events: none;
-        z-index: 8;
       }
 
-      .journal-section.dare-burst .journal-dare {
-        animation: dare-pump 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      .journal-item.journal-float-1 {
+        animation: journal-drift-1 calc(10s / 1.69) ease-in-out infinite alternate;
       }
 
-      @keyframes dare-pump {
-        0% {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0.55);
+      .journal-item.journal-float-2 {
+        animation: journal-drift-2 calc(12s / 1.69) ease-in-out infinite alternate;
+      }
+
+      .journal-item.journal-float-3 {
+        animation: journal-drift-3 calc(9s / 1.69) ease-in-out infinite alternate;
+      }
+
+      .journal-item.journal-float-4 {
+        animation: journal-drift-4 calc(11.5s / 1.69) ease-in-out infinite alternate;
+      }
+
+      .journal-item.journal-float-5 {
+        animation: journal-drift-5 calc(13s / 1.69) ease-in-out infinite alternate;
+      }
+
+      .journal-item.journal-float-6 {
+        animation: journal-drift-6 calc(10.5s / 1.69) ease-in-out infinite alternate;
+      }
+
+      .journal-item.journal-float-7 {
+        animation: journal-drift-7 calc(11s / 1.69) ease-in-out infinite alternate;
+      }
+
+      .journal-item.journal-float-8 {
+        animation: journal-drift-8 calc(12.5s / 1.69) ease-in-out infinite alternate;
+      }
+
+      @keyframes journal-drift-1 {
+        from {
+          transform: rotate(-1.5deg) translate(-8px, 4px);
         }
-        35% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1.17);
+        to {
+          transform: rotate(-0.4deg) translate(10px, -8px);
         }
-        100% {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(1);
+      }
+
+      @keyframes journal-drift-2 {
+        from {
+          transform: rotate(1.2deg) translate(6px, -6px);
+        }
+        to {
+          transform: rotate(0.3deg) translate(-12px, 8px);
+        }
+      }
+
+      @keyframes journal-drift-3 {
+        from {
+          transform: rotate(-0.6deg) translate(4px, 10px);
+        }
+        to {
+          transform: rotate(1deg) translate(-6px, -12px);
+        }
+      }
+
+      @keyframes journal-drift-4 {
+        from {
+          transform: rotate(1.4deg) translate(-10px, -4px);
+        }
+        to {
+          transform: rotate(-0.5deg) translate(8px, 10px);
+        }
+      }
+
+      @keyframes journal-drift-5 {
+        from {
+          transform: rotate(-1.1deg) translate(12px, 6px);
+        }
+        to {
+          transform: rotate(0.8deg) translate(-8px, -6px);
+        }
+      }
+
+      @keyframes journal-drift-6 {
+        from {
+          transform: rotate(0.7deg) translate(-6px, 12px);
+        }
+        to {
+          transform: rotate(-1.3deg) translate(10px, -8px);
+        }
+      }
+
+      @keyframes journal-drift-7 {
+        from {
+          transform: rotate(-0.9deg) translate(8px, -10px);
+        }
+        to {
+          transform: rotate(1.1deg) translate(-14px, 6px);
+        }
+      }
+
+      @keyframes journal-drift-8 {
+        from {
+          transform: rotate(1.5deg) translate(-4px, 8px);
+        }
+        to {
+          transform: rotate(-0.7deg) translate(6px, -14px);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .journal-item.journal-float-1,
+        .journal-item.journal-float-2,
+        .journal-item.journal-float-3,
+        .journal-item.journal-float-4,
+        .journal-item.journal-float-5,
+        .journal-item.journal-float-6,
+        .journal-item.journal-float-7,
+        .journal-item.journal-float-8 {
+          animation: none;
+          transform: none;
         }
       }
 
@@ -826,11 +1485,14 @@
         .about-copy {
           min-height: 56vh;
           justify-content: start;
-          padding-top: 2rem;
+          padding-top: calc(2rem + 20px);
+          align-items: stretch;
+          padding-right: clamp(1rem, 4vw, 140px);
         }
 
         .about-block {
           text-align: left;
+          width: 100%;
         }
 
         .services-layout {
@@ -843,10 +1505,6 @@
           min-height: 33.33vh;
           padding-top: 2rem;
           padding-bottom: 2rem;
-        }
-
-        .service-title {
-          font-size: clamp(1.05rem, 5vw, 1.65rem);
         }
 
         .service-extra {
@@ -866,16 +1524,47 @@
           font-size: clamp(1.5rem, 10vw, 2.8rem);
         }
 
+        .journal-section {
+          height: auto;
+          min-height: auto;
+        }
+
         .journal-layout {
           grid-template-columns: 1fr;
+          height: auto;
+          min-height: auto;
+          overflow: visible;
         }
 
         .journal-left {
-          min-height: 35vh;
+          min-height: auto;
+          height: auto;
+          overflow-y: visible;
+          padding-bottom: 2.5rem;
+        }
+
+        .journal-quote-wrap {
+          min-height: 42vh;
+          align-items: center;
         }
 
         .journal-collage {
-          min-height: 65vh;
+          min-height: 50vh;
+          height: auto;
+        }
+
+        .journal-scroll {
+          height: auto;
+          max-height: none;
+          overflow-y: visible;
+          padding-bottom: 3rem;
+          display: flex;
+          flex-wrap: wrap;
+        }
+
+        .journal-item {
+          width: min(100%, var(--journal-w, 88vw)) !important;
+          height: var(--journal-h, 30vh) !important;
         }
 
         .projects-detail-view {
@@ -885,7 +1574,7 @@
 
         .project-detail-copy {
           gap: 1.2rem;
-          padding-top: 3rem;
+          padding-top: 4rem;
           padding-bottom: 1.5rem;
         }
 
@@ -898,9 +1587,14 @@
           max-width: none;
         }
 
-        .project-detail-timeline {
-          width: min(92vw, 92vw);
-          bottom: 1.2rem;
+        .project-detail-media-bottom {
+          width: min(calc(100% - 1.5rem), 96vw);
+          bottom: 1rem;
+        }
+
+        .project-detail-mute {
+          bottom: 0.65rem;
+          right: 0.65rem;
         }
       }
     </style>
@@ -908,8 +1602,8 @@
   <body>
     <header class="site-header">
       <div class="hero-top">
-        <div class="logo">The ! To All Your ?</div>
-        <div class="center-tagline">[ WHOEVER DARES JOINS ]</div>
+        <a href="#projects" class="logo">The ! To All Your ?</a>
+        <a href="#home" class="center-tagline">[ WHOEVER DARES JOINS ]</a>
         <div class="clock">[09:34:56]</div>
       </div>
     </header>
@@ -931,9 +1625,11 @@
 
           <div class="hero-bottom">
             <h1 class="wordmark-logo">
-              <img src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png" alt="Not So Civilized" />
+              <a href="#home" aria-label="Home">
+                <img src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png" alt="Not So Civilized" />
+              </a>
             </h1>
-            <p class="tagline">Dare.</p>
+            <a href="#contact" class="tagline" aria-label="Contact us">Dare.</a>
           </div>
         </div>
 
@@ -943,7 +1639,9 @@
         <div class="about-layout">
           <div class="about-image" aria-hidden="true"></div>
           <div class="about-logo">
-            <img src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png" alt="Not So Civilized" />
+            <a href="#home" aria-label="Home">
+              <img src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png" alt="Not So Civilized" />
+            </a>
           </div>
           <div class="about-copy">
             <p class="about-block">
@@ -977,9 +1675,6 @@
                 concept should move with precision.
               </p>
             </div>
-            <div class="service-right">
-              <div class="clock service-time">[ 09:34:56 ]</div>
-            </div>
           </article>
 
           <article class="service-band creation">
@@ -990,9 +1685,6 @@
                 for rollout across digital and physical channels.
               </p>
             </div>
-            <div class="service-right">
-              <div class="clock service-time">[ 09:34:56 ]</div>
-            </div>
           </article>
 
           <article class="service-band execution">
@@ -1002,9 +1694,6 @@
                 End-to-end production and launch support, built to carry the original idea into real
                 deliverables with consistency and impact.
               </p>
-            </div>
-            <div class="service-right">
-              <div class="clock service-time">[ 09:34:56 ]</div>
             </div>
           </article>
         </div>
@@ -1017,71 +1706,367 @@
               <video muted loop playsinline preload="metadata">
                 <source src="assets/web/PROJECT/optimized/aki-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Aki</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="1">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/oil-gaz-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/akiki-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Akiki</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="2">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/naggiar-film-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/beit-trad-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Beit Trad</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="3">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/elissar-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/besh-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Besh</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="4">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/naggiar-artist-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/bokja-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Bokja</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="5">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/sami-web-lite.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/elissar-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Elissar</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="6">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/mj-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/irrelevant-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Irrelevant</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="7">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/irrelevant-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/katarina-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Katarina</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="8">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/orient-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/mj-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Mj</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="9">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/pop-up-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/naggiar-artist-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Naggiar Artist</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="10">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/soar-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/naggiar-film-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Naggiar Film</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
             <article class="project-card" data-project-index="11">
               <video muted loop playsinline preload="metadata">
-                <source src="assets/web/PROJECT/optimized/bokja-web.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/oil-gaz-web.mp4" type="video/mp4" />
               </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Oil & Gaz</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </article>
+            <article class="project-card" data-project-index="12">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/orient-web.mp4" type="video/mp4" />
+              </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Orient</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </article>
+            <article class="project-card" data-project-index="13">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/pop-up-web.mp4" type="video/mp4" />
+              </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Pop Up</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </article>
+            <article class="project-card" data-project-index="14">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/sami-web-lite.mp4" type="video/mp4" />
+              </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Sami</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </article>
+            <article class="project-card" data-project-index="15">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/saras-bag-web.mp4" type="video/mp4" />
+              </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Sara's Bag</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </article>
+            <article class="project-card" data-project-index="16">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/saristique-web.mp4" type="video/mp4" />
+              </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Saristique</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </article>
+            <article class="project-card" data-project-index="17">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/soar-web.mp4" type="video/mp4" />
+              </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Soar</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            </article>
+            <article class="project-card" data-project-index="18">
+              <video muted loop playsinline preload="metadata">
+                <source src="assets/web/PROJECT/optimized/steakbar-sushi-web.mp4" type="video/mp4" />
+              </video>
+              <div class="project-card-hover" aria-hidden="true">
+                <div class="project-card-hover-bg"></div>
+                <div class="project-card-hover-inner">
+                  <p class="project-card-hover-title">Steakbar Sushi</p>
+                  <img
+                    class="project-card-hover-logo"
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt=""
+                    width="150"
+                    height="40"
+                    decoding="async"
+                  />
+                </div>
+              </div>
             </article>
           </div>
 
           <div class="project-overlay">
             <div class="project-center-text">- SOME -&#10;OF&#10;(THEM)</div>
-
-            <div class="project-static-footer">
-              <h2 class="wordmark">Not So Civilized</h2>
-              <p class="tagline">Dare.</p>
-            </div>
           </div>
 
           <div class="project-nav">
@@ -1139,9 +2124,11 @@
               </button>
             </div>
           </div>
-          <div class="project-detail-timeline">
-            <div class="project-progress-bar" id="project-progress-bar" role="slider" aria-label="Video progress">
-              <div class="project-progress-fill" id="project-progress-fill"></div>
+          <div class="project-detail-media-bottom">
+            <div class="project-detail-timeline">
+              <div class="project-progress-bar" id="project-progress-bar" role="slider" aria-label="Video progress">
+                <div class="project-progress-fill" id="project-progress-fill"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -1150,22 +2137,31 @@
       <section class="section journal-section" id="journal">
         <div class="journal-layout">
           <div class="journal-left">
-            <p class="journal-quote">" Get Lost In Our Journal "</p>
+            <div class="journal-quote-wrap">
+              <p class="journal-quote">" Get Lost In Our Journal "</p>
+            </div>
 
             <div class="journal-bottom">
-              <h2 class="wordmark">Not So Civilized</h2>
-              <div class="center-tagline">[ Whoever Dares Joins ]</div>
+              <div class="journal-bottom-logo">
+                <a href="#home" aria-label="Home">
+                  <img
+                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+                    alt="Not So Civilized"
+                    decoding="async"
+                  />
+                </a>
+              </div>
+              <p class="journal-bottom-tagline">
+                [ WHOEVER<br />
+                DARES<br />
+                JOINS ]
+              </p>
             </div>
           </div>
 
           <div class="journal-collage" id="journal-collage">
-            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/p1-web.mp4" type="video/mp4" /></video></article>
-            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/p2-web.mp4" type="video/mp4" /></video></article>
-            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/p3-web.mp4" type="video/mp4" /></video></article>
-            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/homepage-video-web.mp4" type="video/mp4" /></video></article>
-            <article class="journal-tile"><video muted loop playsinline preload="metadata"><source src="assets/web/homepage/optimized/p2-web.mp4" type="video/mp4" /></video></article>
+            <div class="journal-scroll" id="journal-scroll" aria-label="Journal photography" tabindex="0"></div>
           </div>
-          <h3 class="journal-dare">DARE</h3>
         </div>
       </section>
 
@@ -1177,12 +2173,26 @@
         </p>
       </section>
 
-      <section class="section" id="contact">
-        <h2>Contact Us</h2>
-        <p>
-          Add your preferred contact details and response window. Keep this section straightforward and
-          easy to act on.
-        </p>
+      <section class="section contact-section" id="contact" aria-label="Contact">
+        <div class="contact-main">
+          <h2 class="contact-title">&ldquo; DARE TO CONTACT US &rdquo;</h2>
+          <div class="contact-details">
+            <a class="contact-line contact-line--email" href="mailto:dare@notsocivilised.com"
+              >dare@notsocivilised.com</a>
+            <a class="contact-line contact-line--phone" href="tel:+96181682868">+961 81-682868</a>
+            <span class="contact-line contact-line--social">@notsocivilised</span>
+          </div>
+        </div>
+        <div class="contact-footer-logo">
+          <a href="#home" aria-label="Home">
+            <img
+              src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-Black.png"
+              alt="Not So Civilized"
+              decoding="async"
+            />
+          </a>
+        </div>
+        <div class="contact-bar" aria-hidden="true"></div>
       </section>
     </main>
 
@@ -1192,10 +2202,10 @@
       let clockTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const timeFormatter = () =>
         new Intl.DateTimeFormat("en-US", {
-          hour: "2-digit",
+          hour: "numeric",
           minute: "2-digit",
           second: "2-digit",
-          hour12: false,
+          hour12: true,
           timeZone: clockTimeZone,
         });
 
@@ -1222,6 +2232,41 @@
 
       initClockLocation();
 
+      const bgVideo = document.getElementById("bg-video");
+      if (bgVideo) {
+        const enforceBgVideoMuted = () => {
+          bgVideo.muted = true;
+          bgVideo.defaultMuted = true;
+          bgVideo.volume = 0;
+          bgVideo.setAttribute("muted", "");
+        };
+        enforceBgVideoMuted();
+        bgVideo.addEventListener("loadedmetadata", enforceBgVideoMuted);
+        bgVideo.addEventListener("play", enforceBgVideoMuted);
+        const bgPlayPromise = bgVideo.play();
+        if (bgPlayPromise && typeof bgPlayPromise.catch === "function") {
+          bgPlayPromise.catch(() => {});
+        }
+      }
+
+      const contactSectionEl = document.getElementById("contact");
+      const siteHeaderEl = document.querySelector(".site-header");
+      const syncContactHeaderTheme = () => {
+        if (!contactSectionEl) return;
+        const headerH = siteHeaderEl?.getBoundingClientRect().height ?? 88;
+        const r = contactSectionEl.getBoundingClientRect();
+        const overlap =
+          r.top <= headerH + 12 && r.bottom > Math.min(headerH * 0.5, 72);
+        document.body.classList.toggle("contact-in-view", overlap);
+      };
+      if (contactSectionEl) {
+        syncContactHeaderTheme();
+        window.addEventListener("scroll", syncContactHeaderTheme, { passive: true });
+        window.addEventListener("resize", syncContactHeaderTheme);
+        window.addEventListener("hashchange", syncContactHeaderTheme);
+        requestAnimationFrame(syncContactHeaderTheme);
+      }
+
       const projectData = [
         {
           title: "AKI",
@@ -1229,14 +2274,24 @@
           video: "assets/web/PROJECT/optimized/aki-web.mp4",
         },
         {
-          title: "OIL & GAZ",
-          text: "PROJECT OIL & GAZ.",
-          video: "assets/web/PROJECT/optimized/oil-gaz-web.mp4",
+          title: "AKIKI",
+          text: "PROJECT AKIKI.",
+          video: "assets/web/PROJECT/optimized/akiki-web.mp4",
         },
         {
-          title: "NAGGIAR FILM",
-          text: "PROJECT NAGGIAR FILM.",
-          video: "assets/web/PROJECT/optimized/naggiar-film-web.mp4",
+          title: "BEIT TRAD",
+          text: "PROJECT BEIT TRAD.",
+          video: "assets/web/PROJECT/optimized/beit-trad-web.mp4",
+        },
+        {
+          title: "BESH",
+          text: "PROJECT BESH.",
+          video: "assets/web/PROJECT/optimized/besh-web.mp4",
+        },
+        {
+          title: "BOKJA",
+          text: "PROJECT BOKJA.",
+          video: "assets/web/PROJECT/optimized/bokja-web.mp4",
         },
         {
           title: "ELISSAR",
@@ -1244,14 +2299,14 @@
           video: "assets/web/PROJECT/optimized/elissar-web.mp4",
         },
         {
-          title: "NAGGIAR ARTIST",
-          text: "PROJECT NAGGIAR ARTIST.",
-          video: "assets/web/PROJECT/optimized/naggiar-artist-web.mp4",
+          title: "IRRELEVANT",
+          text: "PROJECT IRRELEVANT.",
+          video: "assets/web/PROJECT/optimized/irrelevant-web.mp4",
         },
         {
-          title: "SAMI",
-          text: "PROJECT SAMI.",
-          video: "assets/web/PROJECT/optimized/sami-web-lite.mp4",
+          title: "KATARINA",
+          text: "PROJECT KATARINA.",
+          video: "assets/web/PROJECT/optimized/katarina-web.mp4",
         },
         {
           title: "MJ",
@@ -1259,9 +2314,19 @@
           video: "assets/web/PROJECT/optimized/mj-web.mp4",
         },
         {
-          title: "IRRELEVANT",
-          text: "PROJECT IRRELEVANT.",
-          video: "assets/web/PROJECT/optimized/irrelevant-web.mp4",
+          title: "NAGGIAR ARTIST",
+          text: "PROJECT NAGGIAR ARTIST.",
+          video: "assets/web/PROJECT/optimized/naggiar-artist-web.mp4",
+        },
+        {
+          title: "NAGGIAR FILM",
+          text: "PROJECT NAGGIAR FILM.",
+          video: "assets/web/PROJECT/optimized/naggiar-film-web.mp4",
+        },
+        {
+          title: "OIL & GAZ",
+          text: "PROJECT OIL & GAZ.",
+          video: "assets/web/PROJECT/optimized/oil-gaz-web.mp4",
         },
         {
           title: "ORIENT",
@@ -1274,14 +2339,29 @@
           video: "assets/web/PROJECT/optimized/pop-up-web.mp4",
         },
         {
+          title: "SAMI",
+          text: "PROJECT SAMI.",
+          video: "assets/web/PROJECT/optimized/sami-web-lite.mp4",
+        },
+        {
+          title: "SARA'S BAG",
+          text: "PROJECT SARA'S BAG.",
+          video: "assets/web/PROJECT/optimized/saras-bag-web.mp4",
+        },
+        {
+          title: "SARISTIQUE",
+          text: "PROJECT SARISTIQUE.",
+          video: "assets/web/PROJECT/optimized/saristique-web.mp4",
+        },
+        {
           title: "SOAR",
           text: "PROJECT SOAR.",
           video: "assets/web/PROJECT/optimized/soar-web.mp4",
         },
         {
-          title: "BOKJA",
-          text: "PROJECT BOKJA.",
-          video: "assets/web/PROJECT/optimized/bokja-web.mp4",
+          title: "STEAKBAR SUSHI",
+          text: "PROJECT STEAKBAR SUSHI.",
+          video: "assets/web/PROJECT/optimized/steakbar-sushi-web.mp4",
         },
       ];
 
@@ -1304,18 +2384,17 @@
       const playTogglePlayIcon = document.getElementById("play-toggle-play");
       const detailVideoWrap = document.querySelector(".project-detail-video-wrap");
       const projectsCarouselView = document.querySelector(".projects-carousel-view");
-      const journalSection = document.querySelector(".journal-section");
-      const journalTiles = Array.from(document.querySelectorAll(".journal-tile"));
+      const journalScrollEl = document.getElementById("journal-scroll");
+      const journalBase = "assets/web/homepage/JOURNAL/";
 
       let carouselOffset = 0;
       let lastFrameTime = 0;
       let lastVideoSyncTime = 0;
       let isProjectsInView = false;
       let detailProgressFrameId = null;
-      let journalInView = false;
-      let journalCycleInterval = null;
-      let journalCollapseTimeout = null;
-      let journalBurstTimeout = null;
+      let projectDetailScrollY = 0;
+      let detailVideoLoadToken = 0;
+      let detailVideoRetryTimer = null;
       const baseCarouselSpeed = 24; // px per second
 
       const getCarouselLoopWidth = () => projectsTrack.scrollWidth / 2;
@@ -1362,39 +2441,142 @@
           const clone = card.cloneNode(true);
           projectsTrack.appendChild(clone);
         });
+        const allCardVideos = Array.from(projectsTrack.querySelectorAll(".project-card video"));
+        allCardVideos.forEach((video) => {
+          video.muted = true;
+          video.loop = true;
+          video.playsInline = true;
+          video.setAttribute("playsinline", "");
+          video.setAttribute("muted", "");
+          video.dataset.shouldPlay = "0";
+        });
         renderProjectPosition();
         window.requestAnimationFrame(runCarouselFrame);
+      };
+
+      const preventWheelWhileProjectDetail = (event) => {
+        if (document.body.classList.contains("projects-detail-open")) {
+          event.preventDefault();
+        }
+      };
+
+      const preventTouchMoveWhileProjectDetail = (event) => {
+        if (document.body.classList.contains("projects-detail-open")) {
+          event.preventDefault();
+        }
+      };
+
+      const syncDetailMuteUi = () => {
+        muteIconOn.style.display = detailVideo.muted ? "none" : "block";
+        muteIconOff.style.display = detailVideo.muted ? "block" : "none";
+        detailMuteButton.setAttribute("aria-label", detailVideo.muted ? "Unmute" : "Mute");
+      };
+
+      const attemptCarouselVideoPlay = (video) => {
+        if (!video || !video.paused) return;
+        video.muted = true;
+        const playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {});
+        }
+      };
+
+      const attemptDetailVideoPlay = () => {
+        if (!projectsSection.classList.contains("detail-open")) return;
+        detailVideo.muted = false;
+        syncDetailMuteUi();
+        const playPromise = detailVideo.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {
+            detailVideo.muted = true;
+            syncDetailMuteUi();
+            detailVideo.play().catch(() => {});
+          });
+        }
+      };
+
+      const scheduleDetailVideoRetry = (token, delayMs = 420) => {
+        if (detailVideoRetryTimer) {
+          clearTimeout(detailVideoRetryTimer);
+          detailVideoRetryTimer = null;
+        }
+        detailVideoRetryTimer = setTimeout(() => {
+          if (token !== detailVideoLoadToken || !projectsSection.classList.contains("detail-open")) return;
+          detailVideo.load();
+          attemptDetailVideoPlay();
+        }, delayMs);
       };
 
       const openProjectDetail = (index) => {
         const project = projectData[index];
         if (!project) return;
+        detailVideoLoadToken += 1;
+        const loadToken = detailVideoLoadToken;
+        if (detailVideoRetryTimer) {
+          clearTimeout(detailVideoRetryTimer);
+          detailVideoRetryTimer = null;
+        }
 
         detailTitle.textContent = project.title;
         detailText.textContent = project.text;
+        projectDetailScrollY = window.scrollY;
+        document.documentElement.classList.add("projects-detail-open");
+        document.body.classList.add("projects-detail-open");
+        document.body.style.top = `-${projectDetailScrollY}px`;
+        projectsSection.classList.add("detail-open");
+        window.addEventListener("wheel", preventWheelWhileProjectDetail, { passive: false });
+        window.addEventListener("touchmove", preventTouchMoveWhileProjectDetail, { passive: false });
         detailVideo.src = project.video;
         detailVideo.load();
-        projectsSection.classList.add("detail-open");
         detailVideo.currentTime = 0;
-        detailVideo.muted = false;
-        muteIconOn.style.display = "block";
-        muteIconOff.style.display = "none";
-        detailMuteButton.setAttribute("aria-label", "Mute");
         playTogglePauseIcon.style.display = "block";
         playTogglePlayIcon.style.display = "none";
         detailPlayToggleButton.setAttribute("aria-label", "Pause");
         detailPlayToggleButton.classList.remove("show");
         detailReplayButton.classList.remove("show");
         progressFill.style.width = "0%";
-        const autoPlayAttempt = detailVideo.play();
-        if (autoPlayAttempt && typeof autoPlayAttempt.catch === "function") {
-          autoPlayAttempt.catch(() => {});
-        }
+
+        attemptDetailVideoPlay();
+        detailVideo.addEventListener("canplay", attemptDetailVideoPlay, { once: true });
+        detailVideo.addEventListener(
+          "loadeddata",
+          () => {
+            if (loadToken !== detailVideoLoadToken) return;
+            attemptDetailVideoPlay();
+          },
+          { once: true }
+        );
+        detailVideo.addEventListener(
+          "stalled",
+          () => {
+            scheduleDetailVideoRetry(loadToken, 360);
+          },
+          { once: true }
+        );
+        detailVideo.addEventListener(
+          "error",
+          () => {
+            scheduleDetailVideoRetry(loadToken, 300);
+          },
+          { once: true }
+        );
+
         syncCarouselVideoPlayback();
       };
 
       const closeProjectDetail = () => {
+        detailVideoLoadToken += 1;
+        if (detailVideoRetryTimer) {
+          clearTimeout(detailVideoRetryTimer);
+          detailVideoRetryTimer = null;
+        }
+        window.removeEventListener("wheel", preventWheelWhileProjectDetail);
+        window.removeEventListener("touchmove", preventTouchMoveWhileProjectDetail);
         projectsSection.classList.remove("detail-open");
+        document.documentElement.classList.remove("projects-detail-open");
+        document.body.classList.remove("projects-detail-open");
+        document.body.style.top = "";
+        window.scrollTo(0, projectDetailScrollY);
         detailVideo.pause();
         detailVideo.currentTime = 0;
         detailReplayButton.classList.remove("show");
@@ -1425,115 +2607,97 @@
       const syncCarouselVideoPlayback = () => {
         const cards = Array.from(projectsTrack.querySelectorAll(".project-card"));
         const detailOpen = projectsSection.classList.contains("detail-open");
-        const viewRect = projectsCarouselView.getBoundingClientRect();
 
         cards.forEach((card) => {
           const video = card.querySelector("video");
           if (!video) return;
 
           if (!isProjectsInView || detailOpen) {
-            video.pause();
+            video.dataset.shouldPlay = "0";
+            if (!video.paused) video.pause();
             return;
           }
 
-          const rect = card.getBoundingClientRect();
-          const visibleWidth = Math.max(0, Math.min(rect.right, viewRect.right) - Math.max(rect.left, viewRect.left));
-          const visibilityRatio = visibleWidth / Math.max(rect.width, 1);
+          if (video.dataset.shouldPlay !== "1") {
+            video.dataset.shouldPlay = "1";
+            attemptCarouselVideoPlay(video);
+            return;
+          }
+          attemptCarouselVideoPlay(video);
+        });
+      };
 
-          if (visibilityRatio > 0.25) {
-            const playAttempt = video.play();
-            if (playAttempt && typeof playAttempt.catch === "function") {
-              playAttempt.catch(() => {});
+      const journalFrac = (i, salt = 0) => {
+        const x = Math.sin(i * 12.9898 + salt * 78.233 + 11.17) * 43758.5453123;
+        return x - Math.floor(x);
+      };
+
+      const initJournalGallery = async () => {
+        if (!journalScrollEl) return;
+        try {
+          const res = await fetch(`${journalBase}journal-manifest.json`);
+          if (!res.ok) throw new Error("manifest");
+          const files = await res.json();
+          if (!Array.isArray(files) || !files.length) return;
+
+          const frag = document.createDocumentFragment();
+          const journalSizeScale = 1.55;
+          const journalPackedScale = 0.88;
+          files.forEach((filename, index) => {
+            const article = document.createElement("article");
+            const floatClass = (index % 8) + 1;
+            article.className = `journal-item journal-float-${floatClass}`;
+
+            const f = journalFrac;
+            const mode = index % 7;
+
+            const placeVhBox = (wVh, hVh) => {
+              const w = wVh * journalSizeScale * journalPackedScale;
+              const h = hVh * journalSizeScale * journalPackedScale;
+              article.style.setProperty("--journal-w", `${w.toFixed(2)}vh`);
+              article.style.setProperty("--journal-h", `${h.toFixed(2)}vh`);
+              article.style.marginLeft = "";
+              article.style.marginRight = "";
+            };
+
+            if (mode === 0 || mode === 5) {
+              const side = 17.5 + f(index, 1) * 7.5;
+              placeVhBox(side, side);
+            } else if (mode === 1) {
+              const h = 19 + f(index, 3) * 8.5;
+              const w = (h * 4) / 3;
+              placeVhBox(w, h);
+            } else if (mode === 2) {
+              const w = 17 + f(index, 4) * 7.5;
+              const h = (w * 4) / 3;
+              placeVhBox(w, h);
+            } else if (mode === 3) {
+              const h = 18.5 + f(index, 5) * 8;
+              const w = (h * 3) / 2;
+              placeVhBox(w, h);
+            } else if (mode === 4) {
+              const w = 15.5 + f(index, 6) * 6.5;
+              const h = (w * 3) / 2;
+              placeVhBox(w, h);
+            } else {
+              const h = 18 + f(index, 7) * 7.5;
+              const w = (h * 5) / 4;
+              placeVhBox(w, h);
             }
-          } else {
-            video.pause();
-          }
-        });
-      };
 
-      const randomizeJournalTiles = () => {
-        const presets = [
-          { left: 6, top: 5, width: 30, ratio: 1.15, rot: -1.2 },
-          { left: 36, top: 18, width: 34, ratio: 1.04, rot: 1.3 },
-          { left: 58, top: 7, width: 28, ratio: 0.74, rot: -0.6 },
-          { left: 44, top: 49, width: 30, ratio: 0.98, rot: 0.9 },
-          { left: 72, top: 41, width: 26, ratio: 1.35, rot: -1.1 },
-        ];
-
-        journalTiles.forEach((tile, index) => {
-          const preset = presets[index % presets.length];
-          const jitterX = (Math.random() - 0.5) * 6;
-          const jitterY = (Math.random() - 0.5) * 8;
-          const jitterW = (Math.random() - 0.5) * 4;
-          const jitterRot = (Math.random() - 0.5) * 3;
-
-          const width = Math.max(20, Math.min(38, preset.width + jitterW));
-          const left = Math.max(2, Math.min(78, preset.left + jitterX));
-          const top = Math.max(2, Math.min(75, preset.top + jitterY));
-          const height = width * preset.ratio;
-
-          tile.style.left = `${left}%`;
-          tile.style.top = `${top}%`;
-          tile.style.width = `${width}%`;
-          tile.style.height = `${height}%`;
-          tile.style.transform = `rotate(${preset.rot + jitterRot}deg)`;
-          tile.style.opacity = "0.95";
-        });
-      };
-
-      const syncJournalVideoPlayback = () => {
-        journalTiles.forEach((tile) => {
-          const video = tile.querySelector("video");
-          if (!video) return;
-          if (!journalInView || journalSection.classList.contains("swallowed")) {
-            video.pause();
-            return;
-          }
-          const playAttempt = video.play();
-          if (playAttempt && typeof playAttempt.catch === "function") {
-            playAttempt.catch(() => {});
-          }
-        });
-      };
-
-      const runJournalCycle = () => {
-        journalSection.classList.remove("dare-burst");
-        journalSection.classList.add("swallowed");
-        syncJournalVideoPlayback();
-
-        clearTimeout(journalBurstTimeout);
-        journalBurstTimeout = setTimeout(() => {
-          journalSection.classList.remove("swallowed");
-          randomizeJournalTiles();
-          journalSection.classList.add("dare-burst");
-          syncJournalVideoPlayback();
-        }, 1000);
-      };
-
-      const startJournalAnimationLoop = () => {
-        if (journalCycleInterval) return;
-        randomizeJournalTiles();
-        syncJournalVideoPlayback();
-
-        clearTimeout(journalCollapseTimeout);
-        journalCollapseTimeout = setTimeout(() => {
-          runJournalCycle();
-        }, 10000);
-
-        journalCycleInterval = setInterval(() => {
-          runJournalCycle();
-        }, 11000);
-      };
-
-      const stopJournalAnimationLoop = () => {
-        clearTimeout(journalCollapseTimeout);
-        clearTimeout(journalBurstTimeout);
-        clearInterval(journalCycleInterval);
-        journalCollapseTimeout = null;
-        journalBurstTimeout = null;
-        journalCycleInterval = null;
-        journalSection.classList.remove("swallowed", "dare-burst");
-        syncJournalVideoPlayback();
+            const img = document.createElement("img");
+            img.src = `${journalBase}${encodeURIComponent(filename)}`;
+            img.alt = "";
+            img.loading = index < 7 ? "eager" : "lazy";
+            img.decoding = "async";
+            article.appendChild(img);
+            frag.appendChild(article);
+          });
+          journalScrollEl.appendChild(frag);
+        } catch {
+          journalScrollEl.innerHTML =
+            '<p class="journal-load-fallback" style="color:rgba(255,255,255,0.45);padding:1.25rem;font-family:Andale Mono,monospace;font-size:0.75rem;">Journal images could not be loaded.</p>';
+        }
       };
 
       nextButton.addEventListener("click", () => nudgeCarousel(1));
@@ -1545,6 +2709,14 @@
         if (!projectCard) return;
         const index = Number(projectCard.dataset.projectIndex || 0);
         openProjectDetail(index);
+      });
+
+      document.querySelectorAll(".site-header a").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (projectsSection.classList.contains("detail-open")) {
+            closeProjectDetail();
+          }
+        });
       });
 
       detailClose.addEventListener("click", closeProjectDetail);
@@ -1583,18 +2755,13 @@
       detailMuteButton.addEventListener("click", (event) => {
         event.stopPropagation();
         detailVideo.muted = !detailVideo.muted;
-        muteIconOn.style.display = detailVideo.muted ? "none" : "block";
-        muteIconOff.style.display = detailVideo.muted ? "block" : "none";
-        detailMuteButton.setAttribute("aria-label", detailVideo.muted ? "Unmute" : "Mute");
+        syncDetailMuteUi();
       });
 
       detailVideoWrap.addEventListener("click", () => {
         if (detailVideo.paused || detailVideo.ended) {
           detailReplayButton.classList.remove("show");
-          const playAttempt = detailVideo.play();
-          if (playAttempt && typeof playAttempt.catch === "function") {
-            playAttempt.catch(() => {});
-          }
+          attemptDetailVideoPlay();
           return;
         }
 
@@ -1605,10 +2772,7 @@
         event.stopPropagation();
         if (detailVideo.paused || detailVideo.ended) {
           detailReplayButton.classList.remove("show");
-          const playAttempt = detailVideo.play();
-          if (playAttempt && typeof playAttempt.catch === "function") {
-            playAttempt.catch(() => {});
-          }
+          attemptDetailVideoPlay();
           return;
         }
         detailVideo.pause();
@@ -1618,13 +2782,11 @@
         event.stopPropagation();
         detailVideo.currentTime = 0;
         detailReplayButton.classList.remove("show");
-        const replayAttempt = detailVideo.play();
-        if (replayAttempt && typeof replayAttempt.catch === "function") {
-          replayAttempt.catch(() => {});
-        }
+        attemptDetailVideoPlay();
       });
 
       progressBar.addEventListener("click", (event) => {
+        event.stopPropagation();
         if (!detailVideo.duration) return;
         const barRect = progressBar.getBoundingClientRect();
         const clickRatio = (event.clientX - barRect.left) / barRect.width;
@@ -1649,19 +2811,7 @@
       );
       projectsObserver.observe(projectsSection);
 
-      const journalObserver = new IntersectionObserver(
-        (entries) => {
-          const [entry] = entries;
-          journalInView = entry.isIntersecting && entry.intersectionRatio > 0.3;
-          if (journalInView) {
-            startJournalAnimationLoop();
-          } else {
-            stopJournalAnimationLoop();
-          }
-        },
-        { threshold: [0, 0.3, 0.6, 1] }
-      );
-      journalObserver.observe(journalSection);
+      initJournalGallery();
 
       startContinuousCarousel();
     </script>
