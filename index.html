@@ -3514,7 +3514,6 @@
       const serviceTitles = Array.from(document.querySelectorAll(".service-band .service-title"));
       if (servicesSection && serviceTitles.length) {
         let servicesInView = false;
-        let lastServicesScrollY = window.scrollY;
         const replayServicesTitles = () => {
           serviceTitles.forEach((title) => title.classList.remove("is-visible"));
           void servicesSection.offsetHeight;
@@ -3525,13 +3524,11 @@
           (entries) => {
             const [entry] = entries;
             const nowInView = entry.isIntersecting && entry.intersectionRatio > 0.18;
-            const isScrollingDown = window.scrollY >= lastServicesScrollY;
-            if (nowInView && !servicesInView && isScrollingDown) {
+            if (nowInView && !servicesInView) {
               replayServicesTitles();
             } else if (!nowInView && servicesInView) {
               serviceTitles.forEach((title) => title.classList.remove("is-visible"));
             }
-            lastServicesScrollY = window.scrollY;
             servicesInView = nowInView;
           },
           { threshold: [0, 0.18, 0.35, 0.6] }
