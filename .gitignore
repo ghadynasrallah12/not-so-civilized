@@ -7,6 +7,7 @@ assets/web/PROJECT/*
 !assets/web/PROJECT/optimized/
 assets/web/homepage/*
 !assets/web/homepage/optimized/
+!assets/web/homepage/JOURNAL/
 
 # Local high-bitrate backups kept next to optimized exports
 **/*-original-backup*.mp4
