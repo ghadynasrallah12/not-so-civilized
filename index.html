@@ -6,6 +6,25 @@
     <title>Not So Civilized</title>
     <link rel="preconnect" href="https://fonts.cdnfonts.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      rel="preload"
+      as="image"
+      href="assets/web/homepage/optimized/homepage-video-poster.jpg"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="video"
+      href="assets/web/homepage/optimized/homepage-video-web.mp4"
+      type="video/mp4"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
+    />
     <link href="https://fonts.cdnfonts.com/css/andale-mono" rel="stylesheet" />
     <link href="https://fonts.cdnfonts.com/css/delirium-ncv" rel="stylesheet" />
     <link href="https://fonts.cdnfonts.com/css/dan-hand" rel="stylesheet" />
@@ -1777,8 +1796,16 @@
     </header>
     <main>
       <section class="hero" id="home">
-        <video id="bg-video" autoplay loop playsinline muted>
-          <source src="assets/web/homepage/optimized/homepage-video-web.mp4?v=20260427-noaudio" type="video/mp4" />
+        <video
+          id="bg-video"
+          autoplay
+          loop
+          playsinline
+          muted
+          preload="auto"
+          poster="assets/web/homepage/optimized/homepage-video-poster.jpg"
+        >
+          <source src="assets/web/homepage/optimized/homepage-video-web.mp4" type="video/mp4" />
         </video>
 
         <div class="hero-content">
@@ -2137,7 +2164,7 @@
             </article>
             <article class="project-card" data-project-index="14">
               <video muted loop playsinline preload="none">
-                <source src="assets/web/PROJECT/optimized/sami-web-lite.mp4" type="video/mp4" />
+                <source src="assets/web/PROJECT/optimized/sami-web.mp4" type="video/mp4" />
               </video>
               <div class="project-card-hover" aria-hidden="true">
                 <div class="project-card-hover-bg"></div>
@@ -2597,98 +2624,130 @@
           title: "AKI",
           text: "PROJECT AKI.",
           video: "assets/web/PROJECT/optimized/aki-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/aki.jpg",
         },
         {
           title: "AKIKI",
           text: "PROJECT AKIKI.",
           video: "assets/web/PROJECT/optimized/akiki-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/akiki.jpg",
         },
         {
           title: "BEIT TRAD",
           text: "PROJECT BEIT TRAD.",
           video: "assets/web/PROJECT/optimized/beit-trad-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/beit-trad.jpg",
         },
         {
           title: "BESH",
           text: "PROJECT BESH.",
           video: "assets/web/PROJECT/optimized/besh-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/besh.jpg",
         },
         {
           title: "BOKJA",
           text: "PROJECT BOKJA.",
           video: "assets/web/PROJECT/optimized/bokja-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/bokja.jpg",
         },
         {
           title: "ELISSAR",
           text: "PROJECT ELISSAR.",
           video: "assets/web/PROJECT/optimized/elissar-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/elissar.jpg",
         },
         {
           title: "IRRELEVANT",
           text: "PROJECT IRRELEVANT.",
           video: "assets/web/PROJECT/optimized/irrelevant-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/irrelevant.jpg",
         },
         {
           title: "KATARINA",
           text: "PROJECT KATARINA.",
           video: "assets/web/PROJECT/optimized/katarina-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/katarina.jpg",
         },
         {
           title: "MJ",
           text: "PROJECT MJ.",
           video: "assets/web/PROJECT/optimized/mj-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/mj.jpg",
         },
         {
           title: "NAGGIAR ARTIST",
           text: "PROJECT NAGGIAR ARTIST.",
           video: "assets/web/PROJECT/optimized/naggiar-artist-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/naggiar-artist.jpg",
         },
         {
           title: "NAGGIAR FILM",
           text: "PROJECT NAGGIAR FILM.",
           video: "assets/web/PROJECT/optimized/naggiar-film-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/naggiar-film.jpg",
         },
         {
           title: "OIL & GAZ",
           text: "PROJECT OIL & GAZ.",
           video: "assets/web/PROJECT/optimized/oil-gaz-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/oil-gaz.jpg",
         },
         {
           title: "ORIENT",
           text: "PROJECT ORIENT.",
           video: "assets/web/PROJECT/optimized/orient-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/orient.jpg",
         },
         {
           title: "POP UP",
           text: "PROJECT POP UP.",
           video: "assets/web/PROJECT/optimized/pop-up-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/pop-up.jpg",
         },
         {
           title: "SAMI",
           text: "PROJECT SAMI.",
-          video: "assets/web/PROJECT/optimized/sami-web-lite.mp4",
+          video: "assets/web/PROJECT/optimized/sami-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/sami.jpg",
         },
         {
           title: "SARA'S BAG",
           text: "PROJECT SARA'S BAG.",
           video: "assets/web/PROJECT/optimized/saras-bag-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/saras-bag.jpg",
         },
         {
           title: "SARISTIQUE",
           text: "PROJECT SARISTIQUE.",
           video: "assets/web/PROJECT/optimized/saristique-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/saristique.jpg",
         },
         {
           title: "SOAR",
           text: "PROJECT SOAR.",
           video: "assets/web/PROJECT/optimized/soar-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/soar.jpg",
         },
         {
           title: "STEAKBAR SUSHI",
           text: "PROJECT STEAKBAR SUSHI.",
           video: "assets/web/PROJECT/optimized/steakbar-sushi-web.mp4",
+          poster: "assets/web/PROJECT/optimized/posters/steakbar-sushi.jpg",
         },
       ];
+
+      // Apply posters to every project card video so cards show an image
+      // instantly instead of a blank black box while video bytes load.
+      (() => {
+        const cards = document.querySelectorAll("#projects-track .project-card");
+        cards.forEach((card) => {
+          const idx = Number(card.dataset.projectIndex || 0);
+          const project = projectData[idx];
+          if (!project || !project.poster) return;
+          const v = card.querySelector("video");
+          if (v && !v.poster) v.setAttribute("poster", project.poster);
+        });
+      })();
 
       const projectsSection = document.querySelector(".projects-section");
       const projectsTrack = document.getElementById("projects-track");
@@ -2980,6 +3039,9 @@
           detailTitle.textContent = project.title;
           detailText.textContent = project.text;
 
+          if (project.poster) {
+            detailVideo.setAttribute("poster", project.poster);
+          }
           detailVideo.src = project.video;
           detailVideo.load();
           try {
@@ -3405,6 +3467,42 @@
         openProjectDetail(index, projectCard);
       });
 
+      // Pre-warm detail video bytes when the user signals intent (hover/touch).
+      // The browser keeps the bytes cached, so the actual click feels instant.
+      const detailPreloadCache = new Set();
+      const preloadDetailVideo = (projectCard) => {
+        if (!projectCard) return;
+        const index = Number(projectCard.dataset.projectIndex || 0);
+        const project = projectData[index];
+        if (!project || !project.video) return;
+        if (detailPreloadCache.has(project.video)) return;
+        detailPreloadCache.add(project.video);
+        try {
+          const link = document.createElement("link");
+          link.rel = "prefetch";
+          link.as = "video";
+          link.href = project.video;
+          link.type = "video/mp4";
+          document.head.appendChild(link);
+        } catch (_) {}
+      };
+      projectsTrack.addEventListener(
+        "pointerenter",
+        (event) => {
+          const projectCard = event.target.closest && event.target.closest(".project-card");
+          if (projectCard) preloadDetailVideo(projectCard);
+        },
+        true
+      );
+      projectsTrack.addEventListener(
+        "touchstart",
+        (event) => {
+          const projectCard = event.target.closest && event.target.closest(".project-card");
+          if (projectCard) preloadDetailVideo(projectCard);
+        },
+        { passive: true, capture: true }
+      );
+
       document.querySelectorAll(".site-header a:not(.logo)").forEach((link) => {
         link.addEventListener("click", () => {
           if (projectsSection.classList.contains("detail-open")) {
@@ -3478,6 +3576,17 @@
       });
 
       detailPlayToggleButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (detailVideo.paused || detailVideo.ended) {
+          detailReplayButton.classList.remove("show");
+          attemptDetailVideoPlay();
+          return;
+        }
+        detailVideo.pause();
+      });
+
+      // Click anywhere on the video to play/pause as well.
+      detailVideo.addEventListener("click", (event) => {
         event.stopPropagation();
         if (detailVideo.paused || detailVideo.ended) {
           detailReplayButton.classList.remove("show");

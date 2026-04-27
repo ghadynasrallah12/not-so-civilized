@@ -1,0 +1,92 @@
+
+=== 21:22:16 Encoding: assets/web/PROJECT/AKI/p1.mp4 -> assets/web/PROJECT/optimized/aki-web.mp4 (CRF 24, max 6M) ===
+  done: 253MB -> 13MB
+
+=== 21:23:12 Encoding: assets/web/PROJECT/AKIKI/FILM 1.mp4 -> assets/web/PROJECT/optimized/akiki-web.mp4 (CRF 24, max 6M) ===
+  done: 194MB -> 23MB
+
+=== 21:24:33 Encoding: assets/web/PROJECT/BEIT TRAD/BEIT TRAD COLORED.mp4 -> assets/web/PROJECT/optimized/beit-trad-web.mp4 (CRF 24, max 6M) ===
+  done: 538MB -> 21MB
+
+=== 21:25:57 Encoding: assets/web/PROJECT/BESH/2.mp4 -> assets/web/PROJECT/optimized/besh-web.mp4 (CRF 23, max 8M) ===
+  done: 42MB -> 0MB
+
+=== 21:26:01 Encoding: assets/web/PROJECT/BOKJA/BOKJA WEDESIGN.mp4 -> assets/web/PROJECT/optimized/bokja-web.mp4 (CRF 24, max 6M) ===
+[libx264 @ 0x1060064a0] frame MB size (120x90) > level limit (8192)
+[libx264 @ 0x1060064a0] DPB size (4 frames, 43200 mbs) > level limit (3 frames, 32768 mbs)
+[libx264 @ 0x1060064a0] MB rate (270000) > level limit (245760)
+  done: 352MB -> 20MB
+
+=== 21:27:25 Encoding: assets/web/PROJECT/ELISSAR/ELISSAR KANSO FIL FINAL WITH SUBTITLES.mov -> assets/web/PROJECT/optimized/elissar-web.mp4 (CRF 24, max 5M) ===
+  done: 1386MB -> 27MB
+
+=== 21:29:45 Encoding: assets/web/PROJECT/IRRELEVANT/IRRELEVANT_DOCU_FINAL.MP4 -> assets/web/PROJECT/optimized/irrelevant-web.mp4 (CRF 24, max 5M) ===
+  done: 640MB -> 13MB
+
+=== 21:31:21 Encoding: assets/web/PROJECT/KATARINA/albino.mp4 -> assets/web/PROJECT/optimized/katarina-web.mp4 (CRF 23, max 8M) ===
+  done: 5MB -> 1MB
+
+=== 21:31:29 Encoding: assets/web/PROJECT/MJ/MARIE JOE FILM WITH SUBTITLES.mp4 -> assets/web/PROJECT/optimized/mj-web.mp4 (CRF 24, max 4M) ===
+  done: 1705MB -> 29MB
+
+=== 21:34:31 Encoding: assets/web/PROJECT/NAGGIAR ARTIST/OUISAM FINAL mp4.mp4 -> assets/web/PROJECT/optimized/naggiar-artist-web.mp4 (CRF 24, max 6M) ===
+  done: 397MB -> 8MB
+
+=== 21:35:32 Encoding: assets/web/PROJECT/NAGGIAR FILM/NAGGIAR_4K_FINAL01_.MP4 -> assets/web/PROJECT/optimized/naggiar-film-web.mp4 (CRF 24, max 5M) ===
+  done: 195MB -> 38MB
+
+=== 21:38:12 Encoding: assets/web/PROJECT/OIL&GAZ/GENERAL OIL&GAZ.mp4 -> assets/web/PROJECT/optimized/oil-gaz-web.mp4 (CRF 23, max 8M) ===
+[libx264 @ 0x105306440] frame MB size (120x90) > level limit (8192)
+[libx264 @ 0x105306440] DPB size (4 frames, 43200 mbs) > level limit (3 frames, 32768 mbs)
+[libx264 @ 0x105306440] MB rate (270000) > level limit (245760)
+  done: 219MB -> 8MB
+
+=== 21:38:45 Encoding: assets/web/PROJECT/ORIENT/CITY VIEW.mp4 -> assets/web/PROJECT/optimized/orient-web.mp4 (CRF 23, max 7M) ===
+  done: 287MB -> 9MB
+
+=== 21:39:27 Encoding: assets/web/PROJECT/POP UP/MAN.mp4 -> assets/web/PROJECT/optimized/pop-up-web.mp4 (CRF 24, max 6M) ===
+[libx264 @ 0x14c2072c0] frame MB size (120x90) > level limit (8192)
+[libx264 @ 0x14c2072c0] DPB size (4 frames, 43200 mbs) > level limit (3 frames, 32768 mbs)
+[libx264 @ 0x14c2072c0] MB rate (270000) > level limit (245760)
+  done: 354MB -> 14MB
+
+=== 21:40:56 Encoding: assets/web/PROJECT/SAMI/final sami.mp4 -> assets/web/PROJECT/optimized/sami-web.mp4 (CRF 24, max 4M) ===
+  done: 602MB -> 48MB
+
+=== 21:44:27 Encoding: assets/web/PROJECT/SARA'S BAG/HORIZONTAL WITHOUT BARS WITH SUBTITLES .mp4 -> assets/web/PROJECT/optimized/saras-bag-web.mp4 (CRF 24, max 6M) ===
+  done: 284MB -> 13MB
+
+=== 21:45:28 Encoding: assets/web/PROJECT/SARISTIQUE/FINAL OMDB SARI.mp4 -> assets/web/PROJECT/optimized/saristique-web.mp4 (CRF 24, max 5M) ===
+  done: 765MB -> 41MB
+
+=== 21:48:19 Encoding: assets/web/PROJECT/SOAR/SOAR_ESTHER_V4.mp4 -> assets/web/PROJECT/optimized/soar-web.mp4 (CRF 23, max 8M) ===
+  done: 64MB -> 1MB
+
+=== 21:48:32 Encoding: assets/web/PROJECT/STEAKBAR SUSHI/vclassic 2025-07-16 183053.365.MOV -> assets/web/PROJECT/optimized/steakbar-sushi-web.mp4 (CRF 23, max 8M) ===
+  done: 8MB -> 1MB
+
+=== 21:48:40 Encoding: assets/web/homepage/HOMEPAGE VIDEO.mov -> assets/web/homepage/optimized/homepage-video-web.mp4 (CRF 25, max 4M) ===
+[swscaler @ 0x130008000] deprecated pixel format used, make sure you did set range correctly
+  done: 10MB -> 1MB
+
+=== 21:48:51 ALL DONE ===
+-rw-r--r--@ 1 ghadynasrallah  staff    14M Apr 27 21:23 assets/web/PROJECT/optimized/aki-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    23M Apr 27 21:24 assets/web/PROJECT/optimized/akiki-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    21M Apr 27 21:25 assets/web/PROJECT/optimized/beit-trad-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff   573K Apr 27 21:26 assets/web/PROJECT/optimized/besh-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    20M Apr 27 21:27 assets/web/PROJECT/optimized/bokja-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    27M Apr 27 21:29 assets/web/PROJECT/optimized/elissar-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    14M Apr 27 21:31 assets/web/PROJECT/optimized/irrelevant-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff   1.4M Apr 27 21:31 assets/web/PROJECT/optimized/katarina-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    30M Apr 27 21:34 assets/web/PROJECT/optimized/mj-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff   8.1M Apr 27 21:35 assets/web/PROJECT/optimized/naggiar-artist-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    38M Apr 27 21:38 assets/web/PROJECT/optimized/naggiar-film-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff   8.2M Apr 27 21:38 assets/web/PROJECT/optimized/oil-gaz-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    10M Apr 27 21:39 assets/web/PROJECT/optimized/orient-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    14M Apr 27 21:40 assets/web/PROJECT/optimized/pop-up-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    48M Apr 27 21:44 assets/web/PROJECT/optimized/sami-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    14M Apr 27 21:45 assets/web/PROJECT/optimized/saras-bag-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff    41M Apr 27 21:48 assets/web/PROJECT/optimized/saristique-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff   1.3M Apr 27 21:48 assets/web/PROJECT/optimized/soar-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff   1.4M Apr 27 21:48 assets/web/PROJECT/optimized/steakbar-sushi-web.mp4
+-rw-r--r--@ 1 ghadynasrallah  staff   1.8M Apr 27 21:48 assets/web/homepage/optimized/homepage-video-web.mp4

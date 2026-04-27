@@ -9,5 +9,13 @@ assets/web/homepage/*
 !assets/web/homepage/optimized/
 !assets/web/homepage/JOURNAL/
 
+# Original project source files used for re-encoding/remuxing.
+# Kept locally for audio remux but never pushed (gigabytes).
+assets/original/
+assets/original/**
+
 # Local high-bitrate backups kept next to optimized exports
 **/*-original-backup*.mp4
+
+# Encoder/remux log output
+scripts/*.log
