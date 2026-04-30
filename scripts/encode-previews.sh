@@ -1,9 +1,10 @@
 #!/bin/bash
 # Generate short silent H.264 PREVIEW clips for the projects carousel.
 # Strategy:
-#   - Carousel only needs a looping teaser — detail page plays full HD + audio.
-#   - 8 sec, max 720px on the long edge, tighter bitrate cap (many clips can load at once).
-#   - Target ~120–450 KB per clip so scrolling stays responsive on mobile networks.
+#   - Same resolution as the source (no scaling) so previews look as crisp
+#     as the click-to-play full clip.
+#   - First 5 seconds only — looping teaser, detail page plays the full clip + audio.
+#   - VBR with a maxrate cap targeting ~2–3 MB per file (CRF 23, max 4.5 Mb/s, buf 9 Mb/s).
 #   - Source = the existing optimized full HD clip (already remuxed with audio).
 
 set -uo pipefail
@@ -29,13 +30,12 @@ preview() {
   echo "=== $(date '+%H:%M:%S') Preview $label ===" | tee -a "$LOG"
 
   ffmpeg -y -hide_banner -loglevel error \
-    -ss 0 -t 8 -i "$src" \
+    -ss 0 -t 5 -i "$src" \
     -map 0:v:0 \
-    -c:v libx264 -profile:v high -level 3.1 -pix_fmt yuv420p \
-    -preset medium -crf 31 \
-    -maxrate 650k -bufsize 1300k \
-    -g 48 -keyint_min 48 -sc_threshold 0 \
-    -vf "scale='if(gt(iw,ih),min(720,iw),-2)':'if(gt(iw,ih),-2,min(720,ih))':flags=lanczos" \
+    -c:v libx264 -profile:v high -level 4.1 -pix_fmt yuv420p \
+    -preset slow -crf 23 \
+    -maxrate 4500k -bufsize 9000k \
+    -g 60 -keyint_min 60 -sc_threshold 0 \
     -an \
     -movflags +faststart \
     "$out" 2>&1 | tee -a "$LOG"
