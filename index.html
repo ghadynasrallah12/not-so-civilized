@@ -25,10 +25,39 @@
       as="image"
       href="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
     />
-    <link href="https://fonts.cdnfonts.com/css/andale-mono" rel="stylesheet" />
-    <link href="https://fonts.cdnfonts.com/css/delirium-ncv" rel="stylesheet" />
-    <link href="https://fonts.cdnfonts.com/css/dan-hand" rel="stylesheet" />
-    <link href="https://fonts.cdnfonts.com/css/aku-kamu" rel="stylesheet" />
+    <!-- Fonts loaded async so they don't block first paint.
+         The @font-face rules below cover the local-served weights with font-display:swap,
+         so text is rendered immediately with the system fallback while remote fonts load. -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.cdnfonts.com/css/andale-mono"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.cdnfonts.com/css/delirium-ncv"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.cdnfonts.com/css/dan-hand"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.cdnfonts.com/css/aku-kamu"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link href="https://fonts.cdnfonts.com/css/andale-mono" rel="stylesheet" />
+      <link href="https://fonts.cdnfonts.com/css/delirium-ncv" rel="stylesheet" />
+      <link href="https://fonts.cdnfonts.com/css/dan-hand" rel="stylesheet" />
+      <link href="https://fonts.cdnfonts.com/css/aku-kamu" rel="stylesheet" />
+    </noscript>
     <style>
       :root {
         --bg: #f2eee1;
@@ -37,6 +66,8 @@
         --accent: #d7c39a;
         --section-bg: #0f0f12;
         --contact-surface: #f5f2eb;
+        --brand-logo-width: 148px;
+        --brand-logo-height: 59px;
       }
 
       @font-face {
@@ -98,6 +129,12 @@
         font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
         background: var(--section-bg);
         color: var(--text-light);
+      }
+
+      html,
+      body,
+      body * {
+        cursor: crosshair !important;
       }
 
       html.projects-detail-open,
@@ -189,13 +226,14 @@
         font-weight: 700;
         font-family: "Andale Mono", "AndaleMono", monospace;
         letter-spacing: 0.06em;
+        transform: translate(15%, 30%);
       }
 
       .center-tagline {
         text-align: center;
         position: absolute;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate(-50%, 30%);
         width: max-content;
         opacity: 0.9;
         font-size: 14px;
@@ -208,6 +246,7 @@
         letter-spacing: 0.06em;
         white-space: nowrap;
         font-family: "Andale Mono", "AndaleMono", monospace;
+        transform: translate(-15%, 30%);
       }
 
       .main-nav {
@@ -251,6 +290,7 @@
       .wordmark-logo {
         margin: 0;
         line-height: 0;
+        transform: translate(30%, -30%);
       }
 
       .wordmark-logo a {
@@ -259,8 +299,8 @@
       }
 
       .wordmark-logo img {
-        width: clamp(108px, 16vw, 160px);
-        height: auto;
+        width: var(--brand-logo-width);
+        height: var(--brand-logo-height);
         display: block;
       }
 
@@ -274,6 +314,7 @@
         font-weight: 700;
         text-transform: uppercase;
         font-family: "Aku & Kamu" !important;
+        transform: translate(-30%, -30%);
       }
 
       a.tagline {
@@ -319,8 +360,8 @@
       section.contact-section {
         position: relative;
         z-index: 2;
-        margin: -14px 0 0;
-        padding: 14px 0 0;
+        margin: 0;
+        padding: 0;
         min-height: 100vh;
         min-height: 100dvh;
         width: 100%;
@@ -335,8 +376,82 @@
       }
 
       section#standards.section {
+        position: relative;
         border-bottom: none;
+        border-top: none;
         margin-bottom: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        background: transparent;
+        display: flex;
+        align-items: stretch;
+        justify-content: stretch;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .standards-layout {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+      }
+
+      .standards-grid {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        grid-template-rows: repeat(7, minmax(0, 1fr));
+        gap: 0;
+      }
+
+      .standards-tile {
+        overflow: hidden;
+        cursor: zoom-in;
+      }
+
+      .standards-tile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transform: scale(1.001);
+      }
+
+      .standards-zoom-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2200;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 360ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .standards-zoom-overlay.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .standards-zoom-overlay .zoom-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(8, 8, 10, 0.45);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .standards-zoom-clone {
+        position: fixed;
+        z-index: 2201;
+        object-fit: cover;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        will-change: top, left, width, height;
+        transition:
+          top 420ms cubic-bezier(0.22, 1, 0.36, 1),
+          left 420ms cubic-bezier(0.22, 1, 0.36, 1),
+          width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+          height 420ms cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .contact-bar {
@@ -382,10 +497,11 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.55rem;
-        font-family: "Dan Hand", "Dan's Hand", "Segoe Print", "Bradley Hand ITC", cursive;
-        font-size: clamp(1.05rem, 2.4vw, 1.45rem);
-        line-height: 1.45;
+        gap: 0.3rem;
+        font-family: "Dan's Hand", "Dan Hand", "Segoe Print", "Bradley Hand ITC", cursive;
+        font-size: clamp(1.4rem, 3vw, 2.1rem);
+        line-height: 1.18;
+        font-weight: 400;
         color: #0a0a0a;
       }
 
@@ -393,43 +509,30 @@
         display: block;
         transform-origin: center;
         white-space: nowrap;
-        opacity: 0;
+        opacity: 1;
       }
 
       .contact-details .contact-line.is-visible {
         opacity: 1;
-        transition: opacity 0.22s ease;
-      }
-
-      .contact-details .contact-line.is-typing::after {
-        content: "|";
-        display: inline-block;
-        margin-left: 0.08em;
-        opacity: 0.95;
-        animation: contact-caret-blink 0.72s step-end infinite;
-      }
-
-      @keyframes contact-caret-blink {
-        0%,
-        48% {
-          opacity: 0.95;
-        }
-        49%,
-        100% {
-          opacity: 0;
-        }
       }
 
       .contact-details .contact-line--email {
-        transform: translateX(-1.1rem) rotate(-2.2deg);
+        font-size: clamp(2rem, 4.5vw, 3.2rem);
+        line-height: 1.03;
+        letter-spacing: 0.01em;
+        transform: none;
       }
 
       .contact-details .contact-line--phone {
-        transform: translateX(0.85rem) rotate(1.4deg);
+        font-size: clamp(1.85rem, 4.1vw, 2.8rem);
+        line-height: 1.05;
+        transform: none;
       }
 
       .contact-details .contact-line--social {
-        transform: translateX(-0.35rem) rotate(-1.6deg);
+        font-size: clamp(1.85rem, 4.1vw, 2.8rem);
+        line-height: 1.05;
+        transform: translateY(-10%) rotate(-5deg);
       }
 
       .contact-details a {
@@ -458,8 +561,8 @@
       }
 
       .contact-footer-logo img {
-        width: clamp(108px, 16vw, 160px);
-        height: auto;
+        width: var(--brand-logo-width);
+        height: var(--brand-logo-height);
         display: block;
       }
 
@@ -491,16 +594,13 @@
 
       .about-layout {
         min-height: 100vh;
-        display: grid;
-        grid-template-columns: 41% 59%;
+        display: block;
         position: relative;
+        background: #050505;
       }
 
       .about-image {
-        position: relative;
-        background-image: url("assets/web/homepage/optimized/about-web.jpg");
-        background-size: cover;
-        background-position: center;
+        display: none;
       }
 
       .about-image::after {
@@ -530,7 +630,8 @@
         background: #050505;
         position: relative;
         z-index: 2;
-        box-shadow: -3.5rem 0 4.5rem 0 rgba(5, 5, 5, 0.5);
+        box-shadow: none;
+        min-height: 100vh;
       }
 
       .about-block {
@@ -568,6 +669,7 @@
         bottom: 2rem;
         line-height: 0;
         z-index: 4;
+        transform: translate(30%, -30%);
       }
 
       .about-logo a {
@@ -576,8 +678,8 @@
       }
 
       .about-logo img {
-        width: clamp(108px, 16vw, 160px);
-        height: auto;
+        width: var(--brand-logo-width);
+        height: var(--brand-logo-height);
         display: block;
       }
 
@@ -642,7 +744,7 @@
       }
 
       .service-band.consultancy::before {
-        background-color: #1f2326;
+        background-color: #293133;
         background-image: none;
       }
 
@@ -661,9 +763,9 @@
 
       .service-band.execution::before {
         background-color: #0c0c0e;
-        background-image: url("assets/web/homepage/optimized/concept-creation-development-web.jpg");
+        background-image: url("assets/web/homepage/optimized/concept-creation-web.jpg");
         background-size: 100% auto;
-        background-position: center 25%;
+        background-position: center 48%;
         background-repeat: no-repeat;
         filter: brightness(1.18) contrast(1.14) saturate(1.12);
       }
@@ -681,6 +783,7 @@
 
       .service-band h2.service-title {
         margin: 0;
+        margin-bottom: 2.1rem;
         font-weight: 400;
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -708,7 +811,8 @@
       }
 
       .service-extra {
-        margin: 0.8rem 0 0;
+        margin: 0;
+        padding-top: 0.4rem;
         max-width: 56ch;
         opacity: 0;
         max-height: 0;
@@ -767,6 +871,77 @@
         border-left: 1px solid rgba(0, 0, 0, 0.5);
         border-right: 1px solid rgba(0, 0, 0, 0.5);
         cursor: pointer;
+      }
+
+      /* ----- Universal media loader (shimmer + spinner) -----
+       * Add class .has-media-loader to a positioned wrapper around <video> or <img>.
+       * The .media-loader child is shown until JS sets data-loaded="true" on the wrapper.
+       */
+      .has-media-loader {
+        position: relative;
+      }
+      .has-media-loader[data-loaded="true"] .media-loader {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .media-loader {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(8, 8, 10, 0.6);
+        background-image: linear-gradient(
+          110deg,
+          rgba(255, 255, 255, 0) 30%,
+          rgba(255, 255, 255, 0.08) 50%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        background-size: 220% 100%;
+        background-repeat: no-repeat;
+        background-position: 110% 0;
+        animation: media-loader-shimmer 1.4s linear infinite;
+        transition: opacity 320ms ease;
+        pointer-events: none;
+      }
+      .media-loader::after {
+        content: "";
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.18);
+        border-top-color: rgba(255, 255, 255, 0.85);
+        animation: media-loader-spin 0.9s linear infinite;
+      }
+      .media-loader.is-light {
+        background-color: rgba(245, 242, 235, 0.6);
+      }
+      .media-loader.is-light::after {
+        border-color: rgba(0, 0, 0, 0.18);
+        border-top-color: rgba(0, 0, 0, 0.7);
+      }
+      @keyframes media-loader-shimmer {
+        0% { background-position: 110% 0; }
+        100% { background-position: -110% 0; }
+      }
+      @keyframes media-loader-spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* Make project carousel cards & detail wrap loader-aware */
+      .project-card .media-loader { z-index: 2; }
+      .project-detail-video-wrap .media-loader { z-index: 2; border-radius: inherit; }
+      .journal-item .media-loader { z-index: 1; }
+      .standards-tile .media-loader { z-index: 1; }
+
+      /* Image fade-in on load (paired with blur-up data-blur background) */
+      img.fade-in {
+        opacity: 0;
+        transition: opacity 360ms ease;
+      }
+      img.fade-in.is-loaded {
+        opacity: 1;
       }
 
       .project-shared-flyer {
@@ -834,56 +1009,21 @@
       }
 
       .project-card-hover-bg {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        top: auto;
-        height: 30%;
-        background: linear-gradient(
-          to bottom,
-          rgba(255, 255, 255, 0.95) 0%,
-          rgba(255, 255, 255, 0.86) 58%,
-          rgba(255, 255, 255, 0.35) 100%
-        );
-        -webkit-backdrop-filter: blur(2.6px);
-        backdrop-filter: blur(2.6px);
-        transform: translateY(100%);
-        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        display: none;
       }
 
       .project-card-hover-bg::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.42s ease 0.1s;
-        background: linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.52) 0%,
-          rgba(0, 0, 0, 0.2) 36%,
-          rgba(0, 0, 0, 0) 100%
-        );
-      }
-
-      .project-card:hover .project-card-hover-bg {
-        transform: translateY(0);
-      }
-
-      .project-card:hover .project-card-hover-bg::after {
-        opacity: 1;
+        display: none;
       }
 
       .project-card-hover-inner {
         position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 30%;
+        inset: 0;
         z-index: 2;
         box-sizing: border-box;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         padding: 0;
         opacity: 0;
         transition: opacity 0.35s ease 0.12s;
@@ -894,30 +1034,25 @@
       }
 
       .project-card-hover-title {
-        position: absolute;
-        top: clamp(0.5rem, 1.35vw, 0.9rem);
-        left: clamp(0.75rem, 2.2vw, 1.35rem);
-        right: clamp(5.75rem, 15vw, 10rem);
-        margin: 0;
-        color: #0e0e10;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-size: clamp(1.05rem, 2.2vw, 1.65rem);
-        font-weight: 700;
-        font-family: "Delirium NCV", "Delirium", "Andale Mono", "AndaleMono", monospace;
-        line-height: 1.1;
-        max-width: none;
+        display: none;
       }
 
       .project-card-hover-logo {
-        position: absolute;
-        right: clamp(0.65rem, 1.8vw, 1.1rem);
-        bottom: clamp(0.55rem, 1.5vw, 0.95rem);
-        width: clamp(108px, 16vw, 160px);
+        width: clamp(132px, 20vw, 230px);
         height: auto;
         display: block;
         object-fit: contain;
-        filter: brightness(0) saturate(100%);
+        filter: none;
+        opacity: 0;
+        transform: scale(0.92);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .project-card:hover .project-card-hover-logo {
+        opacity: 1;
+        transform: scale(1);
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -1418,8 +1553,8 @@
       }
 
       .journal-bottom-logo img {
-        width: clamp(108px, 16vw, 160px);
-        height: auto;
+        width: var(--brand-logo-width);
+        height: var(--brand-logo-height);
         display: block;
       }
 
@@ -1661,6 +1796,16 @@
       }
 
       @media (max-width: 900px) {
+        .standards-layout {
+          height: 100vh;
+          height: 100dvh;
+        }
+
+        .standards-grid {
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          grid-template-rows: repeat(8, minmax(0, 1fr));
+        }
+
         .about-layout {
           grid-template-columns: 1fr;
         }
@@ -1865,8 +2010,8 @@
             <div class="service-left">
               <h2 class="service-title">Creative<br />Consultancy</h2>
               <p class="service-extra">
-                Brand positioning, communication audits, and strategic frameworks to define how your
-                concept should move with precision.
+                The puzzle. It’s the creative foundation of every project. It defines the core vision
+                through a clear presentation, treatment, and strategic plan that becomes the creative bible.
               </p>
             </div>
           </article>
@@ -1875,8 +2020,9 @@
             <div class="service-left">
               <h2 class="service-title">Concept Creation<br />&amp; Development</h2>
               <p class="service-extra">
-                We translate ideas into visual systems, campaign structures, and story direction ready
-                for rollout across digital and physical channels.
+                It defines the direction for all materials—and makes the work creative. If the puzzle is
+                the creative strategy, the pieces are the creative directions. Guiding execution across any
+                medium, not just film.
               </p>
             </div>
           </article>
@@ -1885,8 +2031,9 @@
             <div class="service-left">
               <h2 class="service-title">Creative<br />Execution</h2>
               <p class="service-extra">
-                End-to-end production and launch support, built to carry the original idea into real
-                deliverables with consistency and impact.
+                It’s the process of building the puzzle itself,best done by the ones who created it. It’s
+                where the idea comes to life, whatever it takes. Each idea has its own way of being
+                executed, with its own process, timeline, and team.
               </p>
             </div>
           </article>
@@ -2279,7 +2426,7 @@
             <button class="project-detail-close" id="project-detail-close">Back To Projects</button>
           </div>
           <div class="project-detail-media">
-            <div class="project-detail-video-wrap">
+            <div class="project-detail-video-wrap has-media-loader" data-loaded="false">
               <video
                 id="project-detail-video"
                 class="project-detail-video"
@@ -2289,6 +2436,7 @@
               >
                 <source src="assets/web/PROJECT/optimized/aki-web.mp4" type="video/mp4" />
               </video>
+              <div class="media-loader" id="project-detail-loader" aria-hidden="true"></div>
               <button id="project-detail-mute" class="project-detail-mute" type="button" aria-label="Mute">
                 <svg id="mute-icon-on" class="control-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M3 10v4h4l5 4V6l-5 4H3z"></path>
@@ -2360,12 +2508,13 @@
       </section>
 
       <section class="section" id="standards">
-        <h2>Standards</h2>
-        <p>
-          Define your values and workflow principles. This makes expectations clear for collaborators and
-          clients.
-        </p>
+        <div class="standards-layout" aria-label="Standards image board">
+          <div class="standards-grid" id="standards-grid"></div>
+        </div>
       </section>
+      <div class="standards-zoom-overlay" id="standards-zoom-overlay" aria-hidden="true">
+        <div class="zoom-backdrop"></div>
+      </div>
 
       <section class="section contact-section" id="contact" aria-label="Contact">
         <div class="contact-main">
@@ -2524,98 +2673,9 @@
       }
 
       const contactLines = Array.from(document.querySelectorAll(".contact-details .contact-line"));
-      const contactTypingTimers = [];
-      let contactTypingRunId = 0;
-      let contactTypingActive = false;
-
-      const clearContactTypingTimers = () => {
-        while (contactTypingTimers.length) {
-          const timerId = contactTypingTimers.pop();
-          clearTimeout(timerId);
-        }
-      };
-
-      const resetContactTyping = () => {
-        clearContactTypingTimers();
-        contactTypingActive = false;
+      if (contactLines.length) {
         contactLines.forEach((line) => {
-          const fullText = line.dataset.fullText || line.textContent.trim();
-          line.dataset.fullText = fullText;
-          line.textContent = "";
-          line.classList.remove("is-typing");
-          line.classList.remove("is-visible");
-        });
-      };
-
-      const typeContactLine = (line, fullText, runId, startDelay = 0) =>
-        new Promise((resolve) => {
-          const beginTimer = setTimeout(() => {
-            if (runId !== contactTypingRunId) return resolve();
-            line.classList.add("is-visible");
-            line.classList.add("is-typing");
-            line.textContent = "";
-            let idx = 0;
-            const typeNext = () => {
-              if (runId !== contactTypingRunId) return resolve();
-              idx += 1;
-              line.textContent = fullText.slice(0, idx);
-              if (idx >= fullText.length) {
-                line.classList.remove("is-typing");
-                return resolve();
-              }
-              const char = fullText[idx - 1];
-              const cadence = /\s/.test(char) ? 45 : 63;
-              const tickTimer = setTimeout(typeNext, cadence);
-              contactTypingTimers.push(tickTimer);
-            };
-            typeNext();
-          }, startDelay);
-          contactTypingTimers.push(beginTimer);
-        });
-
-      const runContactTypingSequence = async () => {
-        if (!contactLines.length || contactTypingActive) return;
-        contactTypingActive = true;
-        contactTypingRunId += 1;
-        const runId = contactTypingRunId;
-        clearContactTypingTimers();
-        for (const line of contactLines) {
-          const fullText = line.dataset.fullText || line.textContent.trim();
-          line.dataset.fullText = fullText;
-          await typeContactLine(line, fullText, runId, 120);
-        }
-        if (runId === contactTypingRunId) {
-          contactTypingActive = false;
-        }
-      };
-
-      if (contactSectionEl && contactLines.length) {
-        contactLines.forEach((line) => {
-          line.dataset.fullText = line.textContent.trim();
-        });
-        resetContactTyping();
-        let contactWasInView = false;
-        const contactTypingObserver = new IntersectionObserver(
-          (entries) => {
-            const [entry] = entries;
-            const nowInView = entry.isIntersecting && entry.intersectionRatio > 0.14;
-            if (nowInView && !contactWasInView) {
-              resetContactTyping();
-              runContactTypingSequence();
-            } else if (!nowInView && contactWasInView) {
-              resetContactTyping();
-            }
-            contactWasInView = nowInView;
-          },
-          { threshold: [0, 0.14, 0.3, 0.5] }
-        );
-        contactTypingObserver.observe(contactSectionEl);
-
-        document.querySelectorAll('a[href="#contact"]').forEach((contactLink) => {
-          contactLink.addEventListener("click", () => {
-            resetContactTyping();
-            runContactTypingSequence();
-          });
+          line.classList.add("is-visible");
         });
       }
 
@@ -2736,16 +2796,118 @@
         },
       ];
 
+      // Build a preview-clip URL from the full-quality web URL.
+      // Carousel uses tiny 12-sec previews; detail view uses the full clip with audio.
+      const buildPreviewUrl = (videoUrl) => {
+        if (!videoUrl) return videoUrl;
+        return videoUrl
+          .replace("/PROJECT/optimized/", "/PROJECT/optimized/previews/")
+          .replace(/\.mp4$/i, "-preview.mp4");
+      };
+
+      // -------- Universal media-loader helper ---------
+      // Wraps an <img> or <video> with a loader sibling and toggles data-loaded.
+      // The wrapper element passed in must be position:relative (or the loader CSS
+      // will turn it into one via .has-media-loader).
+      const attachMediaLoader = (wrapEl, mediaEl, { lightTheme = false } = {}) => {
+        if (!wrapEl || !mediaEl) return;
+        wrapEl.classList.add("has-media-loader");
+        if (!wrapEl.hasAttribute("data-loaded")) wrapEl.setAttribute("data-loaded", "false");
+        let loader = wrapEl.querySelector(":scope > .media-loader");
+        if (!loader) {
+          loader = document.createElement("div");
+          loader.className = "media-loader" + (lightTheme ? " is-light" : "");
+          loader.setAttribute("aria-hidden", "true");
+          wrapEl.appendChild(loader);
+        }
+        const markLoaded = () => {
+          wrapEl.setAttribute("data-loaded", "true");
+        };
+        const markLoading = () => {
+          wrapEl.setAttribute("data-loaded", "false");
+        };
+        if (mediaEl.tagName === "IMG") {
+          if (mediaEl.complete && mediaEl.naturalWidth > 0) {
+            markLoaded();
+          } else {
+            mediaEl.addEventListener("load", markLoaded, { once: false });
+            mediaEl.addEventListener("error", markLoaded, { once: false });
+          }
+        } else if (mediaEl.tagName === "VIDEO") {
+          // Video: hide loader once we have enough data to play, also on first frame.
+          const onReady = () => markLoaded();
+          mediaEl.addEventListener("loadeddata", onReady);
+          mediaEl.addEventListener("canplay", onReady);
+          mediaEl.addEventListener("playing", onReady);
+          mediaEl.addEventListener("error", markLoaded);
+          mediaEl.addEventListener("waiting", markLoading);
+          mediaEl.addEventListener("stalled", markLoading);
+          if (mediaEl.readyState >= 2) markLoaded();
+        }
+      };
+
       // Apply posters to every project card video so cards show an image
       // instantly instead of a blank black box while video bytes load.
+      // Also map per-project hover logos (shown centered on hover).
       (() => {
+        const projectHoverLogos = {
+          AKI: "assets/project logos/aki.png",
+          AKIKI: "assets/project logos/akiki-transparent.png",
+          "BEIT TRAD": "assets/project logos/Beit Trad-transparent.png",
+          BESH: "assets/project logos/Besh.png",
+          BOKJA: "assets/project logos/BOKJA W.png",
+          ELISSAR: "assets/project logos/elissar.PNG",
+          IRRELEVANT: "assets/project logos/irrelevant3.png",
+          "NAGGIAR ARTIST": "assets/project logos/naggiar-artist.png",
+          "NAGGIAR FILM": "assets/project logos/Logo Naggiar-transparent.png",
+          "OIL & GAZ": "assets/project logos/oil-&-Gaz-logo-white.png",
+          ORIENT: "assets/project logos/Orient.png",
+          "SARA'S BAG": "assets/project logos/Saras bag-transparent.png",
+          SOAR: "assets/project logos/Soar.png",
+          "STEAKBAR SUSHI": "assets/project logos/steakbarsushi-2-transparent.png",
+        };
+
         const cards = document.querySelectorAll("#projects-track .project-card");
         cards.forEach((card) => {
           const idx = Number(card.dataset.projectIndex || 0);
           const project = projectData[idx];
-          if (!project || !project.poster) return;
+          if (!project) return;
+
+          // Loader overlay on the card.
+          card.classList.add("has-media-loader");
+          card.setAttribute("data-loaded", "false");
+          if (!card.querySelector(":scope > .media-loader")) {
+            const loader = document.createElement("div");
+            loader.className = "media-loader";
+            loader.setAttribute("aria-hidden", "true");
+            card.appendChild(loader);
+          }
+
           const v = card.querySelector("video");
-          if (v && !v.poster) v.setAttribute("poster", project.poster);
+          if (v) {
+            if (project.poster && !v.poster) v.setAttribute("poster", project.poster);
+            // Swap to the lightweight preview clip.
+            const source = v.querySelector("source");
+            const previewUrl = buildPreviewUrl(project.video);
+            if (source && previewUrl) {
+              source.setAttribute("src", previewUrl);
+              v.load();
+            }
+            attachMediaLoader(card, v);
+          }
+
+          const hoverLogo = card.querySelector(".project-card-hover-logo");
+          if (hoverLogo) {
+            const logoPath = projectHoverLogos[project.title];
+            if (!logoPath) {
+              hoverLogo.style.display = "none";
+            } else {
+              hoverLogo.src = encodeURI(logoPath);
+              hoverLogo.alt = `${project.title} logo`;
+              hoverLogo.loading = "lazy";
+              hoverLogo.decoding = "async";
+            }
+          }
         });
       })();
 
@@ -2776,6 +2938,9 @@
       const playTogglePauseIcon = document.getElementById("play-toggle-pause");
       const playTogglePlayIcon = document.getElementById("play-toggle-play");
       const detailVideoWrap = document.querySelector(".project-detail-video-wrap");
+      if (detailVideoWrap && detailVideo) {
+        attachMediaLoader(detailVideoWrap, detailVideo);
+      }
       const projectsCarouselView = document.querySelector(".projects-carousel-view");
       const journalScrollEl = document.getElementById("journal-scroll");
       const journalBase = "assets/web/homepage/optimized/JOURNAL/";
@@ -3042,8 +3207,26 @@
           if (project.poster) {
             detailVideo.setAttribute("poster", project.poster);
           }
+          // Show shimmer/spinner until the new full HD clip is ready.
+          if (detailVideoWrap) detailVideoWrap.setAttribute("data-loaded", "false");
           detailVideo.src = project.video;
           detailVideo.load();
+          // Pre-warm the NEXT project so the user gets near-instant transitions.
+          (() => {
+            const nextProject = projectData[(index + 1) % projectData.length];
+            if (!nextProject || !nextProject.video) return;
+            const id = "nsc-prefetch-next-project";
+            let link = document.getElementById(id);
+            if (!link) {
+              link = document.createElement("link");
+              link.id = id;
+              link.rel = "prefetch";
+              link.as = "video";
+              link.type = "video/mp4";
+              document.head.appendChild(link);
+            }
+            link.href = nextProject.video;
+          })();
           try {
             detailVideo.currentTime = 0;
           } catch (_) {}
@@ -3194,17 +3377,10 @@
       let journalDragZCounter = 5;
       const enableJournalItemDrag = (item) => {
         let activePointerId = null;
-        let interactionMode = "move";
-        let resizeDir = "";
         let startX = 0;
         let startY = 0;
         let baseDx = 0;
         let baseDy = 0;
-        let startWidth = 0;
-        let startHeight = 0;
-        let originalInlineWidth = "";
-        let originalInlineHeight = "";
-        const edgeThreshold = 14;
 
         const readOffset = (name) => Number(item.dataset[name] || 0);
         const writeOffset = (dx, dy) => {
@@ -3216,62 +3392,7 @@
 
         writeOffset(readOffset("dx"), readOffset("dy"));
 
-        const getResizeDirection = (event) => {
-          const rect = item.getBoundingClientRect();
-          const x = event.clientX - rect.left;
-          const y = event.clientY - rect.top;
-          const nearLeft = x <= edgeThreshold;
-          const nearRight = x >= rect.width - edgeThreshold;
-          const nearTop = y <= edgeThreshold;
-          const nearBottom = y >= rect.height - edgeThreshold;
-
-          if ((nearLeft || nearRight) && (nearTop || nearBottom)) {
-            if ((nearLeft && nearTop) || (nearRight && nearBottom)) return "nwse";
-            return "nesw";
-          }
-          if (nearLeft || nearRight) return "ew";
-          if (nearTop || nearBottom) return "ns";
-          return "";
-        };
-
-        const syncHoverCursor = (event) => {
-          if (activePointerId !== null) return;
-          const dir = getResizeDirection(event);
-          if (dir === "ew") item.style.cursor = "ew-resize";
-          else if (dir === "ns") item.style.cursor = "ns-resize";
-          else if (dir === "nwse") item.style.cursor = "nwse-resize";
-          else if (dir === "nesw") item.style.cursor = "nesw-resize";
-          else item.style.cursor = "grab";
-        };
-
-        const applyResize = (dx, dy) => {
-          const minWidth = 120;
-          const minHeight = 120;
-          let nextWidth = startWidth;
-          let nextHeight = startHeight;
-
-          if (resizeDir === "ew") {
-            nextWidth = startWidth + dx;
-          } else if (resizeDir === "ns") {
-            nextHeight = startHeight + dy;
-          } else {
-            // Diagonal resize: resize both axes together for natural corner drag.
-            nextWidth = startWidth + dx;
-            nextHeight = startHeight + dy;
-          }
-
-          nextWidth = Math.max(minWidth, nextWidth);
-          nextHeight = Math.max(minHeight, nextHeight);
-          item.style.width = `${nextWidth}px`;
-          item.style.height = `${nextHeight}px`;
-          item.style.setProperty("--journal-w", `${nextWidth}px`);
-          item.style.setProperty("--journal-h", `${nextHeight}px`);
-        };
-
-        item.addEventListener("pointermove", syncHoverCursor);
-        item.addEventListener("pointerleave", () => {
-          if (activePointerId === null) item.style.cursor = "grab";
-        });
+        item.style.cursor = "grab";
 
         item.addEventListener("pointerdown", (event) => {
           if (event.button !== 0 && event.pointerType !== "touch") return;
@@ -3280,15 +3401,6 @@
           startY = event.clientY;
           baseDx = readOffset("dx");
           baseDy = readOffset("dy");
-          resizeDir = getResizeDirection(event);
-          interactionMode = resizeDir ? "resize" : "move";
-          const rect = item.getBoundingClientRect();
-          startWidth = rect.width;
-          startHeight = rect.height;
-          originalInlineWidth = item.style.width;
-          originalInlineHeight = item.style.height;
-          if (!originalInlineWidth) item.style.width = `${rect.width}px`;
-          if (!originalInlineHeight) item.style.height = `${rect.height}px`;
           item.classList.add("is-dragging");
           journalDragZCounter += 1;
           item.style.zIndex = String(journalDragZCounter);
@@ -3300,11 +3412,6 @@
           if (activePointerId !== event.pointerId) return;
           const dx = event.clientX - startX;
           const dy = event.clientY - startY;
-          if (interactionMode === "resize") {
-            applyResize(dx, dy);
-            return;
-          }
-
           const dynamicMaxX = Math.max(window.innerWidth * 0.95, 800);
           const dynamicMaxY = Math.max(window.innerHeight * 1.35, 1000);
           const nextDx = Math.max(-dynamicMaxX, Math.min(dynamicMaxX, baseDx + dx));
@@ -3315,8 +3422,6 @@
         const endDrag = (event) => {
           if (activePointerId !== event.pointerId) return;
           activePointerId = null;
-          interactionMode = "move";
-          resizeDir = "";
           item.classList.remove("is-dragging");
           item.style.cursor = "grab";
         };
@@ -3332,6 +3437,14 @@
           if (!res.ok) throw new Error("manifest");
           const files = await res.json();
           if (!Array.isArray(files) || !files.length) return;
+
+          // Tiny base64 LQIPs (Phase 3) — load once, used as bg of every tile so
+          // there's never an empty black box while the full image streams in.
+          let blurMap = {};
+          try {
+            const blurRes = await fetch(`${journalBase}blur-placeholders.json`);
+            if (blurRes.ok) blurMap = await blurRes.json();
+          } catch (_) {}
 
           const frag = document.createDocumentFragment();
           const journalSizeScale = 1.55;
@@ -3389,6 +3502,17 @@
             };
           };
 
+          // Helper: build sibling URLs for AVIF + WebP + original.
+          const buildPictureSources = (origUrl) => {
+            const dot = origUrl.lastIndexOf(".");
+            const stem = dot > 0 ? origUrl.slice(0, dot) : origUrl;
+            return {
+              avif: `${stem}.avif`,
+              webp: `${stem}.webp`,
+              orig: origUrl,
+            };
+          };
+
           files.forEach((filename, index) => {
             const article = document.createElement("article");
             const floatClass = (index % 8) + 1;
@@ -3434,12 +3558,46 @@
               placeVhBox(article, w, h);
             }
 
+            // Picture tag with AVIF + WebP + JPEG fallback for fastest load.
+            const baseUrl = `${journalBase}${encodeURIComponent(filename)}`;
+            const sources = buildPictureSources(baseUrl);
+            const picture = document.createElement("picture");
+            const sAvif = document.createElement("source");
+            sAvif.srcset = sources.avif;
+            sAvif.type = "image/avif";
+            picture.appendChild(sAvif);
+            const sWebp = document.createElement("source");
+            sWebp.srcset = sources.webp;
+            sWebp.type = "image/webp";
+            picture.appendChild(sWebp);
             const img = document.createElement("img");
-            img.src = `${journalBase}${encodeURIComponent(filename)}`;
+            img.src = sources.orig;
             img.alt = "";
-            img.loading = index < 1 ? "eager" : "lazy";
+            img.loading = index < 8 ? "eager" : "lazy";
             img.decoding = "async";
-            article.appendChild(img);
+            img.classList.add("fade-in");
+            const onImgLoaded = () => img.classList.add("is-loaded");
+            if (img.complete && img.naturalWidth > 0) {
+              onImgLoaded();
+            } else {
+              img.addEventListener("load", onImgLoaded, { once: true });
+              img.addEventListener("error", onImgLoaded, { once: true });
+            }
+            picture.appendChild(img);
+            article.appendChild(picture);
+
+            // Blur-up: paint a tiny base64 thumbnail behind the <img> so the
+            // user sees a color/composition immediately. The fade-in image
+            // gracefully replaces it once loaded.
+            const blurData = blurMap && blurMap[filename];
+            if (blurData) {
+              article.style.backgroundImage = `url("${blurData}")`;
+              article.style.backgroundSize = "cover";
+              article.style.backgroundPosition = "center";
+              article.style.backgroundRepeat = "no-repeat";
+            }
+
+            attachMediaLoader(article, img);
 
             const initialOffset = getInitialJournalOffset(index);
             article.dataset.dx = String(initialOffset.dx);
@@ -3453,6 +3611,184 @@
           journalScrollEl.innerHTML =
             '<p class="journal-load-fallback" style="color:rgba(255,255,255,0.45);padding:1.25rem;font-family:Andale Mono,monospace;font-size:0.75rem;">Journal images could not be loaded.</p>';
         }
+      };
+
+      const initStandardsBoard = async () => {
+        const standardsGridEl = document.getElementById("standards-grid");
+        const standardsZoomOverlay = document.getElementById("standards-zoom-overlay");
+        if (!standardsGridEl) return;
+
+        let standardsImages = [];
+        try {
+          const res = await fetch("assets/web/standards/optimized/standards-manifest.json");
+          if (res.ok) {
+            const files = await res.json();
+            if (Array.isArray(files)) standardsImages = files.filter((f) => /\.jpg$/i.test(f));
+          }
+        } catch (_) {}
+        if (!standardsImages.length) return;
+
+        let standardsBlurMap = {};
+        try {
+          const blurRes = await fetch("assets/web/standards/optimized/blur-placeholders.json");
+          if (blurRes.ok) standardsBlurMap = await blurRes.json();
+        } catch (_) {}
+
+        let currentZoom = null;
+
+        const getGridShape = (count) => {
+          // Keep one-per-image (no duplicates) while still filling viewport with a dense board.
+          // 27 images → desktop: 9x3, mobile: 3x9.
+          if (window.innerWidth <= 900) return { cols: 3, rows: Math.ceil(count / 3) };
+          return { cols: 9, rows: Math.ceil(count / 9) };
+        };
+
+        const openStandardsZoom = (imgEl) => {
+          if (!standardsZoomOverlay || currentZoom) return;
+          const startRect = imgEl.getBoundingClientRect();
+          if (!startRect.width || !startRect.height) return;
+
+          const clone = imgEl.cloneNode(true);
+          clone.className = "standards-zoom-clone";
+          clone.style.top = `${startRect.top}px`;
+          clone.style.left = `${startRect.left}px`;
+          clone.style.width = `${startRect.width}px`;
+          clone.style.height = `${startRect.height}px`;
+          document.body.appendChild(clone);
+
+          const naturalW = imgEl.naturalWidth || startRect.width;
+          const naturalH = imgEl.naturalHeight || startRect.height;
+          const maxW = window.innerWidth * 0.88;
+          const maxH = window.innerHeight * 0.88;
+          const scale = Math.min(maxW / naturalW, maxH / naturalH);
+          const targetW = Math.max(320, naturalW * scale);
+          const targetH = Math.max(220, naturalH * scale);
+          const targetLeft = (window.innerWidth - targetW) / 2;
+          const targetTop = (window.innerHeight - targetH) / 2;
+
+          standardsZoomOverlay.classList.add("is-open");
+          standardsZoomOverlay.setAttribute("aria-hidden", "false");
+          requestAnimationFrame(() => {
+            clone.style.top = `${targetTop}px`;
+            clone.style.left = `${targetLeft}px`;
+            clone.style.width = `${targetW}px`;
+            clone.style.height = `${targetH}px`;
+          });
+
+          currentZoom = { source: imgEl, clone, startRect };
+          imgEl.style.visibility = "hidden";
+        };
+
+        const closeStandardsZoom = () => {
+          if (!currentZoom) return;
+          const { source, clone, startRect } = currentZoom;
+          standardsZoomOverlay.classList.remove("is-open");
+          standardsZoomOverlay.setAttribute("aria-hidden", "true");
+          clone.style.top = `${startRect.top}px`;
+          clone.style.left = `${startRect.left}px`;
+          clone.style.width = `${startRect.width}px`;
+          clone.style.height = `${startRect.height}px`;
+          const cleanup = () => {
+            clone.removeEventListener("transitionend", cleanup);
+            clone.remove();
+            source.style.visibility = "";
+          };
+          clone.addEventListener("transitionend", cleanup);
+          currentZoom = null;
+        };
+
+        const buildStandardsTile = (filename, eager) => {
+          const article = document.createElement("article");
+          article.className = "standards-tile";
+
+          const baseUrl = `assets/web/standards/optimized/${encodeURIComponent(filename)}`;
+          const stem = baseUrl.replace(/\.jpg$/i, "");
+          const picture = document.createElement("picture");
+
+          const sAvif = document.createElement("source");
+          sAvif.srcset = `${stem}.avif`;
+          sAvif.type = "image/avif";
+          picture.appendChild(sAvif);
+
+          const sWebp = document.createElement("source");
+          sWebp.srcset = `${stem}.webp`;
+          sWebp.type = "image/webp";
+          picture.appendChild(sWebp);
+
+          const img = document.createElement("img");
+          img.src = baseUrl;
+          img.alt = "";
+          img.loading = eager ? "eager" : "lazy";
+          img.decoding = "async";
+          img.classList.add("fade-in");
+          if (img.complete && img.naturalWidth > 0) {
+            img.classList.add("is-loaded");
+          } else {
+            img.addEventListener("load", () => img.classList.add("is-loaded"), { once: true });
+            img.addEventListener("error", () => img.classList.add("is-loaded"), { once: true });
+          }
+          picture.appendChild(img);
+          article.appendChild(picture);
+
+          // Blur-up placeholder behind the image so users see the composition
+          // immediately, even on slow connections.
+          const blurData = standardsBlurMap && standardsBlurMap[filename];
+          if (blurData) {
+            article.style.backgroundImage = `url("${blurData}")`;
+            article.style.backgroundSize = "cover";
+            article.style.backgroundPosition = "center";
+            article.style.backgroundRepeat = "no-repeat";
+          }
+
+          attachMediaLoader(article, img);
+
+          article.addEventListener("click", () => openStandardsZoom(img));
+          return article;
+        };
+
+        const renderStandardsTiles = () => {
+          const count = standardsImages.length;
+          const { cols, rows } = getGridShape(count);
+          standardsGridEl.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+          standardsGridEl.style.gridTemplateRows = `repeat(${rows}, minmax(0, 1fr))`;
+
+          // PHASE 6: paint in two batches so the first row(s) appear instantly,
+          // then the rest are committed on the next animation frame.
+          standardsGridEl.innerHTML = "";
+          const eagerCount = Math.min(cols * 2, count);
+          const firstFrag = document.createDocumentFragment();
+          for (let i = 0; i < eagerCount; i += 1) {
+            firstFrag.appendChild(buildStandardsTile(standardsImages[i], true));
+          }
+          standardsGridEl.appendChild(firstFrag);
+
+          if (eagerCount < count) {
+            requestAnimationFrame(() => {
+              const restFrag = document.createDocumentFragment();
+              for (let i = eagerCount; i < count; i += 1) {
+                restFrag.appendChild(buildStandardsTile(standardsImages[i], false));
+              }
+              standardsGridEl.appendChild(restFrag);
+            });
+          }
+        };
+
+        renderStandardsTiles();
+        let standardsResizeTimer = null;
+        window.addEventListener("resize", () => {
+          if (standardsResizeTimer) clearTimeout(standardsResizeTimer);
+          standardsResizeTimer = setTimeout(() => {
+            if (currentZoom) closeStandardsZoom();
+            renderStandardsTiles();
+          }, 120);
+        });
+
+        if (standardsZoomOverlay) {
+          standardsZoomOverlay.addEventListener("click", closeStandardsZoom);
+        }
+        window.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") closeStandardsZoom();
+        });
       };
 
       nextButton.addEventListener("click", () => nudgeCarousel(1));
@@ -3727,8 +4063,17 @@
       }
 
       initJournalGallery();
+      initStandardsBoard();
 
       startContinuousCarousel();
+
+      // ---- Service Worker registration (Phase 5) ----
+      // Cache-first for static media so repeat visits feel instant.
+      if ("serviceWorker" in navigator && location.protocol !== "file:") {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch(() => {});
+        });
+      }
     </script>
   </body>
 </html>

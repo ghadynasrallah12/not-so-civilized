@@ -19,3 +19,22 @@ assets/original/**
 
 # Encoder/remux log output
 scripts/*.log
+
+# Local-only debug pages
+cursor-preview.html
+
+# Unreferenced project logos (kept locally as backups, not deployed)
+assets/project logos/Beit Trad.png
+assets/project logos/Logo Naggiar.jpg
+assets/project logos/Saras bag.jpg.webp
+assets/project logos/SteakbarSushi-transparent.png
+assets/project logos/SteakbarSushi.png
+assets/project logos/akiki.jpeg
+assets/project logos/irrelevant 2.jpeg
+assets/project logos/irrelevant-2-transparent.png
+assets/project logos/irrelevant-transparent.png
+assets/project logos/irrelevant.png
+assets/project logos/steakbarsushi 2.png
+
+# Stale/old typo dirs
+assets/curosr/
