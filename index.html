@@ -419,6 +419,25 @@
         transform: scale(1.001);
       }
 
+      /* Skeleton tiles painted before the manifest fetch resolves —
+         a faint shimmer fills the section so it never looks blank. */
+      .standards-tile.standards-skeleton {
+        background: rgba(20, 20, 22, 0.92);
+        cursor: default;
+      }
+      .standards-tile.standards-skeleton .media-loader {
+        background-color: rgba(15, 15, 18, 0.96);
+        background-image: linear-gradient(
+          110deg,
+          rgba(255, 255, 255, 0) 30%,
+          rgba(255, 255, 255, 0.05) 50%,
+          rgba(255, 255, 255, 0) 70%
+        );
+      }
+      .standards-tile.standards-skeleton .media-loader::after {
+        opacity: 0.55;
+      }
+
       .standards-zoom-overlay {
         position: fixed;
         inset: 0;
@@ -3083,6 +3102,82 @@
         }
       };
 
+      // Hot-swap the detail player from preview clip → full-HD master once the
+      // master is sufficiently buffered. We do this with a hidden <video> so
+      // the visible player keeps looping the preview during the wait.
+      let masterUpgradeProbeEl = null;
+      const cancelDetailMasterUpgrade = () => {
+        if (masterUpgradeProbeEl) {
+          masterUpgradeProbeEl.onloadeddata = null;
+          masterUpgradeProbeEl.oncanplaythrough = null;
+          masterUpgradeProbeEl.onerror = null;
+          masterUpgradeProbeEl.removeAttribute("src");
+          try { masterUpgradeProbeEl.load(); } catch (_) {}
+          masterUpgradeProbeEl = null;
+        }
+      };
+
+      const scheduleDetailVideoMasterUpgrade = (token, masterUrl) => {
+        if (!masterUrl) return;
+        cancelDetailMasterUpgrade();
+
+        const probe = document.createElement("video");
+        probe.preload = "auto";
+        probe.muted = true;
+        probe.playsInline = true;
+        probe.style.display = "none";
+        probe.src = masterUrl;
+        masterUpgradeProbeEl = probe;
+        document.body.appendChild(probe);
+
+        const swapToMaster = () => {
+          if (token !== detailVideoLoadToken) {
+            cancelDetailMasterUpgrade();
+            return;
+          }
+          if (!projectsSection.classList.contains("detail-open")) {
+            cancelDetailMasterUpgrade();
+            return;
+          }
+          // Preserve playback position within the master clip if possible.
+          // Preview is 5s and looping, so currentTime maps to first 5s of master.
+          const resumeAt = Number.isFinite(detailVideo.currentTime) ? detailVideo.currentTime % 5 : 0;
+          const wasPlaying = !detailVideo.paused;
+          // Disable looping so the master plays through naturally.
+          detailVideo.loop = false;
+          detailVideo.removeAttribute("loop");
+          detailVideo.src = masterUrl;
+          detailVideo.load();
+          const onReady = () => {
+            try {
+              detailVideo.currentTime = Math.min(resumeAt, Math.max(0, (detailVideo.duration || resumeAt) - 0.1));
+            } catch (_) {}
+            if (wasPlaying) attemptDetailVideoPlay();
+          };
+          if (detailVideo.readyState >= 1) {
+            onReady();
+          } else {
+            detailVideo.addEventListener("loadedmetadata", onReady, { once: true });
+          }
+          cancelDetailMasterUpgrade();
+        };
+
+        probe.addEventListener("canplaythrough", swapToMaster, { once: true });
+        probe.addEventListener(
+          "loadeddata",
+          () => {
+            // Some browsers don't fire canplaythrough for short clips; fall back
+            // to a buffered-time check.
+            try {
+              if (probe.buffered.length && probe.buffered.end(0) >= 4) swapToMaster();
+            } catch (_) {}
+          },
+          { once: true }
+        );
+        probe.addEventListener("error", () => cancelDetailMasterUpgrade(), { once: true });
+        try { probe.load(); } catch (_) {}
+      };
+
       const scheduleDetailVideoRetry = (token, delayMs = 420) => {
         if (detailVideoRetryTimer) {
           clearTimeout(detailVideoRetryTimer);
@@ -3230,10 +3325,23 @@
           if (project.poster) {
             detailVideo.setAttribute("poster", project.poster);
           }
-          // Show shimmer/spinner until the new full HD clip is ready.
+          // Two-stage source strategy for INSTANT playback:
+          //   1. Boot the detail player with the small carousel preview that is
+          //      already cached (or loading) → playback starts the moment the
+          //      flyer animation lands, no buffering wait.
+          //   2. In parallel, pre-buffer the full-HD master in a hidden video
+          //      element. Once it's ready, hot-swap the source so the user gets
+          //      audio + the full clip without seeing a loading state.
+          const previewUrl = buildPreviewUrl(project.video);
           if (detailVideoWrap) detailVideoWrap.setAttribute("data-loaded", "false");
-          detailVideo.src = project.video;
+          detailVideo.src = previewUrl || project.video;
+          detailVideo.loop = true;
+          detailVideo.setAttribute("loop", "");
           detailVideo.load();
+
+          if (previewUrl && previewUrl !== project.video) {
+            scheduleDetailVideoMasterUpgrade(loadToken, project.video);
+          }
           // Pre-warm the NEXT project so the user gets near-instant transitions.
           (() => {
             const nextProject = projectData[(index + 1) % projectData.length];
@@ -3248,7 +3356,7 @@
               link.type = "video/mp4";
               document.head.appendChild(link);
             }
-            link.href = nextProject.video;
+            link.href = buildPreviewUrl(nextProject.video) || nextProject.video;
           })();
           try {
             detailVideo.currentTime = 0;
@@ -3317,6 +3425,7 @@
       const closeProjectDetail = () => {
         isProjectOpening = false;
         detailVideoLoadToken += 1;
+        cancelDetailMasterUpgrade();
         if (detailVideoRetryTimer) {
           clearTimeout(detailVideoRetryTimer);
           detailVideoRetryTimer = null;
@@ -3668,6 +3777,38 @@
         const standardsZoomOverlay = document.getElementById("standards-zoom-overlay");
         if (!standardsGridEl) return;
 
+        const getGridShape = (count) => {
+          // Keep one-per-image (no duplicates) while still filling viewport with a dense board.
+          // 27 images → desktop: 9x3, mobile: 3x9.
+          if (window.innerWidth <= 900) return { cols: 3, rows: Math.ceil(count / 3) };
+          return { cols: 9, rows: Math.ceil(count / 9) };
+        };
+
+        // Paint shimmer placeholders IMMEDIATELY so the section is never an
+        // empty black gap while the manifest fetches over the network.
+        // We use the known canonical count (27) for the initial skeleton so
+        // the grid shape is correct even before the JSON arrives.
+        const PLACEHOLDER_COUNT = 27;
+        const paintStandardsSkeleton = () => {
+          const { cols, rows } = getGridShape(PLACEHOLDER_COUNT);
+          standardsGridEl.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+          standardsGridEl.style.gridTemplateRows = `repeat(${rows}, minmax(0, 1fr))`;
+          standardsGridEl.innerHTML = "";
+          const frag = document.createDocumentFragment();
+          for (let i = 0; i < PLACEHOLDER_COUNT; i += 1) {
+            const tile = document.createElement("article");
+            tile.className = "standards-tile standards-skeleton has-media-loader";
+            tile.setAttribute("data-loaded", "false");
+            const loader = document.createElement("div");
+            loader.className = "media-loader";
+            loader.setAttribute("aria-hidden", "true");
+            tile.appendChild(loader);
+            frag.appendChild(tile);
+          }
+          standardsGridEl.appendChild(frag);
+        };
+        paintStandardsSkeleton();
+
         let standardsImages = [];
         try {
           const res = await fetch("assets/web/standards/optimized/standards-manifest.json");
@@ -3685,13 +3826,6 @@
         } catch (_) {}
 
         let currentZoom = null;
-
-        const getGridShape = (count) => {
-          // Keep one-per-image (no duplicates) while still filling viewport with a dense board.
-          // 27 images → desktop: 9x3, mobile: 3x9.
-          if (window.innerWidth <= 900) return { cols: 3, rows: Math.ceil(count / 3) };
-          return { cols: 9, rows: Math.ceil(count / 9) };
-        };
 
         const openStandardsZoom = (imgEl) => {
           if (!standardsZoomOverlay || currentZoom) return;
