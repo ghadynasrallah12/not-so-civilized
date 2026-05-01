@@ -25,6 +25,13 @@
       as="image"
       href="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
     />
+    <link
+      rel="preload"
+      href="assets/fonts/Dan_Hand.woff"
+      as="font"
+      type="font/woff"
+      crossorigin
+    />
     <!-- Fonts loaded async so they don't block first paint.
          The @font-face rules below cover the local-served weights with font-display:swap,
          so text is rendered immediately with the system fallback while remote fonts load. -->
@@ -68,6 +75,7 @@
         --contact-surface: #f5f2eb;
         --brand-logo-width: 148px;
         --brand-logo-height: 59px;
+        --hero-side-gutter: 76px;
       }
 
       @font-face {
@@ -116,12 +124,24 @@
           local("Nokia Expanded Medium");
       }
 
+      @font-face {
+        font-family: "Dan Hand";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src:
+          local("Dan Hand"),
+          url("assets/fonts/Dan_Hand.woff") format("woff");
+      }
+
       * {
         box-sizing: border-box;
       }
 
       html {
         scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
       }
 
       body {
@@ -182,7 +202,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 2rem clamp(1rem, 4vw, 3rem);
+        padding: 2rem var(--hero-side-gutter);
         color: var(--text-light);
       }
 
@@ -202,7 +222,7 @@
         left: 0;
         right: 0;
         z-index: 120;
-        padding: 2rem clamp(1rem, 4vw, 3rem) 0;
+        padding: 2rem var(--hero-side-gutter) 0;
         background: transparent;
       }
 
@@ -226,7 +246,7 @@
         font-weight: 700;
         font-family: "Andale Mono", "AndaleMono", monospace;
         letter-spacing: 0.06em;
-        transform: translate(15%, 30%);
+        transform: translateY(30%);
       }
 
       .center-tagline {
@@ -242,19 +262,24 @@
       }
 
       .clock {
+        position: absolute;
+        right: -5px;
+        top: 0;
         opacity: 0.9;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.02em;
         white-space: nowrap;
+        text-align: right;
         font-family: "Andale Mono", "AndaleMono", monospace;
-        transform: translate(-15%, 30%);
+        transform: translateY(30%);
       }
 
       .main-nav {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-        gap: clamp(140px, 1vw, 100px);
+        flex-wrap: nowrap;
+        gap: clamp(1rem, 2.2vw, 2.2rem);
+        width: 100%;
         margin: auto 0;
       }
 
@@ -262,11 +287,11 @@
         color: var(--text-light);
         text-decoration: none;
         text-transform: uppercase;
-        
         font-size: 19px;
         opacity: 0.92;
         transition: opacity 0.2s ease;
         font-family: "Andale Mono", "AndaleMono", monospace;
+        white-space: nowrap;
       }
 
       .main-nav a:hover {
@@ -290,7 +315,7 @@
       .wordmark-logo {
         margin: 0;
         line-height: 0;
-        transform: translate(30%, -30%);
+        transform: translate(-1px, -30%);
       }
 
       .wordmark-logo a {
@@ -314,7 +339,7 @@
         font-weight: 700;
         text-transform: uppercase;
         font-family: "Aku & Kamu" !important;
-        transform: translate(-30%, -30%);
+        transform: translateY(calc(-30% - 6px));
       }
 
       a.tagline {
@@ -491,7 +516,7 @@
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: clamp(5rem, 14vw, 7rem) clamp(1.25rem, 5vw, 2.5rem) clamp(2rem, 6vw, 3rem);
+        padding: clamp(5rem, 14vw, 7rem) var(--hero-side-gutter) clamp(2rem, 6vw, 3rem);
         gap: clamp(1.25rem, 3vw, 2rem);
         overflow-x: hidden;
       }
@@ -505,8 +530,7 @@
         font-size: 50px;
         line-height: 1.1;
         letter-spacing: 0.02em;
-        word-spacing: 0;
-        white-space: pre;
+        word-spacing: 0.08em;
         text-transform: uppercase;
         font-family: "Aku & Kamu" !important;
         color: #0a0a0a;
@@ -516,10 +540,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.3rem;
-        font-family: "Dan's Hand", "Dan Hand", "Segoe Print", "Bradley Hand ITC", cursive;
-        font-size: clamp(1.4rem, 3vw, 2.1rem);
-        line-height: 1.18;
+        gap: clamp(0.2rem, 0.55vw, 0.4rem);
+        font-family: "Dan Hand", "Dan's Hand", "Segoe Print", "Bradley Hand ITC", cursive;
+        font-size: clamp(1rem, 1.85vw, 1.35rem);
+        line-height: 1.3;
         font-weight: 400;
         color: #0a0a0a;
       }
@@ -536,21 +560,21 @@
       }
 
       .contact-details .contact-line--email {
-        font-size: clamp(2rem, 4.5vw, 3.2rem);
-        line-height: 1.03;
+        font-size: clamp(1.15rem, 2.15vw, 1.55rem);
+        line-height: 1.28;
         letter-spacing: 0.01em;
         transform: none;
       }
 
       .contact-details .contact-line--phone {
-        font-size: clamp(1.85rem, 4.1vw, 2.8rem);
-        line-height: 1.05;
+        font-size: clamp(1.05rem, 2vw, 1.42rem);
+        line-height: 1.28;
         transform: none;
       }
 
       .contact-details .contact-line--social {
-        font-size: clamp(1.85rem, 4.1vw, 2.8rem);
-        line-height: 1.05;
+        font-size: clamp(1.05rem, 2vw, 1.42rem);
+        line-height: 1.28;
         transform: translateY(-10%) rotate(-5deg);
       }
 
@@ -571,7 +595,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 4vw, 2rem) clamp(2rem, 5vw, 3.5rem);
+        padding: clamp(1rem, 3vw, 2rem) var(--hero-side-gutter) clamp(2rem, 5vw, 3.5rem);
       }
 
       .contact-footer-logo a {
@@ -643,9 +667,9 @@
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-        justify-content: center;
-        gap: clamp(3rem, 8vw, 8.5rem);
-        padding: calc(3rem + 20px) 140px 3rem clamp(1.2rem, 6vw, 4rem);
+        justify-content: flex-start;
+        gap: 150px;
+        padding: 212px var(--hero-side-gutter) clamp(1.6rem, 3.6vh, 2.2rem) var(--hero-side-gutter);
         background: #050505;
         position: relative;
         z-index: 2;
@@ -655,14 +679,14 @@
 
       .about-block {
         margin: 0;
-        width: min(100%, 46rem);
+        width: min(100%, 58rem);
         box-sizing: border-box;
         padding-right: 0;
         text-align: right;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.06em;
         font-size: 20px;
-        line-height: 1.02 !important;
+        line-height: 0.96 !important;
         color: #ffffff;
         font-family: "Andale Mono", "AndaleMono", monospace;
       }
@@ -684,11 +708,11 @@
 
       .about-logo {
         position: absolute;
-        left: clamp(1rem, 4vw, 3rem);
-        bottom: 2rem;
+        left: var(--hero-side-gutter);
+        bottom: max(0px, calc(100dvh - 744px));
         line-height: 0;
         z-index: 4;
-        transform: translate(30%, -30%);
+        transform: none;
       }
 
       .about-logo a {
@@ -726,7 +750,7 @@
         align-items: center;
         justify-content: flex-start;
         gap: 1rem;
-        padding: 2.8rem clamp(1.2rem, 4vw, 3rem);
+        padding: 2.8rem var(--hero-side-gutter);
         border-top: 1px solid rgba(255, 255, 255, 0.06);
         transition: flex 0.5s ease;
       }
@@ -763,8 +787,12 @@
       }
 
       .service-band.consultancy::before {
-        background-color: #293133;
-        background-image: none;
+        background-color: #0c0c0e;
+        background-image: url("assets/web/homepage/optimized/creative%20consultancy.JPG");
+        background-size: 100% auto;
+        background-position: center 30%;
+        background-repeat: no-repeat;
+        filter: brightness(1.14) contrast(1.08) saturate(1.04);
       }
 
       .service-band.consultancy::after {
@@ -773,20 +801,17 @@
 
       .service-band.creation::before {
         background-color: #0c0c0e;
-        background-image: url("assets/web/homepage/optimized/creative-execution-web.jpg");
+        background-image: url("assets/web/homepage/optimized/concept%20creation%20and%20dev.JPG");
         background-size: 100% auto;
-        background-position: center 10%;
+        background-position: center 20%;
         background-repeat: no-repeat;
-        filter: brightness(1.22) contrast(1.16) saturate(1.12);
+        filter: brightness(1.17) contrast(1.12) saturate(1.06);
       }
 
       .service-band.execution::before {
-        background-color: #0c0c0e;
-        background-image: url("assets/web/homepage/optimized/concept-creation-web.jpg");
-        background-size: 100% auto;
-        background-position: center 48%;
-        background-repeat: no-repeat;
-        filter: brightness(1.18) contrast(1.14) saturate(1.12);
+        background-color: #050507;
+        background-image: none;
+        filter: none;
       }
 
       .service-band.creation::after,
@@ -843,9 +868,10 @@
           max-height 0.45s ease;
         color: #ffffff;
         text-transform: uppercase;
-        letter-spacing: 0.07em;
-        line-height: 1.28;
-        font-size: clamp(0.72rem, 0.9vw, 0.95rem);
+        letter-spacing: 0.06em;
+        line-height: 19px !important;
+        font-size: 17px;
+        font-family: "Andale Mono", "AndaleMono", monospace;
       }
 
       .service-band:hover .service-extra {
@@ -1181,18 +1207,127 @@
         min-height: 0;
         height: 100%;
         align-self: stretch;
-        padding: clamp(2.25rem, 5vh, 4rem) clamp(1.8rem, 6vw, 4.1rem) clamp(6.25rem, 14vh, 9rem);
+        padding: calc(env(safe-area-inset-top, 0px) + clamp(9.85rem, 21.5vh, 13.75rem)) var(--hero-side-gutter)
+          clamp(5.5rem, 14vh, 9.5rem);
         background: linear-gradient(90deg, #000000 0%, #000000 52%, rgba(0, 0, 0, 0.92) 78%, rgba(0, 0, 0, 0.45) 100%);
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        gap: 1.4rem;
+        justify-content: flex-start;
+        align-items: stretch;
+        gap: clamp(0.35rem, 1vh, 0.55rem);
         overflow-x: hidden;
-        overflow-y: auto;
+        overflow-y: visible;
         z-index: 5;
         opacity: 1;
         transform: none;
         transition: none;
+      }
+
+      .project-detail-back {
+        position: absolute;
+        top: calc(env(safe-area-inset-top, 0px) + clamp(4.9rem, 10.75vh, 6.6rem));
+        left: calc(var(--hero-side-gutter) - 2px);
+        margin: 0;
+        padding: 0.35rem 0.5rem 0.35rem 0;
+        border: 0;
+        background: transparent;
+        color: #ffffff;
+        cursor: pointer;
+        opacity: 0.88;
+        z-index: 8;
+        transition: opacity 0.18s ease;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+
+      .project-detail-back:hover {
+        opacity: 1;
+      }
+
+      .project-detail-back:focus-visible {
+        outline: 1px solid rgba(255, 255, 255, 0.85);
+        outline-offset: 3px;
+      }
+
+      /* Same glyph as .project-arrow (&larr;), but smaller and lighter for the detail header. */
+      .project-detail-back-arrow {
+        display: block;
+        line-height: 1;
+        font-size: clamp(1.65rem, 3.4vw, 2.35rem);
+        font-weight: 200;
+        letter-spacing: 0;
+        color: rgba(255, 255, 255, 0.82);
+        transition: color 0.18s ease;
+      }
+
+      .project-detail-back:hover .project-detail-back-arrow {
+        color: rgba(255, 255, 255, 0.96);
+      }
+
+      .project-detail-copy-scroll {
+        position: relative;
+        z-index: 2;
+        flex: 1 1 auto;
+        width: 100%;
+        min-height: 0;
+        max-height: min(68vh, calc(100dvh - clamp(16rem, 32vh, 23rem)));
+        overflow-x: hidden;
+        overflow-y: scroll;
+        scrollbar-gutter: stable;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        padding-top: 0.2rem;
+        padding-right: max(18px, 0.65rem);
+        padding-bottom: clamp(0.75rem, 2vh, 1.25rem);
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.38) rgba(255, 255, 255, 0.08);
+      }
+
+      /* Always-visible track when copy overflows (native bar often hides until scroll on macOS). */
+      .project-detail-copy-scroll.has-scroll-overflow::before {
+        content: "";
+        position: absolute;
+        top: 4px;
+        right: 0;
+        bottom: 4px;
+        width: 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        pointer-events: none;
+        z-index: 4;
+      }
+
+      .project-detail-copy-scroll.has-scroll-overflow::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.45);
+        min-height: 56px;
+      }
+
+      .project-detail-copy-scroll::-webkit-scrollbar {
+        width: 8px;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      .project-detail-copy-scroll::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        margin: 4px 0;
+      }
+
+      .project-detail-copy-scroll::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.38);
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        min-height: 48px;
+      }
+
+      .project-detail-copy-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.52);
+        background-clip: padding-box;
       }
 
       .projects-section.detail-open .project-detail-copy {
@@ -1214,8 +1349,10 @@
 
       .project-detail-title {
         margin: 0;
+        margin-left:-3px;
+        padding-top: 0.04em;
         text-transform: uppercase;
-        line-height: 0.86;
+        line-height: 0.94;
         letter-spacing: 0;
         font-family: "Delirium NCV", "Delirium", "Arial Narrow", "Helvetica Neue Condensed", Impact, sans-serif;
         font-size: 150px;
@@ -1232,46 +1369,29 @@
         transform: translateY(0);
       }
 
+      /* Project detail body line-height — tune here (unitless, × font-size): */
       .project-detail-text {
-        margin: 0.7rem 0 0;
-        max-width: 39ch;
-        text-transform: uppercase;
-        letter-spacing: 0.072em;
-        font-size: 20px;
-        line-height: 1.14;
+        margin: 0;
+        margin-left: -3px;
+        max-width: 48ch;
+        text-transform: none;
+        letter-spacing: 0.06em;
+        font-size: 17px;
+        line-height: 0.96 !important;
         font-weight: 100;
         font-family: "Andale Mono", "AndaleMono", monospace;
+        color: rgba(255, 255, 255, 0.92);
+        white-space: pre-line;
         opacity: 0;
-        transform: translateY(34px);
+        transform: translateY(30px);
         transition:
-          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.6s,
-          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.6s;
+          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.52s,
+          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.52s;
       }
 
       .projects-section.detail-open .project-detail-text {
         opacity: 1;
         transform: translateY(0);
-      }
-
-      .project-detail-close {
-        position: absolute;
-        left: clamp(1.8rem, 6vw, 4.1rem);
-        bottom: clamp(4rem, 8.5vh, 5.4rem);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        background: transparent;
-        color: #ffffff;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        padding: 0.55rem 0.9rem;
-        font-size: 0.72rem;
-        cursor: pointer;
-        z-index: 8;
-        transition: background 0.2s ease, color 0.2s ease;
-      }
-
-      .project-detail-close:hover {
-        background: #ffffff;
-        color: #000000;
       }
 
       .project-detail-media {
@@ -1447,7 +1567,8 @@
         fill: none;
       }
 
-      .replay-icon path {
+      .replay-icon path,
+      .replay-icon polyline {
         stroke-width: 2.2;
       }
 
@@ -1504,6 +1625,13 @@
         .project-detail-video {
           transform: none;
         }
+
+        .projects-section.detail-open .project-detail-title,
+        .projects-section.detail-open .project-detail-text {
+          opacity: 1;
+          transform: none;
+          transition: opacity 0.22s ease;
+        }
       }
 
       .journal-section {
@@ -1531,7 +1659,7 @@
         box-sizing: border-box;
         min-height: 0;
         height: 100%;
-        padding: clamp(5rem, 11vh, 6.5rem) clamp(1.2rem, 4vw, 3rem) 3rem;
+        padding: clamp(5rem, 11vh, 6.5rem) var(--hero-side-gutter) 3rem;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
@@ -1585,8 +1713,8 @@
         margin: 0;
         margin-left: auto;
         margin-right: clamp(0, 0.5vw, 0.35rem);
-        padding-left: 62px;
-        padding-right: 62px;
+        padding-left: 0;
+        padding-right: 0;
         text-align: right;
         text-transform: uppercase;
         letter-spacing: 0.12em;
@@ -1832,6 +1960,16 @@
       }
 
       @media (max-width: 900px) {
+        :root {
+          --hero-side-gutter: clamp(1rem, 4vw, 1.75rem);
+        }
+
+        .main-nav {
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: clamp(1.1rem, 4.5vw, 2rem);
+        }
+
         .standards-layout {
           height: 100vh;
           height: 100dvh;
@@ -1853,6 +1991,7 @@
         .about-copy {
           min-height: 56vh;
           justify-content: start;
+          gap: clamp(1.6rem, 4vh, 2.5rem);
           padding-top: calc(2rem + 20px);
           align-items: stretch;
           padding-right: clamp(1rem, 4vw, 140px);
@@ -1941,9 +2080,11 @@
         }
 
         .project-detail-copy {
-          gap: 1.2rem;
-          padding-top: 4rem;
-          padding-bottom: 1.5rem;
+          justify-content: flex-start;
+          gap: 1rem;
+          padding: calc(env(safe-area-inset-top, 0px) + clamp(8.75rem, 19vh, 11.75rem)) var(--hero-side-gutter)
+            clamp(4rem, 12vh, 7rem);
+          min-height: min(52vh, 420px);
         }
 
         .project-detail-media {
@@ -1953,6 +2094,23 @@
 
         .project-detail-text {
           max-width: none;
+        }
+
+        .project-detail-copy-scroll {
+          max-height: min(58vh, calc(100dvh - clamp(14rem, 30vh, 20rem)));
+          padding-top: 0.15rem;
+          padding-bottom: clamp(0.75rem, 2.5vh, 1.25rem);
+        }
+
+        .project-detail-back {
+          top: calc(env(safe-area-inset-top, 0px) + clamp(4.35rem, 9.5vh, 5.85rem));
+          min-height: 44px;
+          min-width: 44px;
+          padding: 0.45rem 0.65rem 0.45rem 0;
+        }
+
+        .project-detail-back-arrow {
+          font-size: clamp(1.5rem, 3.2vw, 2.1rem);
         }
 
         .project-detail-media-bottom {
@@ -2022,19 +2180,21 @@
           <div class="about-copy">
             <p class="about-block">
               <span class="about-line">Not So Civilised</span>
-              <span class="about-line">Is A Creative Studio Specialized In</span>
-              <span class="about-line">Concept Creation And Execution.</span>
+              <span class="about-line">Is A Creative Studio</span>
+              <span class="about-line">Specialized In Concept Creation</span>
+              <span class="about-line">And Execution.</span>
             </p>
             <p class="about-block">
-              <span class="about-line">We Believe That There Is No Brand</span>
-              <span class="about-line">Without A Story No Case Without A</span>
-              <span class="about-line">Reason And No Product Without Character.</span>
+              <span class="about-line">There Is No Brand Without A Story</span>
+              <span class="about-line">No Case Without A Reason</span>
+              <span class="about-line">And No Product</span>
+              <span class="about-line">Without Character.</span>
             </p>
             <p class="about-block">
-              <span class="about-line">We Work Closely With Brands As A</span>
-              <span class="about-line">Thinking Partner Helping Define</span>
-              <span class="about-line">Direction Build Campaigns And Bring</span>
-              <span class="about-line">Them To Life With Clarity And Purpose.</span>
+              <span class="about-line">We Work Closely With Brands</span>
+              <span class="about-line">As A Thinking Partner Helping</span>
+              <span class="about-line">Define Direction Build Campaigns</span>
+              <span class="about-line">And Bring Them To Life With Clarity And Purpose.</span>
             </p>
           </div>
         </div>
@@ -2056,7 +2216,7 @@
             <div class="service-left">
               <h2 class="service-title">Concept Creation<br />&amp; Development</h2>
               <p class="service-extra">
-                It defines the direction for all materials—and makes the work creative. If the puzzle is
+                It defines the direction for all materials and makes the work creative. If the puzzle is
                 the creative strategy, the pieces are the creative directions. Guiding execution across any
                 medium, not just film.
               </p>
@@ -2454,12 +2614,16 @@
 
         <div class="projects-detail-view" id="projects-detail">
           <div class="project-detail-copy">
+            <button type="button" class="project-detail-back" id="project-detail-back" aria-label="Back to projects">
+              <span class="project-detail-back-arrow" aria-hidden="true">&larr;</span>
+            </button>
             <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
-            <p class="project-detail-text" id="project-detail-text">
-              A CALL TO REORIENT. ORIENT CAN MEAN SEVERAL DIFFERENT THINGS. AS A VERB "TO ORIENT" IS TO
-              POSITION OR ALIGN SOMETHING IN A PARTICULAR DIRECTION.
-            </p>
-            <button class="project-detail-close" id="project-detail-close">Back To Projects</button>
+            <div class="project-detail-copy-scroll" id="project-detail-copy-scroll">
+              <p class="project-detail-text" id="project-detail-text">
+                A CALL TO REORIENT. ORIENT CAN MEAN SEVERAL DIFFERENT THINGS. AS A VERB "TO ORIENT" IS TO
+                POSITION OR ALIGN SOMETHING IN A PARTICULAR DIRECTION.
+              </p>
+            </div>
           </div>
           <div class="project-detail-media">
             <div class="project-detail-video-wrap has-media-loader" data-loaded="false">
@@ -2481,8 +2645,8 @@
                 </svg>
                 <svg id="mute-icon-off" class="control-icon" viewBox="0 0 24 24" aria-hidden="true" style="display: none">
                   <path d="M3 10v4h4l5 4V6l-5 4H3z"></path>
-                  <line x1="16" y1="8" x2="21" y2="13"></line>
-                  <line x1="21" y1="8" x2="16" y2="13"></line>
+                  <line x1="17.25" y1="9.25" x2="22.25" y2="14.75"></line>
+                  <line x1="22.25" y1="9.25" x2="17.25" y2="14.75"></line>
                 </svg>
               </button>
               <button id="project-detail-play-toggle" class="project-detail-play-toggle" type="button" aria-label="Pause">
@@ -2496,8 +2660,8 @@
               </button>
               <button id="project-detail-replay" class="project-detail-replay" type="button" aria-label="Replay">
                 <svg class="control-icon replay-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 6v5h-5"></path>
-                  <path d="M20 11a8 8 0 1 0 2 5.2"></path>
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                 </svg>
               </button>
             </div>
@@ -2554,7 +2718,7 @@
 
       <section class="section contact-section" id="contact" aria-label="Contact">
         <div class="contact-main">
-          <h2 class="contact-title">&ldquo;  DARE   TO   CONTACT   US  &rdquo;</h2>
+          <h2 class="contact-title">&ldquo; DARE TO CONTACT US &rdquo;</h2>
           <div class="contact-details">
             <a class="contact-line contact-line--email" href="mailto:dare@notsocivilised.com"
               >dare@notsocivilised.com</a>
@@ -2716,121 +2880,39 @@
       }
 
       const projectData = [
-        {
-          title: "AKI",
-          text: "PROJECT AKI.",
-          video: "assets/web/PROJECT/optimized/aki-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/aki.jpg",
-        },
-        {
-          title: "AKIKI",
-          text: "PROJECT AKIKI.",
-          video: "assets/web/PROJECT/optimized/akiki-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/akiki.jpg",
-        },
-        {
-          title: "BEIT TRAD",
-          text: "PROJECT BEIT TRAD.",
-          video: "assets/web/PROJECT/optimized/beit-trad-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/beit-trad.jpg",
-        },
-        {
-          title: "BESH",
-          text: "PROJECT BESH.",
-          video: "assets/web/PROJECT/optimized/besh-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/besh.jpg",
-        },
-        {
-          title: "BOKJA",
-          text: "PROJECT BOKJA.",
-          video: "assets/web/PROJECT/optimized/bokja-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/bokja.jpg",
-        },
-        {
-          title: "ELISSAR",
-          text: "PROJECT ELISSAR.",
-          video: "assets/web/PROJECT/optimized/elissar-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/elissar.jpg",
-        },
-        {
-          title: "IRRELEVANT",
-          text: "PROJECT IRRELEVANT.",
-          video: "assets/web/PROJECT/optimized/irrelevant-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/irrelevant.jpg",
-        },
-        {
-          title: "KATARINA",
-          text: "PROJECT KATARINA.",
-          video: "assets/web/PROJECT/optimized/katarina-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/katarina.jpg",
-        },
-        {
-          title: "MJ",
-          text: "PROJECT MJ.",
-          video: "assets/web/PROJECT/optimized/mj-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/mj.jpg",
-        },
-        {
-          title: "NAGGIAR ARTIST",
-          text: "PROJECT NAGGIAR ARTIST.",
-          video: "assets/web/PROJECT/optimized/naggiar-artist-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/naggiar-artist.jpg",
-        },
-        {
-          title: "NAGGIAR FILM",
-          text: "PROJECT NAGGIAR FILM.",
-          video: "assets/web/PROJECT/optimized/naggiar-film-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/naggiar-film.jpg",
-        },
-        {
-          title: "OIL & GAZ",
-          text: "PROJECT OIL & GAZ.",
-          video: "assets/web/PROJECT/optimized/oil-gaz-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/oil-gaz.jpg",
-        },
-        {
-          title: "ORIENT",
-          text: "PROJECT ORIENT.",
-          video: "assets/web/PROJECT/optimized/orient-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/orient.jpg",
-        },
-        {
-          title: "POP UP",
-          text: "PROJECT POP UP.",
-          video: "assets/web/PROJECT/optimized/pop-up-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/pop-up.jpg",
-        },
-        {
-          title: "SAMI",
-          text: "PROJECT SAMI.",
-          video: "assets/web/PROJECT/optimized/sami-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/sami.jpg",
-        },
-        {
-          title: "SARA'S BAG",
-          text: "PROJECT SARA'S BAG.",
-          video: "assets/web/PROJECT/optimized/saras-bag-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/saras-bag.jpg",
-        },
-        {
-          title: "SARISTIQUE",
-          text: "PROJECT SARISTIQUE.",
-          video: "assets/web/PROJECT/optimized/saristique-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/saristique.jpg",
-        },
-        {
-          title: "SOAR",
-          text: "PROJECT SOAR.",
-          video: "assets/web/PROJECT/optimized/soar-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/soar.jpg",
-        },
-        {
-          title: "STEAKBAR SUSHI",
-          text: "PROJECT STEAKBAR SUSHI.",
-          video: "assets/web/PROJECT/optimized/steakbar-sushi-web.mp4",
-          poster: "assets/web/PROJECT/optimized/posters/steakbar-sushi.jpg",
-        },
+        { title: "AKI", text: "", video: "assets/web/PROJECT/optimized/aki-web.mp4", poster: "assets/web/PROJECT/optimized/posters/aki.jpg" },
+        { title: "AKIKI", text: "", video: "assets/web/PROJECT/optimized/akiki-web.mp4", poster: "assets/web/PROJECT/optimized/posters/akiki.jpg" },
+        { title: "BEIT TRAD", text: "", video: "assets/web/PROJECT/optimized/beit-trad-web.mp4", poster: "assets/web/PROJECT/optimized/posters/beit-trad.jpg" },
+        { title: "BESH", text: "", video: "assets/web/PROJECT/optimized/besh-web.mp4", poster: "assets/web/PROJECT/optimized/posters/besh.jpg" },
+        { title: "BOKJA", text: "", video: "assets/web/PROJECT/optimized/bokja-web.mp4", poster: "assets/web/PROJECT/optimized/posters/bokja.jpg" },
+        { title: "ELISSAR", text: "", video: "assets/web/PROJECT/optimized/elissar-web.mp4", poster: "assets/web/PROJECT/optimized/posters/elissar.jpg" },
+        { title: "IRRELEVANT", text: "", video: "assets/web/PROJECT/optimized/irrelevant-web.mp4", poster: "assets/web/PROJECT/optimized/posters/irrelevant.jpg" },
+        { title: "KATARINA", text: "", video: "assets/web/PROJECT/optimized/katarina-web.mp4", poster: "assets/web/PROJECT/optimized/posters/katarina.jpg" },
+        { title: "MJ", text: "", video: "assets/web/PROJECT/optimized/mj-web.mp4", poster: "assets/web/PROJECT/optimized/posters/mj.jpg" },
+        { title: "NAGGIAR ARTIST", text: "", video: "assets/web/PROJECT/optimized/naggiar-artist-web.mp4", poster: "assets/web/PROJECT/optimized/posters/naggiar-artist.jpg" },
+        { title: "NAGGIAR FILM", text: "", video: "assets/web/PROJECT/optimized/naggiar-film-web.mp4", poster: "assets/web/PROJECT/optimized/posters/naggiar-film.jpg" },
+        { title: "OIL & GAZ", text: "", video: "assets/web/PROJECT/optimized/oil-gaz-web.mp4", poster: "assets/web/PROJECT/optimized/posters/oil-gaz.jpg" },
+        { title: "ORIENT", text: "", video: "assets/web/PROJECT/optimized/orient-web.mp4", poster: "assets/web/PROJECT/optimized/posters/orient.jpg" },
+        { title: "POP UP", text: "", video: "assets/web/PROJECT/optimized/pop-up-web.mp4", poster: "assets/web/PROJECT/optimized/posters/pop-up.jpg" },
+        { title: "SAMI", text: "", video: "assets/web/PROJECT/optimized/sami-web.mp4", poster: "assets/web/PROJECT/optimized/posters/sami.jpg" },
+        { title: "SARA'S BAG", text: "", video: "assets/web/PROJECT/optimized/saras-bag-web.mp4", poster: "assets/web/PROJECT/optimized/posters/saras-bag.jpg" },
+        { title: "SARISTIQUE", text: "", video: "assets/web/PROJECT/optimized/saristique-web.mp4", poster: "assets/web/PROJECT/optimized/posters/saristique.jpg" },
+        { title: "SOAR", text: "", video: "assets/web/PROJECT/optimized/soar-web.mp4", poster: "assets/web/PROJECT/optimized/posters/soar.jpg" },
+        { title: "STEAKBAR SUSHI", text: "", video: "assets/web/PROJECT/optimized/steakbar-sushi-web.mp4", poster: "assets/web/PROJECT/optimized/posters/steakbar-sushi.jpg" },
       ];
+
+      const projectCopyReady = fetch("assets/web/projects-detail-copy.json")
+        .then((res) => {
+          if (!res.ok) throw new Error("copy");
+          return res.json();
+        })
+        .then((copy) => {
+          projectData.forEach((p) => {
+            const t = copy[p.title];
+            if (typeof t === "string" && t.length) p.text = t;
+          });
+        })
+        .catch(() => {});
 
       // Build a preview-clip URL from the full-quality web URL.
       // Carousel uses short lightweight previews; detail view uses the full clip with audio.
@@ -2967,6 +3049,21 @@
       const prevButton = document.getElementById("projects-prev");
       const detailTitle = document.getElementById("project-detail-title");
       const detailText = document.getElementById("project-detail-text");
+      const detailCopyScroll = document.getElementById("project-detail-copy-scroll");
+      const updateProjectDetailCopyScrollState = () => {
+        if (!detailCopyScroll) return;
+        const overflow = detailCopyScroll.scrollHeight > detailCopyScroll.clientHeight + 2;
+        detailCopyScroll.classList.toggle("has-scroll-overflow", overflow);
+      };
+      if (detailCopyScroll && typeof ResizeObserver !== "undefined") {
+        const detailCopyScrollResizeObserver = new ResizeObserver(() => {
+          if (projectsSection.classList.contains("detail-open")) updateProjectDetailCopyScrollState();
+        });
+        detailCopyScrollResizeObserver.observe(detailCopyScroll);
+      }
+      window.addEventListener("resize", () => {
+        if (projectsSection.classList.contains("detail-open")) updateProjectDetailCopyScrollState();
+      });
       const detailVideo = document.getElementById("project-detail-video");
       if (detailVideo) {
         detailVideo.pause();
@@ -2977,7 +3074,7 @@
         detailVideo.setAttribute("loop", "");
         detailVideo.setAttribute("muted", "");
       }
-      const detailClose = document.getElementById("project-detail-close");
+      const detailBack = document.getElementById("project-detail-back");
       const progressBar = document.getElementById("project-progress-bar");
       const progressFill = document.getElementById("project-progress-fill");
       const detailMuteButton = document.getElementById("project-detail-mute");
@@ -3064,15 +3161,19 @@
       };
 
       const preventWheelWhileProjectDetail = (event) => {
-        if (document.body.classList.contains("projects-detail-open")) {
-          event.preventDefault();
+        if (!document.body.classList.contains("projects-detail-open")) return;
+        if (event.target && event.target.closest && event.target.closest(".project-detail-copy-scroll")) {
+          return;
         }
+        event.preventDefault();
       };
 
       const preventTouchMoveWhileProjectDetail = (event) => {
-        if (document.body.classList.contains("projects-detail-open")) {
-          event.preventDefault();
+        if (!document.body.classList.contains("projects-detail-open")) return;
+        if (event.target && event.target.closest && event.target.closest(".project-detail-copy-scroll")) {
+          return;
         }
+        event.preventDefault();
       };
 
       const syncDetailMuteUi = () => {
@@ -3338,11 +3439,19 @@
         }
 
         try {
+          await projectCopyReady;
           // Always restart the video from 0 when opening the detail page.
           const startTime = 0;
 
           detailTitle.textContent = project.title;
           detailText.textContent = project.text;
+          if (detailCopyScroll) detailCopyScroll.scrollTop = 0;
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              updateProjectDetailCopyScrollState();
+            });
+          });
+          document.fonts.ready.then(() => updateProjectDetailCopyScrollState());
 
           if (project.poster) {
             detailVideo.setAttribute("poster", project.poster);
@@ -3414,6 +3523,9 @@
           // via CSS, and the detail page background cross-fades to black.
           await animateProjectCardToDetail(sourceCard, project, startTime);
 
+          updateProjectDetailCopyScrollState();
+          requestAnimationFrame(() => updateProjectDetailCopyScrollState());
+
           // Make sure the real detail video keeps playing once flyer is gone.
           attemptDetailVideoPlay();
           detailVideo.addEventListener("canplay", attemptDetailVideoPlay, { once: true });
@@ -3456,6 +3568,7 @@
         window.removeEventListener("touchmove", preventTouchMoveWhileProjectDetail);
         projectsSection.classList.remove("detail-open");
         projectsSection.classList.remove("detail-flyer-landed");
+        if (detailCopyScroll) detailCopyScroll.classList.remove("has-scroll-overflow");
         document.documentElement.classList.remove("projects-detail-open");
         document.body.classList.remove("projects-detail-open");
         document.body.style.top = "";
@@ -3555,6 +3668,31 @@
         return x - Math.floor(x);
       };
 
+      /**
+       * Folder order often groups shots from one project together. Interleave across
+       * segments (start / early-mid / … / end) so neighbours in the strip mix sources.
+       * Deterministic: same manifest → same order every load (editorial, not random).
+       */
+      const editorialInterleaveJournalFiles = (files) => {
+        const n = files.length;
+        if (n <= 1) return files.slice();
+        const bins = n < 12 ? 3 : n < 28 ? 4 : 5;
+        const segments = [];
+        for (let b = 0; b < bins; b += 1) {
+          const start = Math.floor((b * n) / bins);
+          const end = Math.floor(((b + 1) * n) / bins);
+          segments.push(files.slice(start, end));
+        }
+        const out = [];
+        const maxLen = Math.max(...segments.map((s) => s.length));
+        for (let i = 0; i < maxLen; i += 1) {
+          for (let b = 0; b < bins; b += 1) {
+            if (i < segments[b].length) out.push(segments[b][i]);
+          }
+        }
+        return out;
+      };
+
       let journalDragZCounter = 5;
       const enableJournalItemDrag = (item) => {
         let activePointerId = null;
@@ -3625,6 +3763,8 @@
           { ratio: "auto", w: 19.2, h: 23.1, dx: 58, dy: -8 },
           { ratio: "4:3", h: 17.9, dx: -8, dy: 40 },
           { ratio: "landscape", h: 16.2, dx: 68, dy: 26 },
+          { ratio: "16:9", h: 19.6, dx: -46, dy: 18 },
+          { ratio: "auto", w: 18.8, h: 22.4, dx: 32, dy: -34 },
         ];
 
         const getRatioPresetBox = (preset) => {
@@ -3734,6 +3874,8 @@
           const files = await res.json();
           if (!Array.isArray(files) || !files.length) return;
 
+          const filesOrdered = editorialInterleaveJournalFiles(files);
+
           let blurMap = {};
           try {
             const blurRes = await fetch(`${journalBase}blur-placeholders.json`);
@@ -3751,7 +3893,7 @@
           };
 
           const frag = document.createDocumentFragment();
-          files.forEach((filename, index) => {
+          filesOrdered.forEach((filename, index) => {
             const article = document.createElement("article");
             const floatClass = (index % 8) + 1;
             article.className = `journal-item journal-float-${floatClass}`;
@@ -3771,7 +3913,7 @@
             const img = document.createElement("img");
             img.src = sources.orig;
             img.alt = "";
-            img.loading = index < 8 ? "eager" : "lazy";
+            img.loading = index < 10 ? "eager" : "lazy";
             img.decoding = "async";
             img.classList.add("fade-in");
             const onImgLoaded = () => img.classList.add("is-loaded");
@@ -3851,7 +3993,9 @@
           const res = await fetch("assets/web/standards/optimized/standards-manifest.json");
           if (res.ok) {
             const files = await res.json();
-            if (Array.isArray(files)) standardsImages = files.filter((f) => /\.jpg$/i.test(f));
+            if (Array.isArray(files)) {
+              standardsImages = files.filter((f) => /\.(jpg|jpeg|png|webp|avif)$/i.test(f));
+            }
           }
         } catch (_) {}
         if (!standardsImages.length) return;
@@ -3923,18 +4067,7 @@
           article.className = "standards-tile";
 
           const baseUrl = `assets/web/standards/optimized/${encodeURIComponent(filename)}`;
-          const stem = baseUrl.replace(/\.jpg$/i, "");
           const picture = document.createElement("picture");
-
-          const sAvif = document.createElement("source");
-          sAvif.srcset = `${stem}.avif`;
-          sAvif.type = "image/avif";
-          picture.appendChild(sAvif);
-
-          const sWebp = document.createElement("source");
-          sWebp.srcset = `${stem}.webp`;
-          sWebp.type = "image/webp";
-          picture.appendChild(sWebp);
 
           const img = document.createElement("img");
           img.src = baseUrl;
@@ -3963,7 +4096,10 @@
 
           attachMediaLoader(article, img);
 
-          article.addEventListener("click", () => openStandardsZoom(img));
+          article.addEventListener("click", () => {
+            if (!img.complete || img.naturalWidth <= 0) return;
+            openStandardsZoom(img);
+          });
           return article;
         };
 
@@ -4083,7 +4219,51 @@
         });
       }
 
-      detailClose.addEventListener("click", closeProjectDetail);
+      if (detailBack) {
+        detailBack.addEventListener("click", () => closeProjectDetail());
+      }
+
+      const projectsDetailView = document.getElementById("projects-detail");
+      const projectDetailWheelBackThreshold = 50;
+      const onProjectDetailWheelBack = (event) => {
+        if (!document.body.classList.contains("projects-detail-open")) return;
+        const dx = event.deltaX;
+        const dy = event.deltaY;
+        if (Math.abs(dx) < projectDetailWheelBackThreshold) return;
+        if (Math.abs(dx) <= Math.abs(dy) * 1.2) return;
+        event.preventDefault();
+        closeProjectDetail();
+      };
+      window.addEventListener("wheel", onProjectDetailWheelBack, { passive: false, capture: true });
+
+      let projectDetailTouchStartX = 0;
+      let projectDetailTouchStartY = 0;
+      if (projectsDetailView) {
+        projectsDetailView.addEventListener(
+          "touchstart",
+          (event) => {
+            if (!document.body.classList.contains("projects-detail-open")) return;
+            const touch = event.touches[0];
+            if (!touch) return;
+            projectDetailTouchStartX = touch.clientX;
+            projectDetailTouchStartY = touch.clientY;
+          },
+          { passive: true }
+        );
+        projectsDetailView.addEventListener(
+          "touchend",
+          (event) => {
+            if (!document.body.classList.contains("projects-detail-open")) return;
+            const t = event.changedTouches[0];
+            const dx = t.clientX - projectDetailTouchStartX;
+            const dy = t.clientY - projectDetailTouchStartY;
+            if (Math.abs(dx) < 72) return;
+            if (Math.abs(dx) < Math.abs(dy) * 1.35) return;
+            closeProjectDetail();
+          },
+          { passive: true }
+        );
+      }
 
       detailVideo.addEventListener("play", startDetailProgressLoop);
       detailVideo.addEventListener("play", () => {
@@ -4190,6 +4370,7 @@
       const aboutBlocks = Array.from(document.querySelectorAll(".about-copy .about-block"));
       if (aboutSection && aboutBlocks.length) {
         let aboutLines = [];
+        let aboutSectionInView = false;
 
         const assignLineIndices = () => {
           aboutLines.forEach((line, idx) => {
@@ -4226,13 +4407,32 @@
                 if (!line.classList.contains("is-visible")) {
                   replayLineAnimation(line);
                 }
-              } else if (!entry.isIntersecting && entry.intersectionRatio <= 0.02) {
+              } else if (
+                !aboutSectionInView &&
+                !entry.isIntersecting &&
+                entry.intersectionRatio <= 0.02
+              ) {
                 line.classList.remove("is-visible");
               }
             });
           },
           { threshold: [0, 0.02, 0.18, 0.28, 0.45, 0.7] }
         );
+
+        const aboutSectionObserver = new IntersectionObserver(
+          (entries) => {
+            const [entry] = entries;
+            const nowInView = entry.isIntersecting && entry.intersectionRatio > 0.05;
+
+            if (!nowInView && aboutSectionInView) {
+              aboutLines.forEach((line) => line.classList.remove("is-visible"));
+            }
+
+            aboutSectionInView = nowInView;
+          },
+          { threshold: [0, 0.05, 0.12, 0.25] }
+        );
+        aboutSectionObserver.observe(aboutSection);
 
         const observeCurrentLines = () => {
           aboutLines.forEach((line) => aboutLinesObserver.observe(line));
