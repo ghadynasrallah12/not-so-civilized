@@ -1666,6 +1666,23 @@
         pointer-events: none;
       }
 
+      .journal-item.journal-skeleton {
+        cursor: default;
+        background: rgba(12, 12, 14, 0.96);
+      }
+      .journal-item.journal-skeleton .media-loader {
+        background-color: rgba(10, 10, 12, 0.98);
+        background-image: linear-gradient(
+          110deg,
+          rgba(255, 255, 255, 0) 30%,
+          rgba(255, 255, 255, 0.05) 50%,
+          rgba(255, 255, 255, 0) 70%
+        );
+      }
+      .journal-item.journal-skeleton .media-loader::after {
+        opacity: 0.55;
+      }
+
       .journal-item.is-dragging {
         cursor: grabbing;
         transition: none;
@@ -3139,9 +3156,12 @@
             cancelDetailMasterUpgrade();
             return;
           }
-          // Preserve playback position within the master clip if possible.
-          // Preview is 5s and looping, so currentTime maps to first 5s of master.
-          const resumeAt = Number.isFinite(detailVideo.currentTime) ? detailVideo.currentTime % 5 : 0;
+          // Preserve playback position when upgrading preview → master (same timeline).
+          const dur = Number.isFinite(detailVideo.duration) ? detailVideo.duration : 0;
+          const resumeAt =
+            Number.isFinite(detailVideo.currentTime) && dur > 0.1
+              ? Math.min(Math.max(0, detailVideo.currentTime), dur - 0.05)
+              : 0;
           const wasPlaying = !detailVideo.paused;
           // Disable looping so the master plays through naturally.
           detailVideo.loop = false;
@@ -3166,10 +3186,12 @@
         probe.addEventListener(
           "loadeddata",
           () => {
-            // Some browsers don't fire canplaythrough for short clips; fall back
-            // to a buffered-time check.
+            // Some browsers don't fire canplaythrough; fall back to a small
+            // buffered slice (scales with clip length for long previews).
             try {
-              if (probe.buffered.length && probe.buffered.end(0) >= 4) swapToMaster();
+              const pd = Number.isFinite(probe.duration) && probe.duration > 0 ? probe.duration : 30;
+              const minBuf = Math.min(5, Math.max(1.5, pd * 0.08));
+              if (probe.buffered.length && probe.buffered.end(0) >= minBuf) swapToMaster();
             } catch (_) {}
           },
           { once: true }
@@ -3591,77 +3613,133 @@
 
       const initJournalGallery = async () => {
         if (!journalScrollEl) return;
+
+        const journalSizeScale = 1.55;
+        const journalPackedScale = 0.88;
+        const journalLoadPresets = [
+          { ratio: "16:9", h: 20.5, dx: -12, dy: -12 },
+          { ratio: "auto", w: 18.6, h: 23.8, dx: 44, dy: -22 },
+          { ratio: "4:3", h: 18.4, dx: -34, dy: 30 },
+          { ratio: "landscape", h: 16.8, dx: 36, dy: 20 },
+          { ratio: "16:9", h: 21.4, dx: -20, dy: -36 },
+          { ratio: "auto", w: 19.2, h: 23.1, dx: 58, dy: -8 },
+          { ratio: "4:3", h: 17.9, dx: -8, dy: 40 },
+          { ratio: "landscape", h: 16.2, dx: 68, dy: 26 },
+        ];
+
+        const getRatioPresetBox = (preset) => {
+          if (preset.ratio === "16:9") {
+            const h = preset.h;
+            const w = (h * 16) / 9;
+            return { w, h };
+          }
+          if (preset.ratio === "4:3") {
+            const h = preset.h;
+            const w = (h * 4) / 3;
+            return { w, h };
+          }
+          if (preset.ratio === "landscape") {
+            const h = preset.h;
+            const w = (h * 3) / 2;
+            return { w, h };
+          }
+          return { w: preset.w, h: preset.h };
+        };
+
+        const placeVhBox = (targetArticle, wVh, hVh) => {
+          const w = wVh * journalSizeScale * journalPackedScale;
+          const h = hVh * journalSizeScale * journalPackedScale;
+          targetArticle.style.setProperty("--journal-w", `${w.toFixed(2)}vh`);
+          targetArticle.style.setProperty("--journal-h", `${h.toFixed(2)}vh`);
+          targetArticle.style.marginLeft = "";
+          targetArticle.style.marginRight = "";
+        };
+
+        const getInitialJournalOffset = (index) => {
+          if (index < journalLoadPresets.length) {
+            return { dx: journalLoadPresets[index].dx, dy: journalLoadPresets[index].dy };
+          }
+          const rowPhase = index % 6;
+          const baseX = Math.round((journalFrac(index, 41) - 0.5) * 132);
+          const baseY = Math.round((journalFrac(index, 57) - 0.5) * 84);
+          const overlapY = rowPhase >= 2 ? -Math.round(16 + journalFrac(index, 73) * 68) : 0;
+          const overlapX =
+            rowPhase === 1 || rowPhase === 4
+              ? Math.round((journalFrac(index, 89) - 0.5) * 58)
+              : Math.round((journalFrac(index, 101) - 0.5) * 24);
+          return {
+            dx: baseX + overlapX,
+            dy: baseY + overlapY,
+          };
+        };
+
+        const applyJournalItemSizing = (article, index) => {
+          const f = journalFrac;
+          const mode = index % 7;
+          if (index < journalLoadPresets.length) {
+            const presetBox = getRatioPresetBox(journalLoadPresets[index]);
+            placeVhBox(article, presetBox.w, presetBox.h);
+          } else if (mode === 0 || mode === 5) {
+            const side = 17.5 + f(index, 1) * 7.5;
+            placeVhBox(article, side, side);
+          } else if (mode === 1) {
+            const h = 19 + f(index, 3) * 8.5;
+            const w = (h * 4) / 3;
+            placeVhBox(article, w, h);
+          } else if (mode === 2) {
+            const w = 17 + f(index, 4) * 7.5;
+            const h = (w * 4) / 3;
+            placeVhBox(article, w, h);
+          } else if (mode === 3) {
+            const h = 18.5 + f(index, 5) * 8;
+            const w = (h * 3) / 2;
+            placeVhBox(article, w, h);
+          } else if (mode === 4) {
+            const w = 15.5 + f(index, 6) * 6.5;
+            const h = (w * 3) / 2;
+            placeVhBox(article, w, h);
+          } else {
+            const h = 18 + f(index, 7) * 7.5;
+            const w = (h * 5) / 4;
+            placeVhBox(article, w, h);
+          }
+        };
+
+        const paintJournalSkeleton = () => {
+          journalScrollEl.innerHTML = "";
+          const skelFrag = document.createDocumentFragment();
+          const skeletonCount = 12;
+          for (let i = 0; i < skeletonCount; i += 1) {
+            const article = document.createElement("article");
+            const floatClass = (i % 8) + 1;
+            article.className = `journal-item journal-float-${floatClass} journal-skeleton has-media-loader`;
+            article.setAttribute("data-loaded", "false");
+            applyJournalItemSizing(article, i);
+            const loader = document.createElement("div");
+            loader.className = "media-loader";
+            loader.setAttribute("aria-hidden", "true");
+            article.appendChild(loader);
+            const io = getInitialJournalOffset(i);
+            article.dataset.dx = String(io.dx);
+            article.dataset.dy = String(io.dy);
+            skelFrag.appendChild(article);
+          }
+          journalScrollEl.appendChild(skelFrag);
+        };
+        paintJournalSkeleton();
+
         try {
           const res = await fetch(`${journalBase}journal-manifest.json`);
           if (!res.ok) throw new Error("manifest");
           const files = await res.json();
           if (!Array.isArray(files) || !files.length) return;
 
-          // Tiny base64 LQIPs (Phase 3) — load once, used as bg of every tile so
-          // there's never an empty black box while the full image streams in.
           let blurMap = {};
           try {
             const blurRes = await fetch(`${journalBase}blur-placeholders.json`);
             if (blurRes.ok) blurMap = await blurRes.json();
           } catch (_) {}
 
-          const frag = document.createDocumentFragment();
-          const journalSizeScale = 1.55;
-          const journalPackedScale = 0.88;
-          const journalLoadPresets = [
-            // Loading-screen collage presets (magazine style, overlapping)
-            // Spread across the visible collage pane to avoid an empty gap.
-            // ratio: "landscape" | "16:9" | "auto" | "4:3"
-            { ratio: "16:9", h: 20.5, dx: -12, dy: -12 },
-            { ratio: "auto", w: 18.6, h: 23.8, dx: 44, dy: -22 },
-            { ratio: "4:3", h: 18.4, dx: -34, dy: 30 },
-            { ratio: "landscape", h: 16.8, dx: 36, dy: 20 },
-            { ratio: "16:9", h: 21.4, dx: -20, dy: -36 },
-            { ratio: "auto", w: 19.2, h: 23.1, dx: 58, dy: -8 },
-            { ratio: "4:3", h: 17.9, dx: -8, dy: 40 },
-            { ratio: "landscape", h: 16.2, dx: 68, dy: 26 },
-          ];
-
-          const getRatioPresetBox = (preset) => {
-            if (preset.ratio === "16:9") {
-              const h = preset.h;
-              const w = (h * 16) / 9;
-              return { w, h };
-            }
-            if (preset.ratio === "4:3") {
-              const h = preset.h;
-              const w = (h * 4) / 3;
-              return { w, h };
-            }
-            if (preset.ratio === "landscape") {
-              const h = preset.h;
-              const w = (h * 3) / 2;
-              return { w, h };
-            }
-            // auto: allow art-directed mixed sizing
-            return { w: preset.w, h: preset.h };
-          };
-
-          const getInitialJournalOffset = (index) => {
-            if (index < journalLoadPresets.length) {
-              return { dx: journalLoadPresets[index].dx, dy: journalLoadPresets[index].dy };
-            }
-            // Keep a repeatable collage on every load, with deliberate overlap.
-            const rowPhase = index % 6;
-            const baseX = Math.round((journalFrac(index, 41) - 0.5) * 132);
-            const baseY = Math.round((journalFrac(index, 57) - 0.5) * 84);
-            const overlapY = rowPhase >= 2 ? -Math.round(16 + journalFrac(index, 73) * 68) : 0;
-            const overlapX =
-              rowPhase === 1 || rowPhase === 4
-                ? Math.round((journalFrac(index, 89) - 0.5) * 58)
-                : Math.round((journalFrac(index, 101) - 0.5) * 24);
-            return {
-              dx: baseX + overlapX,
-              dy: baseY + overlapY,
-            };
-          };
-
-          // Helper: build sibling URLs for AVIF + WebP + original.
           const buildPictureSources = (origUrl) => {
             const dot = origUrl.lastIndexOf(".");
             const stem = dot > 0 ? origUrl.slice(0, dot) : origUrl;
@@ -3672,52 +3750,13 @@
             };
           };
 
+          const frag = document.createDocumentFragment();
           files.forEach((filename, index) => {
             const article = document.createElement("article");
             const floatClass = (index % 8) + 1;
             article.className = `journal-item journal-float-${floatClass}`;
+            applyJournalItemSizing(article, index);
 
-            const f = journalFrac;
-            const mode = index % 7;
-
-            const placeVhBox = (targetArticle, wVh, hVh) => {
-              const w = wVh * journalSizeScale * journalPackedScale;
-              const h = hVh * journalSizeScale * journalPackedScale;
-              targetArticle.style.setProperty("--journal-w", `${w.toFixed(2)}vh`);
-              targetArticle.style.setProperty("--journal-h", `${h.toFixed(2)}vh`);
-              targetArticle.style.marginLeft = "";
-              targetArticle.style.marginRight = "";
-            };
-
-            if (index < journalLoadPresets.length) {
-              const presetBox = getRatioPresetBox(journalLoadPresets[index]);
-              placeVhBox(article, presetBox.w, presetBox.h);
-            } else if (mode === 0 || mode === 5) {
-              const side = 17.5 + f(index, 1) * 7.5;
-              placeVhBox(article, side, side);
-            } else if (mode === 1) {
-              const h = 19 + f(index, 3) * 8.5;
-              const w = (h * 4) / 3;
-              placeVhBox(article, w, h);
-            } else if (mode === 2) {
-              const w = 17 + f(index, 4) * 7.5;
-              const h = (w * 4) / 3;
-              placeVhBox(article, w, h);
-            } else if (mode === 3) {
-              const h = 18.5 + f(index, 5) * 8;
-              const w = (h * 3) / 2;
-              placeVhBox(article, w, h);
-            } else if (mode === 4) {
-              const w = 15.5 + f(index, 6) * 6.5;
-              const h = (w * 3) / 2;
-              placeVhBox(article, w, h);
-            } else {
-              const h = 18 + f(index, 7) * 7.5;
-              const w = (h * 5) / 4;
-              placeVhBox(article, w, h);
-            }
-
-            // Picture tag with AVIF + WebP + JPEG fallback for fastest load.
             const baseUrl = `${journalBase}${encodeURIComponent(filename)}`;
             const sources = buildPictureSources(baseUrl);
             const picture = document.createElement("picture");
@@ -3745,9 +3784,6 @@
             picture.appendChild(img);
             article.appendChild(picture);
 
-            // Blur-up: paint a tiny base64 thumbnail behind the <img> so the
-            // user sees a color/composition immediately. The fade-in image
-            // gracefully replaces it once loaded.
             const blurData = blurMap && blurMap[filename];
             if (blurData) {
               article.style.backgroundImage = `url("${blurData}")`;
@@ -3765,6 +3801,7 @@
             enableJournalItemDrag(article);
             frag.appendChild(article);
           });
+          journalScrollEl.innerHTML = "";
           journalScrollEl.appendChild(frag);
         } catch {
           journalScrollEl.innerHTML =
