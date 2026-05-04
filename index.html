@@ -3074,10 +3074,10 @@
           }
         } else if (mediaEl.tagName === "VIDEO") {
           // Video: hide loader once we have enough data to play, also on first frame.
-          // Once a source has reached ready state, we ignore subsequent waiting/stalled
-          // events — those fire spuriously during fast scroll/throttling and would
-          // otherwise flash the spinner over a video that is actually playing fine.
-          // Only a fresh src (loadstart) re-arms the spinner.
+          // Do NOT tie the spinner to `loadstart` — Chrome/Safari can fire loadstart
+          // repeatedly during fast trackpad scrolling / internal buffer churn even when
+          // the <source> URL never changed, which would flash the loader over playing video.
+          // New sources already set data-loaded="false" in ensureCarouselVideoSrc before load().
           let sticky = mediaEl.readyState >= 2;
           const onReady = () => {
             markLoaded();
@@ -3086,10 +3086,6 @@
           const onWaiting = () => {
             if (!sticky) markLoading();
           };
-          mediaEl.addEventListener("loadstart", () => {
-            sticky = false;
-            markLoading();
-          });
           mediaEl.addEventListener("loadeddata", onReady);
           mediaEl.addEventListener("canplay", onReady);
           mediaEl.addEventListener("playing", onReady);
@@ -3122,6 +3118,8 @@
 
           const v = card.querySelector("video");
           if (v) {
+            v.loop = true;
+            v.setAttribute("loop", "");
             if (project.poster && !v.poster) v.setAttribute("poster", project.poster);
             // Carousel uses the project's frameset clip; falls back to a generated preview URL
             // if no frameset is mapped. Lazy-loaded by syncCarouselVideoPlayback.
@@ -3736,6 +3734,8 @@
 
           if (shouldPlay && allowed.has(video)) {
             ensureCarouselVideoSrc(video, card);
+            video.loop = true;
+            video.setAttribute("loop", "");
             video.dataset.shouldPlay = "1";
             attemptCarouselVideoPlay(video);
             return;
@@ -3743,15 +3743,13 @@
 
           if (shouldPlay && !allowed.has(video)) {
             video.dataset.shouldPlay = "0";
-            if (!video.paused) video.pause();
             card.setAttribute("data-loaded", "true");
             return;
           }
 
-          if (visibilityRatio < 0.04 && video.dataset.shouldPlay !== "0") {
-            video.dataset.shouldPlay = "0";
-            if (!video.paused) video.pause();
-          }
+          // Keep carousel clips looping: do not pause when a card scrolls partly off-screen.
+          // (Pausing here made fast touchpad swipes feel like playback "stopped" and also
+          // interacted badly with decode scheduling vs the loader overlay.)
         });
       };
 
