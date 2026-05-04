@@ -469,6 +469,7 @@
         z-index: 2200;
         opacity: 0;
         pointer-events: none;
+        overflow: hidden;
         transition: opacity 360ms cubic-bezier(0.22, 1, 0.36, 1);
       }
 
@@ -480,22 +481,170 @@
       .standards-zoom-overlay .zoom-backdrop {
         position: absolute;
         inset: 0;
-        background: rgba(8, 8, 10, 0.45);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(8, 8, 10, 0);
+        backdrop-filter: blur(0px);
+        -webkit-backdrop-filter: blur(0px);
+        transition:
+          background 520ms cubic-bezier(0.42, 0, 0.58, 1),
+          backdrop-filter 520ms cubic-bezier(0.42, 0, 0.58, 1),
+          -webkit-backdrop-filter 520ms cubic-bezier(0.42, 0, 0.58, 1);
+      }
+
+      .standards-zoom-overlay.is-open .zoom-backdrop {
+        background: rgba(8, 8, 10, 0.52);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .standards-zoom-shell {
+        position: absolute;
+        inset: 0;
+        z-index: 2202;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(0.75rem, 2.5vw, 1.75rem);
+        padding: clamp(0.75rem, 3vw, 2rem);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 420ms cubic-bezier(0.42, 0, 0.58, 1);
+      }
+
+      .standards-zoom-overlay.is-open .standards-zoom-shell {
+        opacity: 1;
+      }
+
+      .standards-zoom-nav {
+        flex-shrink: 0;
+        width: auto;
+        height: auto;
+        min-width: 2.25rem;
+        min-height: 2.25rem;
+        padding: 0.35rem 0.5rem;
+        margin: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.92);
+        font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+        line-height: 1;
+        cursor: pointer;
+        pointer-events: none;
+        display: grid;
+        place-items: center;
+        opacity: 0.88;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65), 0 0 12px rgba(0, 0, 0, 0.35);
+        -webkit-tap-highlight-color: transparent;
+        transition: opacity 0.2s ease, color 0.2s ease;
+      }
+
+      .standards-zoom-overlay.is-open .standards-zoom-nav {
+        pointer-events: auto;
+      }
+
+      .standards-zoom-nav:hover {
+        opacity: 1;
+        color: #ffffff;
+      }
+
+      .standards-zoom-nav:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.75);
+        outline-offset: 3px;
+      }
+
+      .standards-zoom-viewport {
+        position: relative;
+        flex: 0 1 auto;
+        max-width: min(88vw, 1240px);
+        max-height: 88vh;
+        overflow: hidden;
+        pointer-events: none;
+        border-radius: 2px;
+        box-shadow: 0 28px 72px rgba(0, 0, 0, 0.5);
+        transform: translateZ(0);
+      }
+
+      /* During ±100vw slide, let layers extend past the card box; overlay clips at the screen. */
+      .standards-zoom-viewport.is-sliding {
+        overflow: visible;
+      }
+
+      .standards-zoom-overlay.is-open .standards-zoom-viewport {
+        pointer-events: auto;
+      }
+
+      .standards-zoom-slide-stack {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+      }
+
+      /* Zoom carousel: ±100vw = true left/right edge of the browser viewport. */
+      .standards-zoom-slide {
+        position: absolute;
+        inset: 0;
+        transform: translateX(0);
+        opacity: 1;
+        will-change: transform;
+        transition: transform 520ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Previous: incoming from left (-100vw); current exits with .is-exit-forward → +100vw */
+      .standards-zoom-slide.is-enter-forward {
+        transform: translateX(-100vw);
+      }
+
+      .standards-zoom-slide.is-enter-forward.is-enter-active {
+        transform: translateX(0);
+      }
+
+      .standards-zoom-slide.is-exit-forward {
+        transform: translateX(100vw);
+      }
+
+      /* Next: incoming from right (+100vw); current exits with .is-exit-back → -100vw */
+      .standards-zoom-slide.is-enter-back {
+        transform: translateX(100vw);
+      }
+
+      .standards-zoom-slide.is-enter-back.is-enter-active {
+        transform: translateX(0);
+      }
+
+      .standards-zoom-slide.is-exit-back {
+        transform: translateX(-100vw);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .standards-zoom-slide {
+          transition-duration: 0.01ms;
+        }
+        .standards-zoom-overlay .zoom-backdrop {
+          transition-duration: 0.01ms;
+        }
+      }
+
+      .standards-zoom-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        pointer-events: none;
       }
 
       .standards-zoom-clone {
         position: fixed;
-        z-index: 2201;
+        z-index: 2203;
         object-fit: cover;
+        pointer-events: none;
         box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
         will-change: top, left, width, height;
         transition:
-          top 420ms cubic-bezier(0.22, 1, 0.36, 1),
-          left 420ms cubic-bezier(0.22, 1, 0.36, 1),
-          width 420ms cubic-bezier(0.22, 1, 0.36, 1),
-          height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+          top 520ms cubic-bezier(0.42, 0, 0.58, 1),
+          left 520ms cubic-bezier(0.42, 0, 0.58, 1),
+          width 520ms cubic-bezier(0.42, 0, 0.58, 1),
+          height 520ms cubic-bezier(0.42, 0, 0.58, 1);
       }
 
       .contact-bar {
@@ -869,7 +1018,7 @@
         color: #ffffff;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        line-height: 19px !important;
+        line-height: 15px !important;
         font-size: 17px;
         font-family: "Andale Mono", "AndaleMono", monospace;
       }
@@ -893,6 +1042,7 @@
         height: 100vh;
         min-height: 100vh;
         overflow: hidden;
+        overscroll-behavior-x: contain;
       }
 
       .projects-track {
@@ -1379,7 +1529,7 @@
         font-size: 17px;
         line-height: 0.96 !important;
         font-weight: 100;
-        font-family: "Andale Mono", "AndaleMono", monospace;
+        font-family: "Andale Mono";
         color: rgba(255, 255, 255, 0.92);
         white-space: pre-line;
         opacity: 0;
@@ -1477,7 +1627,6 @@
       }
 
       .project-detail-mute,
-      .project-detail-replay,
       .project-detail-play-toggle {
         position: absolute;
         z-index: 26;
@@ -1492,13 +1641,11 @@
       }
 
       .project-detail-mute:hover,
-      .project-detail-replay:hover,
       .project-detail-play-toggle:hover {
         opacity: 1;
       }
 
       .project-detail-mute:focus-visible,
-      .project-detail-replay:focus-visible,
       .project-detail-play-toggle:focus-visible {
         outline: 1px solid rgba(255, 255, 255, 0.85);
         outline-offset: 2px;
@@ -1516,22 +1663,8 @@
       }
 
       .project-detail-replay {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 2.85rem;
-        height: 2.85rem;
-        padding: 0.22rem;
-        opacity: 0;
+        display: none;
         pointer-events: none;
-        z-index: 28;
-        transition: opacity 0.25s ease, transform 0.25s ease;
-      }
-
-      .project-detail-replay.show {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translate(-50%, -50%) scale(1.05);
       }
 
       .project-detail-play-toggle {
@@ -2631,6 +2764,7 @@
                 id="project-detail-video"
                 class="project-detail-video"
                 muted
+                loop
                 playsinline
                 preload="metadata"
               >
@@ -2712,8 +2846,13 @@
           <div class="standards-grid" id="standards-grid"></div>
         </div>
       </section>
-      <div class="standards-zoom-overlay" id="standards-zoom-overlay" aria-hidden="true">
+      <div class="standards-zoom-overlay" id="standards-zoom-overlay" aria-hidden="true" tabindex="-1">
         <div class="zoom-backdrop"></div>
+        <div class="standards-zoom-shell">
+          <button type="button" class="standards-zoom-nav standards-zoom-nav--prev" id="standards-zoom-prev" aria-label="Previous standard">&larr;</button>
+          <div class="standards-zoom-viewport" id="standards-zoom-viewport"></div>
+          <button type="button" class="standards-zoom-nav standards-zoom-nav--next" id="standards-zoom-next" aria-label="Next standard">&rarr;</button>
+        </div>
       </div>
 
       <section class="section contact-section" id="contact" aria-label="Contact">
@@ -3264,9 +3403,8 @@
               ? Math.min(Math.max(0, detailVideo.currentTime), dur - 0.05)
               : 0;
           const wasPlaying = !detailVideo.paused;
-          // Disable looping so the master plays through naturally.
-          detailVideo.loop = false;
-          detailVideo.removeAttribute("loop");
+          detailVideo.loop = true;
+          detailVideo.setAttribute("loop", "");
           detailVideo.src = masterUrl;
           detailVideo.load();
           const onReady = () => {
@@ -4006,13 +4144,118 @@
           if (blurRes.ok) standardsBlurMap = await blurRes.json();
         } catch (_) {}
 
-        let currentZoom = null;
+        const standardsZoomViewport = document.getElementById("standards-zoom-viewport");
+        const standardsZoomPrev = document.getElementById("standards-zoom-prev");
+        const standardsZoomNext = document.getElementById("standards-zoom-next");
+        const ZOOM_MS = 520;
+        const ZOOM_EASE = "cubic-bezier(0.42, 0, 0.58, 1)";
 
-        const openStandardsZoom = (imgEl) => {
+        let currentZoom = null;
+        let zoomSlideAbort = 0;
+
+        const computeZoomFrame = (imgOrNatural) => {
+          const naturalW = imgOrNatural.naturalWidth || 800;
+          const naturalH = imgOrNatural.naturalHeight || 600;
+          const maxW = window.innerWidth * 0.88;
+          const maxH = window.innerHeight * 0.88;
+          const scale = Math.min(maxW / naturalW, maxH / naturalH, 1);
+          const targetW = Math.max(320, naturalW * scale);
+          const targetH = Math.max(220, naturalH * scale);
+          const targetLeft = (window.innerWidth - targetW) / 2;
+          const targetTop = (window.innerHeight - targetH) / 2;
+          return { targetW, targetH, targetLeft, targetTop };
+        };
+
+        const getGridImageAtIndex = (idx) => {
+          const tile = standardsGridEl.children[idx];
+          if (!tile) return null;
+          return tile.querySelector("img");
+        };
+
+        const revealAllStandardsGridImages = () => {
+          standardsGridEl.querySelectorAll(".standards-tile img").forEach((im) => {
+            im.style.removeProperty("visibility");
+            im.style.removeProperty("pointer-events");
+          });
+        };
+
+        const syncGridVisibilityForIndex = (idx) => {
+          Array.from(standardsGridEl.children).forEach((tile, i) => {
+            const g = tile.querySelector("img");
+            if (!g) return;
+            g.style.visibility = i === idx ? "hidden" : "";
+          });
+        };
+
+        const resetZoomViewportToIndex = (idx) => {
+          if (!standardsZoomViewport) return;
+          const baseUrl = `assets/web/standards/optimized/${encodeURIComponent(standardsImages[idx])}`;
+          standardsZoomViewport.classList.remove("is-sliding");
+          standardsZoomViewport.style.width = "";
+          standardsZoomViewport.style.height = "";
+          standardsZoomViewport.innerHTML = "";
+          const stack = document.createElement("div");
+          stack.className = "standards-zoom-slide-stack";
+          const slide = document.createElement("div");
+          slide.className = "standards-zoom-slide";
+          const img = document.createElement("img");
+          img.src = baseUrl;
+          img.alt = "";
+          img.decoding = "async";
+          slide.appendChild(img);
+          stack.appendChild(slide);
+          standardsZoomViewport.appendChild(stack);
+          requestAnimationFrame(() => {
+            if (!img.complete || img.naturalWidth <= 0) return;
+            const { targetW, targetH } = computeZoomFrame(img);
+            standardsZoomViewport.style.width = `${targetW}px`;
+            standardsZoomViewport.style.height = `${targetH}px`;
+          });
+          img.addEventListener(
+            "load",
+            () => {
+              if (!standardsZoomViewport) return;
+              const { targetW, targetH } = computeZoomFrame(img);
+              standardsZoomViewport.style.width = `${targetW}px`;
+              standardsZoomViewport.style.height = `${targetH}px`;
+            },
+            { once: true }
+          );
+        };
+
+        const settleZoomIntoViewport = (clone, imgEl, tileIndex, startRect, targetW, targetH) => {
+          if (!standardsZoomViewport) return;
+          standardsZoomViewport.classList.remove("is-sliding");
+          standardsZoomViewport.style.width = `${targetW}px`;
+          standardsZoomViewport.style.height = `${targetH}px`;
+          standardsZoomViewport.innerHTML = "";
+          const stack = document.createElement("div");
+          stack.className = "standards-zoom-slide-stack";
+          const slide = document.createElement("div");
+          slide.className = "standards-zoom-slide";
+          clone.classList.remove("standards-zoom-clone");
+          Object.assign(clone.style, {
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            boxShadow: "none",
+            transition: "none",
+          });
+          slide.appendChild(clone);
+          stack.appendChild(slide);
+          standardsZoomViewport.appendChild(stack);
+          if (standardsZoomOverlay) standardsZoomOverlay.focus({ preventScroll: true });
+        };
+
+        const openStandardsZoom = (imgEl, tileIndex) => {
           if (!standardsZoomOverlay || currentZoom) return;
           const startRect = imgEl.getBoundingClientRect();
           if (!startRect.width || !startRect.height) return;
 
+          const { targetW, targetH, targetLeft, targetTop } = computeZoomFrame(imgEl);
           const clone = imgEl.cloneNode(true);
           clone.className = "standards-zoom-clone";
           clone.style.top = `${startRect.top}px`;
@@ -4020,16 +4263,6 @@
           clone.style.width = `${startRect.width}px`;
           clone.style.height = `${startRect.height}px`;
           document.body.appendChild(clone);
-
-          const naturalW = imgEl.naturalWidth || startRect.width;
-          const naturalH = imgEl.naturalHeight || startRect.height;
-          const maxW = window.innerWidth * 0.88;
-          const maxH = window.innerHeight * 0.88;
-          const scale = Math.min(maxW / naturalW, maxH / naturalH);
-          const targetW = Math.max(320, naturalW * scale);
-          const targetH = Math.max(220, naturalH * scale);
-          const targetLeft = (window.innerWidth - targetW) / 2;
-          const targetTop = (window.innerHeight - targetH) / 2;
 
           standardsZoomOverlay.classList.add("is-open");
           standardsZoomOverlay.setAttribute("aria-hidden", "false");
@@ -4040,29 +4273,239 @@
             clone.style.height = `${targetH}px`;
           });
 
-          currentZoom = { source: imgEl, clone, startRect };
-          imgEl.style.visibility = "hidden";
+          currentZoom = {
+            index: tileIndex,
+            sourceImg: imgEl,
+            startRect,
+            openingClone: clone,
+            phase: "opening",
+            isAnimating: false,
+          };
+          syncGridVisibilityForIndex(tileIndex);
+
+          let openingSettled = false;
+          let openingTimerId = null;
+          const onOpenEnd = (e) => {
+            if (!currentZoom || currentZoom.phase !== "opening" || openingSettled) return;
+            if (e && e.propertyName && !["width", "height", "top", "left"].includes(e.propertyName)) return;
+            openingSettled = true;
+            if (openingTimerId !== null) {
+              clearTimeout(openingTimerId);
+              openingTimerId = null;
+            }
+            clone.removeEventListener("transitionend", onOpenEnd);
+            settleZoomIntoViewport(clone, imgEl, tileIndex, startRect, targetW, targetH);
+            currentZoom.phase = "ready";
+            currentZoom.openingClone = null;
+          };
+          const cancelOpeningTransition = () => {
+            if (openingSettled) return;
+            openingSettled = true;
+            if (openingTimerId !== null) {
+              clearTimeout(openingTimerId);
+              openingTimerId = null;
+            }
+            clone.removeEventListener("transitionend", onOpenEnd);
+          };
+          clone.addEventListener("transitionend", onOpenEnd);
+          openingTimerId = window.setTimeout(() => {
+            openingTimerId = null;
+            if (!openingSettled) onOpenEnd(null);
+          }, ZOOM_MS + 80);
+
+          currentZoom.cancelOpeningTransition = cancelOpeningTransition;
         };
 
         const closeStandardsZoom = () => {
           if (!currentZoom) return;
-          const { source, clone, startRect } = currentZoom;
+          if (typeof currentZoom.cancelOpeningTransition === "function") {
+            currentZoom.cancelOpeningTransition();
+          }
+          if (currentZoom.isAnimating && currentZoom.phase === "ready") {
+            zoomSlideAbort += 1;
+            currentZoom.isAnimating = false;
+            resetZoomViewportToIndex(currentZoom.index);
+            syncGridVisibilityForIndex(currentZoom.index);
+          }
+
+          if (currentZoom.phase === "opening" && currentZoom.openingClone) {
+            const { openingClone: clone, sourceImg, startRect: tileRect } = currentZoom;
+            standardsZoomOverlay.classList.remove("is-open");
+            standardsZoomOverlay.setAttribute("aria-hidden", "true");
+            revealAllStandardsGridImages();
+            const sr = tileRect || sourceImg.getBoundingClientRect();
+            clone.style.top = `${sr.top}px`;
+            clone.style.left = `${sr.left}px`;
+            clone.style.width = `${sr.width}px`;
+            clone.style.height = `${sr.height}px`;
+            let openingCleanupDone = false;
+            const cleanupOpening = () => {
+              if (openingCleanupDone) return;
+              openingCleanupDone = true;
+              clone.removeEventListener("transitionend", cleanupOpening);
+              clone.remove();
+              revealAllStandardsGridImages();
+              currentZoom = null;
+            };
+            clone.addEventListener("transitionend", cleanupOpening);
+            window.setTimeout(cleanupOpening, ZOOM_MS + 120);
+            return;
+          }
+
+          let sourceImg = currentZoom.sourceImg;
+          if (!sourceImg || !sourceImg.isConnected) {
+            sourceImg = getGridImageAtIndex(currentZoom.index);
+          }
+          if (!sourceImg) {
+            revealAllStandardsGridImages();
+            currentZoom = null;
+            standardsZoomOverlay.classList.remove("is-open");
+            standardsZoomOverlay.setAttribute("aria-hidden", "true");
+            return;
+          }
+          const startRect = sourceImg.getBoundingClientRect();
+
+          let ghost = currentZoom.openingClone;
+          if (!ghost && standardsZoomViewport) {
+            const live = standardsZoomViewport.querySelector(".standards-zoom-slide img");
+            if (live) {
+              const fr = live.getBoundingClientRect();
+              ghost = live.cloneNode(false);
+              ghost.className = "standards-zoom-clone";
+              ghost.removeAttribute("style");
+              Object.assign(ghost.style, {
+                position: "fixed",
+                top: `${fr.top}px`,
+                left: `${fr.left}px`,
+                width: `${fr.width}px`,
+                height: `${fr.height}px`,
+                objectFit: "cover",
+                zIndex: "2300",
+              });
+              document.body.appendChild(ghost);
+              standardsZoomViewport.innerHTML = "";
+            }
+          }
+
+          if (!ghost) {
+            currentZoom = null;
+            standardsZoomOverlay.classList.remove("is-open");
+            standardsZoomOverlay.setAttribute("aria-hidden", "true");
+            revealAllStandardsGridImages();
+            return;
+          }
+
           standardsZoomOverlay.classList.remove("is-open");
           standardsZoomOverlay.setAttribute("aria-hidden", "true");
-          clone.style.top = `${startRect.top}px`;
-          clone.style.left = `${startRect.left}px`;
-          clone.style.width = `${startRect.width}px`;
-          clone.style.height = `${startRect.height}px`;
+          revealAllStandardsGridImages();
+          requestAnimationFrame(() => {
+            ghost.style.top = `${startRect.top}px`;
+            ghost.style.left = `${startRect.left}px`;
+            ghost.style.width = `${startRect.width}px`;
+            ghost.style.height = `${startRect.height}px`;
+          });
+
+          let ghostCleanupDone = false;
           const cleanup = () => {
-            clone.removeEventListener("transitionend", cleanup);
-            clone.remove();
-            source.style.visibility = "";
+            if (ghostCleanupDone) return;
+            ghostCleanupDone = true;
+            ghost.removeEventListener("transitionend", cleanup);
+            ghost.remove();
+            revealAllStandardsGridImages();
+            currentZoom = null;
           };
-          clone.addEventListener("transitionend", cleanup);
-          currentZoom = null;
+          ghost.addEventListener("transitionend", cleanup);
+          window.setTimeout(cleanup, ZOOM_MS + 120);
         };
 
-        const buildStandardsTile = (filename, eager) => {
+        const navigateStandardsZoom = (direction) => {
+          if (!currentZoom || currentZoom.phase !== "ready" || currentZoom.isAnimating) return;
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            const len = standardsImages.length;
+            const nextIndex = (currentZoom.index + direction + len) % len;
+            const newSrc = `assets/web/standards/optimized/${encodeURIComponent(standardsImages[nextIndex])}`;
+            const stack = standardsZoomViewport && standardsZoomViewport.querySelector(".standards-zoom-slide-stack");
+            if (!stack) return;
+            stack.innerHTML = "";
+            const slide = document.createElement("div");
+            slide.className = "standards-zoom-slide";
+            const img = document.createElement("img");
+            img.src = newSrc;
+            img.alt = "";
+            slide.appendChild(img);
+            stack.appendChild(slide);
+            currentZoom.index = nextIndex;
+            currentZoom.sourceImg = getGridImageAtIndex(nextIndex) || currentZoom.sourceImg;
+            syncGridVisibilityForIndex(nextIndex);
+            return;
+          }
+
+          const len = standardsImages.length;
+          const nextIndex = (currentZoom.index + direction + len) % len;
+          const baseUrl = `assets/web/standards/optimized/${encodeURIComponent(standardsImages[nextIndex])}`;
+          const stack = standardsZoomViewport && standardsZoomViewport.querySelector(".standards-zoom-slide-stack");
+          if (!stack) return;
+
+          const oldSlide = stack.querySelector(".standards-zoom-slide");
+          if (!oldSlide) return;
+
+          currentZoom.isAnimating = true;
+          const slideToken = zoomSlideAbort;
+
+          const newSlide = document.createElement("div");
+          newSlide.className = "standards-zoom-slide";
+          if (direction > 0) newSlide.classList.add("is-enter-back");
+          else newSlide.classList.add("is-enter-forward");
+
+          const newImg = document.createElement("img");
+          newImg.alt = "";
+          newImg.decoding = "async";
+          newImg.src = baseUrl;
+          newSlide.appendChild(newImg);
+          stack.appendChild(newSlide);
+
+          standardsZoomViewport.classList.add("is-sliding");
+
+          const runAnim = () => {
+            const { targetW, targetH } = computeZoomFrame(newImg);
+            standardsZoomViewport.style.width = `${targetW}px`;
+            standardsZoomViewport.style.height = `${targetH}px`;
+
+            void newSlide.getBoundingClientRect();
+
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                if (direction > 0) oldSlide.classList.add("is-exit-back");
+                else oldSlide.classList.add("is-exit-forward");
+                newSlide.classList.add("is-enter-active");
+              });
+            });
+          };
+
+          if (newImg.complete && newImg.naturalWidth > 0) runAnim();
+          else newImg.addEventListener("load", runAnim, { once: true });
+
+          let slideCleanupDone = false;
+          const finishSlide = (e) => {
+            if (e && e.propertyName && e.propertyName !== "transform") return;
+            if (slideCleanupDone || !currentZoom) return;
+            if (zoomSlideAbort !== slideToken) return;
+            slideCleanupDone = true;
+            newSlide.removeEventListener("transitionend", finishSlide);
+            oldSlide.remove();
+            standardsZoomViewport.classList.remove("is-sliding");
+            currentZoom.index = nextIndex;
+            currentZoom.sourceImg = getGridImageAtIndex(nextIndex) || currentZoom.sourceImg;
+            syncGridVisibilityForIndex(nextIndex);
+            currentZoom.isAnimating = false;
+          };
+          newSlide.addEventListener("transitionend", finishSlide);
+          window.setTimeout(() => {
+            if (!slideCleanupDone) finishSlide();
+          }, ZOOM_MS + 160);
+        };
+
+        const buildStandardsTile = (filename, eager, tileIndex) => {
           const article = document.createElement("article");
           article.className = "standards-tile";
 
@@ -4098,7 +4541,7 @@
 
           article.addEventListener("click", () => {
             if (!img.complete || img.naturalWidth <= 0) return;
-            openStandardsZoom(img);
+            openStandardsZoom(img, tileIndex);
           });
           return article;
         };
@@ -4115,7 +4558,7 @@
           const eagerCount = Math.min(cols * 2, count);
           const firstFrag = document.createDocumentFragment();
           for (let i = 0; i < eagerCount; i += 1) {
-            firstFrag.appendChild(buildStandardsTile(standardsImages[i], true));
+            firstFrag.appendChild(buildStandardsTile(standardsImages[i], true, i));
           }
           standardsGridEl.appendChild(firstFrag);
 
@@ -4123,7 +4566,7 @@
             requestAnimationFrame(() => {
               const restFrag = document.createDocumentFragment();
               for (let i = eagerCount; i < count; i += 1) {
-                restFrag.appendChild(buildStandardsTile(standardsImages[i], false));
+                restFrag.appendChild(buildStandardsTile(standardsImages[i], false, i));
               }
               standardsGridEl.appendChild(restFrag);
             });
@@ -4141,10 +4584,56 @@
         });
 
         if (standardsZoomOverlay) {
-          standardsZoomOverlay.addEventListener("click", closeStandardsZoom);
+          standardsZoomOverlay.addEventListener("click", (event) => {
+            if (event.target === standardsZoomOverlay || event.target.classList.contains("zoom-backdrop")) {
+              closeStandardsZoom();
+            }
+          });
+          standardsZoomOverlay.addEventListener(
+            "wheel",
+            (event) => {
+              if (!currentZoom || currentZoom.phase !== "ready" || currentZoom.isAnimating) return;
+              let dx = event.deltaX;
+              const dy = event.deltaY;
+              if (event.shiftKey && Math.abs(dy) > Math.abs(dx)) dx = dy;
+              if (Math.abs(dx) < 0.35) return;
+              if (Math.abs(dx) < Math.abs(dy) * 0.72) return;
+              event.preventDefault();
+              navigateStandardsZoom(dx > 0 ? 1 : -1);
+            },
+            { passive: false }
+          );
+        }
+        if (standardsZoomPrev) {
+          standardsZoomPrev.addEventListener("click", (event) => {
+            event.stopPropagation();
+            navigateStandardsZoom(-1);
+          });
+        }
+        if (standardsZoomNext) {
+          standardsZoomNext.addEventListener("click", (event) => {
+            event.stopPropagation();
+            navigateStandardsZoom(1);
+          });
         }
         window.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") closeStandardsZoom();
+          if (!currentZoom || currentZoom.phase !== "ready") {
+            if (event.key === "Escape") closeStandardsZoom();
+            return;
+          }
+          if (event.key === "Escape") {
+            closeStandardsZoom();
+            return;
+          }
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            navigateStandardsZoom(-1);
+            return;
+          }
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            navigateStandardsZoom(1);
+          }
         });
       };
 
@@ -4287,13 +4776,15 @@
       });
 
       detailVideo.addEventListener("ended", () => {
+        if (!projectsSection.classList.contains("detail-open")) return;
         if (detailProgressFrameId) {
           cancelAnimationFrame(detailProgressFrameId);
           detailProgressFrameId = null;
         }
-        progressFill.style.width = "100%";
-        detailReplayButton.classList.add("show");
-        detailPlayToggleButton.classList.remove("show");
+        try {
+          detailVideo.currentTime = 0;
+        } catch (_) {}
+        attemptDetailVideoPlay();
       });
 
       detailMuteButton.addEventListener("click", (event) => {
@@ -4487,6 +4978,35 @@
       initStandardsBoard();
 
       startContinuousCarousel();
+
+      if (projectsCarouselView) {
+        projectsCarouselView.addEventListener(
+          "wheel",
+          (event) => {
+            if (projectsSection.classList.contains("detail-open") || isProjectOpening) return;
+            if (!isProjectsInView) return;
+
+            let dx = event.deltaX;
+            const dy = event.deltaY;
+            if (event.shiftKey && Math.abs(dy) > Math.abs(dx)) {
+              dx = dy;
+            }
+
+            if (Math.abs(dx) < 0.35) return;
+            const horizontalIntent =
+              Math.abs(dx) >= Math.abs(dy) * 0.72 ||
+              (Math.abs(dx) > 2.5 && Math.abs(dx) > Math.abs(dy) * 0.4);
+            if (!horizontalIntent) return;
+
+            event.preventDefault();
+            carouselOffset += dx;
+            normalizeCarouselOffset();
+            renderProjectPosition();
+            syncCarouselVideoPlayback();
+          },
+          { passive: false }
+        );
+      }
 
       // ---- Service Worker registration (Phase 5) ----
       // Cache-first for static media so repeat visits feel instant.

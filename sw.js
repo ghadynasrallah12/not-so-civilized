@@ -5,7 +5,7 @@
  *   carousel preview clips). Network-first with cache fallback for HTML.
  *   Bumping CACHE_VERSION invalidates everything.
  */
-const CACHE_VERSION = "nsc-v4";
+const CACHE_VERSION = "nsc-v6";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const MEDIA_CACHE = `${CACHE_VERSION}-media`;
 
@@ -65,6 +65,28 @@ self.addEventListener("fetch", (event) => {
   if (request.headers.has("range")) return;
 
   if (isMediaRequest(url)) {
+    const isStandardsManifest =
+      url.pathname.endsWith("/assets/web/standards/optimized/standards-manifest.json");
+
+    if (isStandardsManifest) {
+      event.respondWith(
+        fetch(request)
+          .then((response) => {
+            if (response && response.ok && response.type !== "opaqueredirect") {
+              caches
+                .open(MEDIA_CACHE)
+                .then((cache) => cache.put(request, response.clone()))
+                .catch(() => undefined);
+            }
+            return response;
+          })
+          .catch(() =>
+            caches.open(MEDIA_CACHE).then((cache) => cache.match(request))
+          )
+      );
+      return;
+    }
+
     event.respondWith(
       caches.open(MEDIA_CACHE).then((cache) =>
         cache.match(request).then((cached) => {
