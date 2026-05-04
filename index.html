@@ -3096,42 +3096,41 @@
         }
       };
 
+      // Shared setup for each project carousel tile (original + loop duplicate).
+      // cloneNode(true) does not copy addEventListener listeners — duplicated strip
+      // cards must call this so media-loader hides after the video is ready.
+      const wireProjectCardCarouselMedia = (card) => {
+        const idx = Number(card.dataset.projectIndex || 0);
+        const project = projectData[idx];
+        if (!project) return;
+
+        card.classList.add("has-media-loader");
+        card.setAttribute("data-loaded", "true");
+        if (!card.querySelector(":scope > .media-loader")) {
+          const loader = document.createElement("div");
+          loader.className = "media-loader";
+          loader.setAttribute("aria-hidden", "true");
+          card.appendChild(loader);
+        }
+
+        const v = card.querySelector("video");
+        if (!v) return;
+        v.loop = true;
+        v.setAttribute("loop", "");
+        if (project.poster && !v.poster) v.setAttribute("poster", project.poster);
+        const carouselUrl = project.frameset
+          ? `assets/PROJECT PANEL FRAMSETS/${project.frameset}`
+          : buildPreviewUrl(project.video);
+        if (carouselUrl) v.dataset.carouselSrc = encodeURI(carouselUrl);
+        const source = v.querySelector("source");
+        if (source) source.removeAttribute("src");
+        attachMediaLoader(card, v);
+      };
+
       // Apply posters to every project card video so cards show an image
       // instantly instead of a blank black box while video bytes load.
       (() => {
-        const cards = document.querySelectorAll("#projects-track .project-card");
-        cards.forEach((card) => {
-          const idx = Number(card.dataset.projectIndex || 0);
-          const project = projectData[idx];
-          if (!project) return;
-
-          // Loader overlay on the card.
-          card.classList.add("has-media-loader");
-          // Poster-only until this card wins a decode slot — hide shimmer (no hanging spinner).
-          card.setAttribute("data-loaded", "true");
-          if (!card.querySelector(":scope > .media-loader")) {
-            const loader = document.createElement("div");
-            loader.className = "media-loader";
-            loader.setAttribute("aria-hidden", "true");
-            card.appendChild(loader);
-          }
-
-          const v = card.querySelector("video");
-          if (v) {
-            v.loop = true;
-            v.setAttribute("loop", "");
-            if (project.poster && !v.poster) v.setAttribute("poster", project.poster);
-            // Carousel uses the project's frameset clip; falls back to a generated preview URL
-            // if no frameset is mapped. Lazy-loaded by syncCarouselVideoPlayback.
-            const carouselUrl = project.frameset
-              ? `assets/PROJECT PANEL FRAMSETS/${project.frameset}`
-              : buildPreviewUrl(project.video);
-            if (carouselUrl) v.dataset.carouselSrc = encodeURI(carouselUrl);
-            const source = v.querySelector("source");
-            if (source) source.removeAttribute("src");
-            attachMediaLoader(card, v);
-          }
-        });
+        document.querySelectorAll("#projects-track .project-card").forEach(wireProjectCardCarouselMedia);
       })();
 
       const projectsSection = document.querySelector(".projects-section");
@@ -3237,6 +3236,7 @@
         originalCards.forEach((card) => {
           const clone = card.cloneNode(true);
           projectsTrack.appendChild(clone);
+          wireProjectCardCarouselMedia(clone);
         });
         const allCardVideos = Array.from(projectsTrack.querySelectorAll(".project-card video"));
         allCardVideos.forEach((video) => {
