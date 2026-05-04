@@ -5,7 +5,7 @@
  *   carousel preview clips). Network-first with cache fallback for HTML.
  *   Bumping CACHE_VERSION invalidates everything.
  */
-const CACHE_VERSION = "nsc-v6";
+const CACHE_VERSION = "nsc-v7";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const MEDIA_CACHE = `${CACHE_VERSION}-media`;
 

@@ -564,7 +564,7 @@
         transform: translateZ(0);
       }
 
-      /* During ±100vw slide, let layers extend past the card box; overlay clips at the screen. */
+      /* ±100vw motion: let layers extend past the frame while overlay clips to the screen. */
       .standards-zoom-viewport.is-sliding {
         overflow: visible;
       }
@@ -578,46 +578,26 @@
         width: 100%;
         height: 100%;
         min-height: 0;
+        overflow: hidden;
       }
 
-      /* Zoom carousel: ±100vw = true left/right edge of the browser viewport. */
-      .standards-zoom-slide {
-        position: absolute;
-        inset: 0;
-        transform: translateX(0);
-        opacity: 1;
-        will-change: transform;
+      .standards-zoom-viewport.is-sliding .standards-zoom-slide-stack {
+        overflow: visible;
+      }
+
+      .standards-zoom-slide-stack.is-sliding > .standards-zoom-slide {
         transition: transform 520ms cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      /* Previous: incoming from left (-100vw); current exits with .is-exit-forward → +100vw */
-      .standards-zoom-slide.is-enter-forward {
-        transform: translateX(-100vw);
-      }
-
-      .standards-zoom-slide.is-enter-forward.is-enter-active {
+      .standards-zoom-slide-stack > .standards-zoom-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 1;
         transform: translateX(0);
-      }
-
-      .standards-zoom-slide.is-exit-forward {
-        transform: translateX(100vw);
-      }
-
-      /* Next: incoming from right (+100vw); current exits with .is-exit-back → -100vw */
-      .standards-zoom-slide.is-enter-back {
-        transform: translateX(100vw);
-      }
-
-      .standards-zoom-slide.is-enter-back.is-enter-active {
-        transform: translateX(0);
-      }
-
-      .standards-zoom-slide.is-exit-back {
-        transform: translateX(-100vw);
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .standards-zoom-slide {
+        .standards-zoom-slide-stack.is-sliding > .standards-zoom-slide {
           transition-duration: 0.01ms;
         }
         .standards-zoom-overlay .zoom-backdrop {
@@ -1232,22 +1212,9 @@
         display: none;
       }
 
+      /* Hover logos disabled — hide entirely so nothing renders on hover. */
       .project-card-hover-logo {
-        width: clamp(132px, 20vw, 230px);
-        height: auto;
-        display: block;
-        object-fit: contain;
-        filter: none;
-        opacity: 0;
-        transform: scale(0.92);
-        transition:
-          opacity 0.3s ease,
-          transform 0.3s ease;
-      }
-
-      .project-card:hover .project-card-hover-logo {
-        opacity: 1;
-        transform: scale(1);
+        display: none !important;
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -3019,25 +2986,25 @@
       }
 
       const projectData = [
-        { title: "AKI", text: "", video: "assets/web/PROJECT/optimized/aki-web.mp4", poster: "assets/web/PROJECT/optimized/posters/aki.jpg" },
-        { title: "AKIKI", text: "", video: "assets/web/PROJECT/optimized/akiki-web.mp4", poster: "assets/web/PROJECT/optimized/posters/akiki.jpg" },
-        { title: "BEIT TRAD", text: "", video: "assets/web/PROJECT/optimized/beit-trad-web.mp4", poster: "assets/web/PROJECT/optimized/posters/beit-trad.jpg" },
-        { title: "BESH", text: "", video: "assets/web/PROJECT/optimized/besh-web.mp4", poster: "assets/web/PROJECT/optimized/posters/besh.jpg" },
-        { title: "BOKJA", text: "", video: "assets/web/PROJECT/optimized/bokja-web.mp4", poster: "assets/web/PROJECT/optimized/posters/bokja.jpg" },
-        { title: "ELISSAR", text: "", video: "assets/web/PROJECT/optimized/elissar-web.mp4", poster: "assets/web/PROJECT/optimized/posters/elissar.jpg" },
-        { title: "IRRELEVANT", text: "", video: "assets/web/PROJECT/optimized/irrelevant-web.mp4", poster: "assets/web/PROJECT/optimized/posters/irrelevant.jpg" },
-        { title: "KATARINA", text: "", video: "assets/web/PROJECT/optimized/katarina-web.mp4", poster: "assets/web/PROJECT/optimized/posters/katarina.jpg" },
-        { title: "MJ", text: "", video: "assets/web/PROJECT/optimized/mj-web.mp4", poster: "assets/web/PROJECT/optimized/posters/mj.jpg" },
-        { title: "NAGGIAR ARTIST", text: "", video: "assets/web/PROJECT/optimized/naggiar-artist-web.mp4", poster: "assets/web/PROJECT/optimized/posters/naggiar-artist.jpg" },
-        { title: "NAGGIAR FILM", text: "", video: "assets/web/PROJECT/optimized/naggiar-film-web.mp4", poster: "assets/web/PROJECT/optimized/posters/naggiar-film.jpg" },
-        { title: "OIL & GAZ", text: "", video: "assets/web/PROJECT/optimized/oil-gaz-web.mp4", poster: "assets/web/PROJECT/optimized/posters/oil-gaz.jpg" },
-        { title: "ORIENT", text: "", video: "assets/web/PROJECT/optimized/orient-web.mp4", poster: "assets/web/PROJECT/optimized/posters/orient.jpg" },
-        { title: "POP UP", text: "", video: "assets/web/PROJECT/optimized/pop-up-web.mp4", poster: "assets/web/PROJECT/optimized/posters/pop-up.jpg" },
-        { title: "SAMI", text: "", video: "assets/web/PROJECT/optimized/sami-web.mp4", poster: "assets/web/PROJECT/optimized/posters/sami.jpg" },
-        { title: "SARA'S BAG", text: "", video: "assets/web/PROJECT/optimized/saras-bag-web.mp4", poster: "assets/web/PROJECT/optimized/posters/saras-bag.jpg" },
-        { title: "SARISTIQUE", text: "", video: "assets/web/PROJECT/optimized/saristique-web.mp4", poster: "assets/web/PROJECT/optimized/posters/saristique.jpg" },
-        { title: "SOAR", text: "", video: "assets/web/PROJECT/optimized/soar-web.mp4", poster: "assets/web/PROJECT/optimized/posters/soar.jpg" },
-        { title: "STEAKBAR SUSHI", text: "", video: "assets/web/PROJECT/optimized/steakbar-sushi-web.mp4", poster: "assets/web/PROJECT/optimized/posters/steakbar-sushi.jpg" },
+        { title: "AKI", text: "", video: "assets/web/PROJECT/optimized/aki-web.mp4", poster: "assets/web/PROJECT/optimized/posters/aki.jpg", frameset: "AKI FRAME SET.mp4" },
+        { title: "AKIKI", text: "", video: "assets/web/PROJECT/optimized/akiki-web.mp4", poster: "assets/web/PROJECT/optimized/posters/akiki.jpg", frameset: "AKIKI FRAME SETmp4.mp4" },
+        { title: "BEIT TRAD", text: "", video: "assets/web/PROJECT/optimized/beit-trad-web.mp4", poster: "assets/web/PROJECT/optimized/posters/beit-trad.jpg", frameset: "BEITTRAD FRAMESET.mp4" },
+        { title: "BESH", text: "", video: "assets/web/PROJECT/optimized/besh-web.mp4", poster: "assets/web/PROJECT/optimized/posters/besh.jpg", frameset: "BESH FRAME SETSmp4.mp4" },
+        { title: "BOKJA", text: "", video: "assets/web/PROJECT/optimized/bokja-web.mp4", poster: "assets/web/PROJECT/optimized/posters/bokja.jpg", frameset: "BOKJA FRAME SET mp4.mp4" },
+        { title: "ELISSAR", text: "", video: "assets/web/PROJECT/optimized/elissar-web.mp4", poster: "assets/web/PROJECT/optimized/posters/elissar.jpg", frameset: "ELISSAR FRAME SETmp4.mp4" },
+        { title: "IRRELEVANT", text: "", video: "assets/web/PROJECT/optimized/irrelevant-web.mp4", poster: "assets/web/PROJECT/optimized/posters/irrelevant.jpg", frameset: "IRRELEVANT FRAMESET.mp4" },
+        { title: "KATARINA", text: "", video: "assets/web/PROJECT/optimized/katarina-web.mp4", poster: "assets/web/PROJECT/optimized/posters/katarina.jpg", frameset: "KATARINA FRAMESET.mp4" },
+        { title: "MJ", text: "", video: "assets/web/PROJECT/optimized/mj-web.mp4", poster: "assets/web/PROJECT/optimized/posters/mj.jpg", frameset: "MJ FRAME SET .mp4" },
+        { title: "NAGGIAR ARTIST", text: "", video: "assets/web/PROJECT/optimized/naggiar-artist-web.mp4", poster: "assets/web/PROJECT/optimized/posters/naggiar-artist.jpg", frameset: "NAGGIAR ARTIST FRAMESET.mp4" },
+        { title: "NAGGIAR FILM", text: "", video: "assets/web/PROJECT/optimized/naggiar-film-web.mp4", poster: "assets/web/PROJECT/optimized/posters/naggiar-film.jpg", frameset: "NAGGIAR FILM FRAMESET.mp4" },
+        { title: "OIL & GAZ", text: "", video: "assets/web/PROJECT/optimized/oil-gaz-web.mp4", poster: "assets/web/PROJECT/optimized/posters/oil-gaz.jpg", frameset: "OIL&GAZ FRAMSETmp4.mp4" },
+        { title: "ORIENT", text: "", video: "assets/web/PROJECT/optimized/orient-web.mp4", poster: "assets/web/PROJECT/optimized/posters/orient.jpg", frameset: "ORIENT FRAMESET .mp4" },
+        { title: "POP UP", text: "", video: "assets/web/PROJECT/optimized/pop-up-web.mp4", poster: "assets/web/PROJECT/optimized/posters/pop-up.jpg", frameset: "POPUP FRAMESETmp4.mp4" },
+        { title: "SAMI", text: "", video: "assets/web/PROJECT/optimized/sami-web.mp4", poster: "assets/web/PROJECT/optimized/posters/sami.jpg", frameset: "SAMI FRAMESET.mp4" },
+        { title: "SARA'S BAG", text: "", video: "assets/web/PROJECT/optimized/saras-bag-web.mp4", poster: "assets/web/PROJECT/optimized/posters/saras-bag.jpg", frameset: "SB FRAMESET.mp4" },
+        { title: "SARISTIQUE", text: "", video: "assets/web/PROJECT/optimized/saristique-web.mp4", poster: "assets/web/PROJECT/optimized/posters/saristique.jpg", frameset: "SARITISTIQUE FRAMESETmp4.mp4" },
+        { title: "SOAR", text: "", video: "assets/web/PROJECT/optimized/soar-web.mp4", poster: "assets/web/PROJECT/optimized/posters/soar.jpg", frameset: "SOAR FRAMESET.mp4" },
+        { title: "STEAKBAR SUSHI", text: "", video: "assets/web/PROJECT/optimized/steakbar-sushi-web.mp4", poster: "assets/web/PROJECT/optimized/posters/steakbar-sushi.jpg", frameset: "STEAKBAR FRAMESET.mp4" },
       ];
 
       const projectCopyReady = fetch("assets/web/projects-detail-copy.json")
@@ -3120,25 +3087,7 @@
 
       // Apply posters to every project card video so cards show an image
       // instantly instead of a blank black box while video bytes load.
-      // Also map per-project hover logos (shown centered on hover).
       (() => {
-        const projectHoverLogos = {
-          AKI: "assets/project logos/aki.png",
-          AKIKI: "assets/project logos/akiki-transparent.png",
-          "BEIT TRAD": "assets/project logos/Beit Trad-transparent.png",
-          BESH: "assets/project logos/Besh.png",
-          BOKJA: "assets/project logos/BOKJA W.png",
-          ELISSAR: "assets/project logos/elissar.PNG",
-          IRRELEVANT: "assets/project logos/irrelevant3.png",
-          "NAGGIAR ARTIST": "assets/project logos/naggiar-artist.png",
-          "NAGGIAR FILM": "assets/project logos/Logo Naggiar-transparent.png",
-          "OIL & GAZ": "assets/project logos/oil-&-Gaz-logo-white.png",
-          ORIENT: "assets/project logos/Orient.png",
-          "SARA'S BAG": "assets/project logos/Saras bag-transparent.png",
-          SOAR: "assets/project logos/Soar.png",
-          "STEAKBAR SUSHI": "assets/project logos/steakbarsushi-2-transparent.png",
-        };
-
         const cards = document.querySelectorAll("#projects-track .project-card");
         cards.forEach((card) => {
           const idx = Number(card.dataset.projectIndex || 0);
@@ -3159,25 +3108,15 @@
           const v = card.querySelector("video");
           if (v) {
             if (project.poster && !v.poster) v.setAttribute("poster", project.poster);
-            // Keep poster visible until this card wins a slot — src is set lazily in syncCarouselVideoPlayback.
-            const previewUrl = buildPreviewUrl(project.video);
-            if (previewUrl) v.dataset.carouselSrc = previewUrl;
+            // Carousel uses the project's frameset clip; falls back to a generated preview URL
+            // if no frameset is mapped. Lazy-loaded by syncCarouselVideoPlayback.
+            const carouselUrl = project.frameset
+              ? `assets/project panel framsets/${project.frameset}`
+              : buildPreviewUrl(project.video);
+            if (carouselUrl) v.dataset.carouselSrc = encodeURI(carouselUrl);
             const source = v.querySelector("source");
             if (source) source.removeAttribute("src");
             attachMediaLoader(card, v);
-          }
-
-          const hoverLogo = card.querySelector(".project-card-hover-logo");
-          if (hoverLogo) {
-            const logoPath = projectHoverLogos[project.title];
-            if (!logoPath) {
-              hoverLogo.style.display = "none";
-            } else {
-              hoverLogo.src = encodeURI(logoPath);
-              hoverLogo.alt = `${project.title} logo`;
-              hoverLogo.loading = "lazy";
-              hoverLogo.decoding = "async";
-            }
           }
         });
       })();
@@ -4383,6 +4322,7 @@
                 zIndex: "2300",
               });
               document.body.appendChild(ghost);
+              standardsZoomViewport.classList.remove("is-sliding");
               standardsZoomViewport.innerHTML = "";
             }
           }
@@ -4446,7 +4386,7 @@
           const stack = standardsZoomViewport && standardsZoomViewport.querySelector(".standards-zoom-slide-stack");
           if (!stack) return;
 
-          const oldSlide = stack.querySelector(".standards-zoom-slide");
+          const oldSlide = stack.querySelector(":scope > .standards-zoom-slide");
           if (!oldSlide) return;
 
           currentZoom.isAnimating = true;
@@ -4454,8 +4394,6 @@
 
           const newSlide = document.createElement("div");
           newSlide.className = "standards-zoom-slide";
-          if (direction > 0) newSlide.classList.add("is-enter-back");
-          else newSlide.classList.add("is-enter-forward");
 
           const newImg = document.createElement("img");
           newImg.alt = "";
@@ -4464,20 +4402,41 @@
           newSlide.appendChild(newImg);
           stack.appendChild(newSlide);
 
-          standardsZoomViewport.classList.add("is-sliding");
+          /* Outgoing on top so the current standard clearly slides off (next: left; prev: right). */
+          oldSlide.style.zIndex = "2";
+          newSlide.style.zIndex = "1";
 
           const runAnim = () => {
             const { targetW, targetH } = computeZoomFrame(newImg);
             standardsZoomViewport.style.width = `${targetW}px`;
             standardsZoomViewport.style.height = `${targetH}px`;
 
-            void newSlide.getBoundingClientRect();
+            standardsZoomViewport.classList.add("is-sliding");
+            stack.classList.add("is-sliding");
+
+            newSlide.style.transition = "none";
+            oldSlide.style.transition = "none";
+            if (direction > 0) {
+              newSlide.style.transform = "translateX(100vw)";
+              oldSlide.style.transform = "translateX(0)";
+            } else {
+              newSlide.style.transform = "translateX(-100vw)";
+              oldSlide.style.transform = "translateX(0)";
+            }
+            void newSlide.offsetWidth;
+
+            newSlide.style.removeProperty("transition");
+            oldSlide.style.removeProperty("transition");
 
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
-                if (direction > 0) oldSlide.classList.add("is-exit-back");
-                else oldSlide.classList.add("is-exit-forward");
-                newSlide.classList.add("is-enter-active");
+                if (direction > 0) {
+                  newSlide.style.transform = "translateX(0)";
+                  oldSlide.style.transform = "translateX(-100vw)";
+                } else {
+                  newSlide.style.transform = "translateX(0)";
+                  oldSlide.style.transform = "translateX(100vw)";
+                }
               });
             });
           };
@@ -4487,19 +4446,27 @@
 
           let slideCleanupDone = false;
           const finishSlide = (e) => {
-            if (e && e.propertyName && e.propertyName !== "transform") return;
             if (slideCleanupDone || !currentZoom) return;
             if (zoomSlideAbort !== slideToken) return;
+            if (e) {
+              if (e.target !== newSlide && e.target !== oldSlide) return;
+              if (e.propertyName && e.propertyName !== "transform") return;
+            }
             slideCleanupDone = true;
             newSlide.removeEventListener("transitionend", finishSlide);
+            oldSlide.removeEventListener("transitionend", finishSlide);
             oldSlide.remove();
             standardsZoomViewport.classList.remove("is-sliding");
+            stack.classList.remove("is-sliding");
+            newSlide.style.removeProperty("transform");
+            newSlide.style.removeProperty("z-index");
             currentZoom.index = nextIndex;
             currentZoom.sourceImg = getGridImageAtIndex(nextIndex) || currentZoom.sourceImg;
             syncGridVisibilityForIndex(nextIndex);
             currentZoom.isAnimating = false;
           };
           newSlide.addEventListener("transitionend", finishSlide);
+          oldSlide.addEventListener("transitionend", finishSlide);
           window.setTimeout(() => {
             if (!slideCleanupDone) finishSlide();
           }, ZOOM_MS + 160);
