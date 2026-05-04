@@ -3135,6 +3135,15 @@
 
       const projectsSection = document.querySelector(".projects-section");
       const projectsTrack = document.getElementById("projects-track");
+      const carouselPointer = { x: NaN, y: NaN };
+      window.addEventListener(
+        "pointermove",
+        (e) => {
+          carouselPointer.x = e.clientX;
+          carouselPointer.y = e.clientY;
+        },
+        { capture: true, passive: true }
+      );
       const nextButton = document.getElementById("projects-next");
       const prevButton = document.getElementById("projects-prev");
       const detailTitle = document.getElementById("project-detail-title");
@@ -3404,11 +3413,24 @@
       };
 
       const animateProjectCardToDetail = (sourceCard, project, startTime = 0) => {
-        if (!sourceCard) return Promise.resolve();
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
+        const revealDetailVideoWithoutFlyer = () => {
+          projectsSection.classList.add("detail-flyer-landed");
+        };
+
+        if (!sourceCard) {
+          revealDetailVideoWithoutFlyer();
+          return Promise.resolve();
+        }
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          revealDetailVideoWithoutFlyer();
+          return Promise.resolve();
+        }
 
         const sourceRect = sourceCard.getBoundingClientRect();
-        if (!sourceRect.width || !sourceRect.height) return Promise.resolve();
+        if (!sourceRect.width || !sourceRect.height) {
+          revealDetailVideoWithoutFlyer();
+          return Promise.resolve();
+        }
 
         const sourceVideo = sourceCard.querySelector("video");
         const flyer = document.createElement("div");
@@ -3456,12 +3478,14 @@
             const detailMediaEl = document.querySelector(".project-detail-media");
             if (!detailMediaEl) {
               flyer.remove();
+              projectsSection.classList.add("detail-flyer-landed");
               resolve();
               return;
             }
             const targetRect = detailMediaEl.getBoundingClientRect();
             if (!targetRect.width || !targetRect.height) {
               flyer.remove();
+              projectsSection.classList.add("detail-flyer-landed");
               resolve();
               return;
             }
@@ -3612,6 +3636,9 @@
           // Run the shared element animation. While it flies, title/text fade in
           // via CSS, and the detail page background cross-fades to black.
           await animateProjectCardToDetail(sourceCard, project, startTime);
+          if (!projectsSection.classList.contains("detail-flyer-landed")) {
+            projectsSection.classList.add("detail-flyer-landed");
+          }
 
           updateProjectDetailCopyScrollState();
           requestAnimationFrame(() => updateProjectDetailCopyScrollState());
@@ -3705,6 +3732,15 @@
           return;
         }
 
+        const carouselPointerBiasScore = (rect) => {
+          if (!Number.isFinite(carouselPointer.x) || !Number.isFinite(carouselPointer.y)) return 0;
+          const cx = rect.left + rect.width * 0.5;
+          const cy = rect.top + rect.height * 0.5;
+          const dist = Math.hypot(carouselPointer.x - cx, carouselPointer.y - cy);
+          /* Strongly prefer cards under (or nearest to) the pointer for decode + network. */
+          return 2.75 / (1 + dist / 220);
+        };
+
         const scored = [];
         cards.forEach((card) => {
           const video = card.querySelector("video");
@@ -3713,14 +3749,24 @@
           const visibleWidth = Math.max(0, Math.min(rect.right, viewRect.right) - Math.max(rect.left, viewRect.left));
           const visibilityRatio = visibleWidth / Math.max(rect.width, 1);
           if (visibilityRatio > 0.16) {
-            scored.push({ video, visibilityRatio });
+            const pickScore = visibilityRatio + carouselPointerBiasScore(rect);
+            scored.push({ card, video, visibilityRatio, pickScore });
           }
         });
 
-        scored.sort((a, b) => b.visibilityRatio - a.visibilityRatio);
+        scored.sort((a, b) => b.pickScore - a.pickScore);
         const maxActive = window.innerWidth <= 900 ? 4 : 6;
         const cap = Math.min(maxActive, scored.length);
-        const allowed = new Set(scored.slice(0, cap).map((s) => s.video));
+        const winners = scored.slice(0, cap);
+        const allowed = new Set(winners.map((s) => s.video));
+
+        winners.forEach(({ video, card }) => {
+          ensureCarouselVideoSrc(video, card);
+          video.loop = true;
+          video.setAttribute("loop", "");
+          video.dataset.shouldPlay = "1";
+          attemptCarouselVideoPlay(video);
+        });
 
         cards.forEach((card) => {
           const video = card.querySelector("video");
@@ -3733,11 +3779,6 @@
           const shouldPlay = visibilityRatio > 0.16;
 
           if (shouldPlay && allowed.has(video)) {
-            ensureCarouselVideoSrc(video, card);
-            video.loop = true;
-            video.setAttribute("loop", "");
-            video.dataset.shouldPlay = "1";
-            attemptCarouselVideoPlay(video);
             return;
           }
 
@@ -3748,8 +3789,6 @@
           }
 
           // Keep carousel clips looping: do not pause when a card scrolls partly off-screen.
-          // (Pausing here made fast touchpad swipes feel like playback "stopped" and also
-          // interacted badly with decode scheduling vs the loader overlay.)
         });
       };
 
