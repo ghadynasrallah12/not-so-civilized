@@ -3074,13 +3074,28 @@
           }
         } else if (mediaEl.tagName === "VIDEO") {
           // Video: hide loader once we have enough data to play, also on first frame.
-          const onReady = () => markLoaded();
+          // Once a source has reached ready state, we ignore subsequent waiting/stalled
+          // events — those fire spuriously during fast scroll/throttling and would
+          // otherwise flash the spinner over a video that is actually playing fine.
+          // Only a fresh src (loadstart) re-arms the spinner.
+          let sticky = mediaEl.readyState >= 2;
+          const onReady = () => {
+            markLoaded();
+            sticky = true;
+          };
+          const onWaiting = () => {
+            if (!sticky) markLoading();
+          };
+          mediaEl.addEventListener("loadstart", () => {
+            sticky = false;
+            markLoading();
+          });
           mediaEl.addEventListener("loadeddata", onReady);
           mediaEl.addEventListener("canplay", onReady);
           mediaEl.addEventListener("playing", onReady);
           mediaEl.addEventListener("error", markLoaded);
-          mediaEl.addEventListener("waiting", markLoading);
-          mediaEl.addEventListener("stalled", markLoading);
+          mediaEl.addEventListener("waiting", onWaiting);
+          mediaEl.addEventListener("stalled", onWaiting);
           if (mediaEl.readyState >= 2) markLoaded();
         }
       };
