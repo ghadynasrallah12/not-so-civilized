@@ -436,6 +436,29 @@
         cursor: zoom-in;
       }
 
+      /* Staggered entrance when the section scrolls into view (IO + fallback in JS). */
+      .standards-tile:not(.standards-skeleton):not(.standards-tile-entered) {
+        opacity: 0;
+        transform: translate3d(0, 18px, 0);
+        will-change: opacity, transform;
+      }
+
+      .standards-tile.standards-tile-entered {
+        animation: standards-tile-enter 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-delay: calc(var(--std-i, 0) * 28ms);
+      }
+
+      @keyframes standards-tile-enter {
+        from {
+          opacity: 0;
+          transform: translate3d(0, 18px, 0);
+        }
+        to {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
+      }
+
       .standards-tile img {
         width: 100%;
         height: 100%;
@@ -1117,6 +1140,19 @@
       }
       img.fade-in.is-loaded {
         opacity: 1;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .standards-tile:not(.standards-skeleton) {
+          opacity: 1 !important;
+          transform: none !important;
+          animation: none !important;
+        }
+        img.fade-in,
+        img.fade-in.is-loaded {
+          opacity: 1;
+          transition: none;
+        }
       }
 
       .project-shared-flyer {
@@ -3136,11 +3172,20 @@
       const projectsSection = document.querySelector(".projects-section");
       const projectsTrack = document.getElementById("projects-track");
       const carouselPointer = { x: NaN, y: NaN };
+      let carouselPointerRaf = null;
+      let carouselPointerPendingX = NaN;
+      let carouselPointerPendingY = NaN;
       window.addEventListener(
         "pointermove",
         (e) => {
-          carouselPointer.x = e.clientX;
-          carouselPointer.y = e.clientY;
+          carouselPointerPendingX = e.clientX;
+          carouselPointerPendingY = e.clientY;
+          if (carouselPointerRaf !== null) return;
+          carouselPointerRaf = requestAnimationFrame(() => {
+            carouselPointerRaf = null;
+            carouselPointer.x = carouselPointerPendingX;
+            carouselPointer.y = carouselPointerPendingY;
+          });
         },
         { capture: true, passive: true }
       );
@@ -3194,6 +3239,7 @@
       let carouselOffset = 0;
       let lastFrameTime = 0;
       let lastVideoSyncTime = 0;
+      let carouselUserPauseUntil = 0;
       let isProjectsInView = false;
       let detailProgressFrameId = null;
       let projectDetailScrollY = 0;
@@ -3211,10 +3257,11 @@
       };
 
       const renderProjectPosition = () => {
-        projectsTrack.style.transform = `translateX(-${carouselOffset}px)`;
+        projectsTrack.style.transform = `translate3d(-${carouselOffset}px, 0, 0)`;
       };
 
       const nudgeCarousel = (direction = 1) => {
+        carouselUserPauseUntil = performance.now() + 520;
         const panelWidth = window.innerWidth > 900 ? window.innerWidth / 4 : window.innerWidth;
         carouselOffset += direction * panelWidth;
         normalizeCarouselOffset();
@@ -3226,13 +3273,20 @@
         const deltaMs = timestamp - lastFrameTime;
         lastFrameTime = timestamp;
 
-        if (isProjectsInView && !projectsSection.classList.contains("detail-open") && !isProjectOpening) {
+        if (
+          isProjectsInView &&
+          !projectsSection.classList.contains("detail-open") &&
+          !isProjectOpening &&
+          performance.now() >= carouselUserPauseUntil
+        ) {
           carouselOffset += (baseCarouselSpeed * deltaMs) / 1000;
           normalizeCarouselOffset();
           renderProjectPosition();
         }
 
-        if (timestamp - lastVideoSyncTime > 250) {
+        /* Video visibility work is expensive (~76 layout reads per pass). Keep it
+           on a looser cadence and never stack it on every wheel tick. */
+        if (timestamp - lastVideoSyncTime > 420) {
           lastVideoSyncTime = timestamp;
           syncCarouselVideoPlayback();
         }
@@ -3720,9 +3774,9 @@
       const syncCarouselVideoPlayback = () => {
         const cards = Array.from(projectsTrack.querySelectorAll(".project-card"));
         const detailOpen = projectsSection.classList.contains("detail-open");
-        const viewRect = projectsCarouselView.getBoundingClientRect();
+        const viewRect = projectsCarouselView ? projectsCarouselView.getBoundingClientRect() : null;
 
-        if (!isProjectsInView || detailOpen) {
+        if (!isProjectsInView || detailOpen || !viewRect) {
           cards.forEach((card) => {
             const video = card.querySelector("video");
             if (!video) return;
@@ -3755,7 +3809,7 @@
         });
 
         scored.sort((a, b) => b.pickScore - a.pickScore);
-        const maxActive = window.innerWidth <= 900 ? 4 : 6;
+        const maxActive = window.innerWidth <= 900 ? 3 : 4;
         const cap = Math.min(maxActive, scored.length);
         const winners = scored.slice(0, cap);
         const allowed = new Set(winners.map((s) => s.video));
@@ -3770,25 +3824,9 @@
 
         cards.forEach((card) => {
           const video = card.querySelector("video");
-          if (!video) return;
-
-          const rect = card.getBoundingClientRect();
-          const visibleWidth = Math.max(0, Math.min(rect.right, viewRect.right) - Math.max(rect.left, viewRect.left));
-          const visibilityRatio = visibleWidth / Math.max(rect.width, 1);
-
-          const shouldPlay = visibilityRatio > 0.16;
-
-          if (shouldPlay && allowed.has(video)) {
-            return;
-          }
-
-          if (shouldPlay && !allowed.has(video)) {
-            video.dataset.shouldPlay = "0";
-            card.setAttribute("data-loaded", "true");
-            return;
-          }
-
-          // Keep carousel clips looping: do not pause when a card scrolls partly off-screen.
+          if (!video || allowed.has(video)) return;
+          video.dataset.shouldPlay = "0";
+          if (!video.paused) video.pause();
         });
       };
 
@@ -4524,9 +4562,104 @@
           }, ZOOM_MS + 160);
         };
 
-        const buildStandardsTile = (filename, eager, tileIndex) => {
+        const markStandardsImgLoaded = (img) => {
+          let settled = false;
+          let safetyId = null;
+          const done = () => {
+            if (settled) return;
+            settled = true;
+            if (safetyId !== null) clearTimeout(safetyId);
+            img.classList.add("is-loaded");
+          };
+          safetyId = window.setTimeout(done, 12000);
+          const run = () => {
+            if (typeof img.decode === "function") {
+              img.decode().then(done).catch(done);
+            } else {
+              done();
+            }
+          };
+          if (img.complete && img.naturalWidth > 0) {
+            run();
+          } else {
+            img.addEventListener("load", run, { once: true });
+            img.addEventListener("error", done, { once: true });
+          }
+        };
+
+        let standardsEntranceObserver = null;
+        let standardsEntranceFallbackTimer = null;
+
+        const teardownStandardsGridEntrance = () => {
+          if (standardsEntranceObserver) {
+            standardsEntranceObserver.disconnect();
+            standardsEntranceObserver = null;
+          }
+          if (standardsEntranceFallbackTimer !== null) {
+            clearTimeout(standardsEntranceFallbackTimer);
+            standardsEntranceFallbackTimer = null;
+          }
+        };
+
+        const markStandardsTilesEntered = () => {
+          standardsGridEl.querySelectorAll(".standards-tile:not(.standards-skeleton)").forEach((tile) => {
+            tile.classList.add("standards-tile-entered");
+          });
+        };
+
+        const wireStandardsGridEntrance = () => {
+          teardownStandardsGridEntrance();
+          const section = document.getElementById("standards");
+          if (!section) {
+            markStandardsTilesEntered();
+            return;
+          }
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            markStandardsTilesEntered();
+            return;
+          }
+
+          const tryReveal = () => {
+            const r = section.getBoundingClientRect();
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            if (r.bottom > 0 && r.top < vh * 0.92) {
+              markStandardsTilesEntered();
+              teardownStandardsGridEntrance();
+              return true;
+            }
+            return false;
+          };
+
+          if (tryReveal()) return;
+
+          if (typeof IntersectionObserver !== "undefined") {
+            standardsEntranceObserver = new IntersectionObserver(
+              (entries) => {
+                for (const e of entries) {
+                  if (e.isIntersecting) {
+                    markStandardsTilesEntered();
+                    teardownStandardsGridEntrance();
+                    return;
+                  }
+                }
+              },
+              { root: null, rootMargin: "0px 0px -6% 0px", threshold: 0.01 }
+            );
+            standardsEntranceObserver.observe(section);
+          }
+
+          standardsEntranceFallbackTimer = window.setTimeout(() => {
+            standardsEntranceFallbackTimer = null;
+            if (!section.isConnected) return;
+            markStandardsTilesEntered();
+            teardownStandardsGridEntrance();
+          }, 2800);
+        };
+
+        const buildStandardsTile = (filename, tileIndex) => {
           const article = document.createElement("article");
           article.className = "standards-tile";
+          article.style.setProperty("--std-i", String(tileIndex));
 
           const baseUrl = `assets/web/standards/optimized/${encodeURIComponent(filename)}`;
           const picture = document.createElement("picture");
@@ -4534,15 +4667,10 @@
           const img = document.createElement("img");
           img.src = baseUrl;
           img.alt = "";
-          img.loading = eager ? "eager" : "lazy";
+          img.loading = "eager";
           img.decoding = "async";
           img.classList.add("fade-in");
-          if (img.complete && img.naturalWidth > 0) {
-            img.classList.add("is-loaded");
-          } else {
-            img.addEventListener("load", () => img.classList.add("is-loaded"), { once: true });
-            img.addEventListener("error", () => img.classList.add("is-loaded"), { once: true });
-          }
+          markStandardsImgLoaded(img);
           picture.appendChild(img);
           article.appendChild(picture);
 
@@ -4577,18 +4705,25 @@
           const eagerCount = Math.min(cols * 2, count);
           const firstFrag = document.createDocumentFragment();
           for (let i = 0; i < eagerCount; i += 1) {
-            firstFrag.appendChild(buildStandardsTile(standardsImages[i], true, i));
+            firstFrag.appendChild(buildStandardsTile(standardsImages[i], i));
           }
           standardsGridEl.appendChild(firstFrag);
+
+          const scheduleEntranceWire = () => {
+            requestAnimationFrame(() => wireStandardsGridEntrance());
+          };
 
           if (eagerCount < count) {
             requestAnimationFrame(() => {
               const restFrag = document.createDocumentFragment();
               for (let i = eagerCount; i < count; i += 1) {
-                restFrag.appendChild(buildStandardsTile(standardsImages[i], false, i));
+                restFrag.appendChild(buildStandardsTile(standardsImages[i], i));
               }
               standardsGridEl.appendChild(restFrag);
+              scheduleEntranceWire();
             });
+          } else {
+            scheduleEntranceWire();
           }
         };
 
@@ -4599,6 +4734,7 @@
           standardsResizeTimer = setTimeout(() => {
             if (currentZoom) closeStandardsZoom();
             renderStandardsTiles();
+            requestAnimationFrame(() => wireStandardsGridEntrance());
           }, 120);
         });
 
@@ -5018,10 +5154,10 @@
             if (!horizontalIntent) return;
 
             event.preventDefault();
+            carouselUserPauseUntil = performance.now() + 520;
             carouselOffset += dx;
             normalizeCarouselOffset();
             renderProjectPosition();
-            syncCarouselVideoPlayback();
           },
           { passive: false }
         );
