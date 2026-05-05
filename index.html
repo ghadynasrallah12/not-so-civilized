@@ -157,6 +157,25 @@
         cursor: crosshair !important;
       }
 
+      /* Fullscreen (browser / video): the promoted element lives in the top layer and
+         can ignore the normal body cascade, so restate the crosshair there + on backdrop. */
+      :fullscreen,
+      :-webkit-full-screen,
+      :-moz-full-screen,
+      :-ms-fullscreen {
+        cursor: crosshair !important;
+      }
+      :fullscreen *,
+      :-webkit-full-screen *,
+      :-moz-full-screen *,
+      :-ms-fullscreen * {
+        cursor: crosshair !important;
+      }
+      :fullscreen::backdrop,
+      :-webkit-full-screen::backdrop {
+        cursor: crosshair !important;
+      }
+
       html.projects-detail-open,
       body.projects-detail-open {
         overflow: hidden;
@@ -5162,6 +5181,18 @@
           { passive: false }
         );
       }
+
+      const applyFullscreenCrosshair = () => {
+        const el = document.fullscreenElement || document.webkitFullscreenElement;
+        if (!el) return;
+        try {
+          el.style.setProperty("cursor", "crosshair", "important");
+        } catch (_) {
+          el.style.cursor = "crosshair";
+        }
+      };
+      document.addEventListener("fullscreenchange", applyFullscreenCrosshair);
+      document.addEventListener("webkitfullscreenchange", applyFullscreenCrosshair);
 
       // ---- Service Worker registration (Phase 5) ----
       // Cache-first for static media so repeat visits feel instant.
