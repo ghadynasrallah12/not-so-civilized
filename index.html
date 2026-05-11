@@ -784,18 +784,18 @@
         opacity: 0.88;
       }
 
-      body.contact-in-view .site-header {
+      body:is(.contact-in-view, .logos-in-view) .site-header {
         color: #0a0a0a;
       }
 
-      body.contact-in-view .site-header .hero-top a,
-      body.contact-in-view .site-header .hero-top a.logo,
-      body.contact-in-view .site-header .hero-top a.center-tagline {
+      body:is(.contact-in-view, .logos-in-view) .site-header .hero-top a,
+      body:is(.contact-in-view, .logos-in-view) .site-header .hero-top a.logo,
+      body:is(.contact-in-view, .logos-in-view) .site-header .hero-top a.center-tagline {
         color: #0a0a0a;
         opacity: 1;
       }
 
-      body.contact-in-view .site-header .clock {
+      body:is(.contact-in-view, .logos-in-view) .site-header .clock {
         color: #0a0a0a;
         opacity: 1;
       }
@@ -1057,6 +1057,137 @@
         border-top: none;
         overflow: hidden;
         background: #060607;
+      }
+
+      /* Logos — white field, editorial lockups (after Projects) */
+      .logos-section.section,
+      section.logos-section {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        background: #ffffff !important;
+        color: #0a0a0a;
+        border-top: none;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+      }
+
+      .logos-section .logos-rule-top {
+        height: 10px;
+        width: 100%;
+        flex-shrink: 0;
+        background: #000000;
+      }
+
+      .logos-section .logos-rule-bottom {
+        height: 1px;
+        width: 100%;
+        flex-shrink: 0;
+        background: #000000;
+      }
+
+      .logos-section .logos-inner {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: clamp(1.5rem, 4vw, 3rem);
+        padding: clamp(5rem, 12vh, 7rem) var(--hero-side-gutter) clamp(2rem, 5vh, 3.5rem);
+        box-sizing: border-box;
+      }
+
+      .logos-section .logos-lockup {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        gap: clamp(1.5rem, 4vw, 3.5rem);
+        align-items: center;
+        flex: 1;
+      }
+
+      .logos-section .logos-alma {
+        font-family: ui-rounded, "Arial Rounded MT Bold", "Hiragino Maru Gothic ProN", "M PLUS Rounded 1c",
+          system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(3.25rem, 14vw, 9.5rem);
+        letter-spacing: -0.03em;
+        line-height: 0.92;
+        color: #000000;
+      }
+
+      .logos-section .logos-alma-reg {
+        font-size: 0.28em;
+        vertical-align: super;
+        font-weight: 600;
+        margin-left: 0.08em;
+      }
+
+      .logos-section .logos-those {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        line-height: 1.05;
+        color: #000000;
+      }
+
+      .logos-section .logos-those-line {
+        display: block;
+        font-size: clamp(1.35rem, 3.2vw, 2.75rem);
+      }
+
+      .logos-section .logos-those-line--who {
+        font-size: clamp(2.4rem, 6vw, 5rem);
+        letter-spacing: 0.04em;
+        margin: 0.1em 0;
+      }
+
+      .logos-section .logos-bottom {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .logos-section .logos-nsc {
+        margin: 0;
+        font-family: "Andale Mono", "AndaleMono", monospace;
+        font-weight: 700;
+        font-size: clamp(0.7rem, 1.35vw, 0.95rem);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: transparent;
+        -webkit-text-stroke: 1.5px #000000;
+        max-width: none;
+      }
+
+      .logos-section .logos-dare {
+        margin: 0;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-weight: 700;
+        font-size: clamp(1rem, 2vw, 1.35rem);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #000000;
+        max-width: none;
+      }
+
+      @media (max-width: 768px) {
+        .logos-section .logos-lockup {
+          grid-template-columns: 1fr;
+        }
+        .logos-section .logos-those {
+          align-items: flex-start;
+          text-align: left;
+        }
       }
 
       .projects-carousel-view {
@@ -2307,6 +2438,7 @@
             <a href="#about">About</a>
             <a href="#services">Services</a>
             <a href="#projects">Projects</a>
+            <a href="#logos">Logos</a>
             <a href="#journal">Journal</a>
             <a href="#standards">Standards</a>
             <a href="#contact">Contact Us</a>
@@ -2832,6 +2964,25 @@
         </div>
       </section>
 
+      <section class="section logos-section" id="logos" aria-label="Logos">
+        <div class="logos-rule-top" aria-hidden="true"></div>
+        <div class="logos-inner">
+          <div class="logos-lockup">
+            <div class="logos-alma" aria-hidden="true">ALMA<span class="logos-alma-reg">®</span></div>
+            <div class="logos-those">
+              <span class="logos-those-line">- THOSE -</span>
+              <span class="logos-those-line logos-those-line--who">WHO</span>
+              <span class="logos-those-line">( DARED )</span>
+            </div>
+          </div>
+          <div class="logos-bottom">
+            <p class="logos-nsc">NOT SO CIVILIZED</p>
+            <p class="logos-dare">DARE.</p>
+          </div>
+        </div>
+        <div class="logos-rule-bottom" aria-hidden="true"></div>
+      </section>
+
       <section class="section journal-section" id="journal">
         <div class="journal-layout">
           <div class="journal-left">
@@ -3016,21 +3167,25 @@
       }
 
       const contactSectionEl = document.getElementById("contact");
+      const logosSectionEl = document.getElementById("logos");
       const siteHeaderEl = document.querySelector(".site-header");
-      const syncContactHeaderTheme = () => {
-        if (!contactSectionEl) return;
-        const headerH = siteHeaderEl?.getBoundingClientRect().height ?? 88;
-        const r = contactSectionEl.getBoundingClientRect();
-        const overlap =
-          r.top <= headerH + 12 && r.bottom > Math.min(headerH * 0.5, 72);
-        document.body.classList.toggle("contact-in-view", overlap);
+      const syncLightSectionHeader = () => {
+        if (!siteHeaderEl) return;
+        const headerH = siteHeaderEl.getBoundingClientRect().height ?? 88;
+        const overlap = (el) => {
+          if (!el) return false;
+          const r = el.getBoundingClientRect();
+          return r.top <= headerH + 12 && r.bottom > Math.min(headerH * 0.5, 72);
+        };
+        document.body.classList.toggle("contact-in-view", overlap(contactSectionEl));
+        document.body.classList.toggle("logos-in-view", overlap(logosSectionEl));
       };
-      if (contactSectionEl) {
-        syncContactHeaderTheme();
-        window.addEventListener("scroll", syncContactHeaderTheme, { passive: true });
-        window.addEventListener("resize", syncContactHeaderTheme);
-        window.addEventListener("hashchange", syncContactHeaderTheme);
-        requestAnimationFrame(syncContactHeaderTheme);
+      if (contactSectionEl || logosSectionEl) {
+        syncLightSectionHeader();
+        window.addEventListener("scroll", syncLightSectionHeader, { passive: true });
+        window.addEventListener("resize", syncLightSectionHeader);
+        window.addEventListener("hashchange", syncLightSectionHeader);
+        requestAnimationFrame(syncLightSectionHeader);
       }
 
       const contactLines = Array.from(document.querySelectorAll(".contact-details .contact-line"));
