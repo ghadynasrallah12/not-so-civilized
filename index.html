@@ -1057,24 +1057,27 @@
         border-top: none;
         overflow: hidden;
         background: #060607;
+        min-height: 100vh;
+        min-height: 100svh;
+        min-height: 100dvh;
+        height: 100vh;
+        height: 100svh;
+        height: 100dvh;
       }
 
-      /* Logos — white field, editorial lockups (after Projects).
-         margin-top pulls this section up so it covers any black space below the
-         projects carousel videos (the user fixed video height to viewport but
-         the carousel section still leaves a small bottom strip). */
+      /* Logos — white field, editorial lockups (after Projects). */
       .logos-section.section,
       section.logos-section {
         position: relative;
         z-index: 2;
         isolation: isolate;
-        margin: -22vh 0 0;
+        margin: 0;
         padding: 0;
         width: 100%;
         max-width: 100%;
-        min-height: calc(100vh + 22vh);
-        min-height: calc(100svh + 22vh);
-        min-height: calc(100dvh + 22vh);
+        min-height: 100vh;
+        min-height: 100svh;
+        min-height: 100dvh;
         height: auto;
         background: #ffffff !important;
         color: #0a0a0a;
@@ -1209,7 +1212,11 @@
       .projects-carousel-view {
         position: relative;
         height: 100vh;
+        height: 100svh;
+        height: 100dvh;
         min-height: 100vh;
+        min-height: 100svh;
+        min-height: 100dvh;
         overflow: hidden;
         overscroll-behavior-x: contain;
         isolation: isolate;
@@ -1219,7 +1226,7 @@
         display: flex;
         align-items: stretch;
         height: 100%;
-        min-height: 100vh;
+        min-height: 100%;
         width: max-content;
         will-change: transform;
       }
