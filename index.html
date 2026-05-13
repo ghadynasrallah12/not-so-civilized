@@ -142,6 +142,10 @@
         scroll-behavior: smooth;
         -webkit-text-size-adjust: 100%;
         text-size-adjust: 100%;
+        /* Kill the macOS / Chrome "swipe horizontally to go back / forward"
+           gesture site-wide. Horizontal trackpad swipes inside the journal
+           carousel are claimed by our scroll handler instead. */
+        overscroll-behavior-x: none;
       }
 
       body {
@@ -149,6 +153,7 @@
         font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
         background: var(--section-bg);
         color: var(--text-light);
+        overscroll-behavior-x: none;
       }
 
       html,
@@ -409,7 +414,7 @@
         min-height: 100vh;
         min-height: 100dvh;
         width: 100%;
-        background: var(--contact-surface) !important;
+        background: white !important;
         color: #0a0a0a;
         border-top: none;
         display: flex;
@@ -800,6 +805,22 @@
         opacity: 1;
       }
 
+      body.journal-in-view .site-header {
+        color: #00aa00;
+      }
+
+      body.journal-in-view .site-header .hero-top a,
+      body.journal-in-view .site-header .hero-top a.logo,
+      body.journal-in-view .site-header .hero-top a.center-tagline {
+        color: #00aa00 !important;
+        opacity: 1;
+      }
+
+      body.journal-in-view .site-header .clock {
+        color: #00aa00 !important;
+        opacity: 1;
+      }
+
       .about-section {
         padding: 0;
         border-top: none;
@@ -1056,7 +1077,7 @@
         padding: 0;
         border-top: none;
         overflow: hidden;
-        background: #060607;
+        background: #ffffff !important;
         min-height: 100vh;
         min-height: 100svh;
         min-height: 100dvh;
@@ -1092,7 +1113,7 @@
         height: 10px;
         width: 100%;
         flex-shrink: 0;
-        background: #000000;
+        background: white;
       }
 
       .logos-section .logos-rule-bottom {
@@ -1122,48 +1143,104 @@
         flex: 1;
       }
 
-      .logos-section .logos-alma {
-        font-family: ui-rounded, "Arial Rounded MT Bold", "Hiragino Maru Gothic ProN", "M PLUS Rounded 1c",
-          system-ui, sans-serif;
-        font-weight: 700;
-        font-size: clamp(3.25rem, 14vw, 9.5rem);
-        letter-spacing: -0.03em;
-        line-height: 0.92;
-        color: #000000;
+      /* Project-logos cycler — replaces the old ALMA wordmark.
+         Shows ONE logo at a time, then animates it out as the next one
+         animates in. JS rotates the `.is-active` class on a timer; all
+         visual work is done by the CSS `@keyframes` so the main thread
+         stays free. */
+      .logos-section .logos-cycler {
+        position: relative;
+        width: 100%;
+        min-height: clamp(220px, 36vh, 380px);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
       }
 
-      .logos-section .logos-alma-reg {
-        font-size: 0.28em;
-        vertical-align: super;
-        font-weight: 600;
-        margin-left: 0.08em;
+      /* Left-align the slides with a small left inset so each logo sits
+         just to the right of the section's hero-side-gutter (76px) ruler. */
+      .logos-section .logo-slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0 0 0 1.5rem;
+        box-sizing: border-box;
+        opacity: 0;
+        pointer-events: none;
+        will-change: opacity, transform, filter;
+      }
+
+      /* Every logo occupies the *same* display rectangle inside the cycler.
+         Fixed width + height means each logo slot is identical; object-fit
+         keeps each logo's own aspect ratio while fitting inside that slot,
+         so the perceived sizing is consistent regardless of source aspect. */
+      .logos-section .logo-slide img {
+        width: 70%;
+        height: 60%;
+        object-fit: contain;
+        object-position: left center;
+        display: block;
+      }
+
+      /* 650ms showcase: enter → hold → exit. Paced so 17 logos cycle in
+         ~11s and the next can interrupt cleanly. */
+      .logos-section .logo-slide.is-active {
+        z-index: 1;
+        animation: logoShowcase 650ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      @keyframes logoShowcase {
+        0% {
+          opacity: 0;
+          transform: scale(0.85);
+          filter: blur(4px);
+        }
+        30%, 70% {
+          opacity: 1;
+          transform: scale(1);
+          filter: blur(0);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.08);
+          filter: blur(2px);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .logos-section .logo-slide.is-active {
+          animation: none;
+          opacity: 1;
+        }
       }
 
       .logos-section .logos-those {
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
-        text-align: right;
+        align-items: flex-start;
+        text-align: left;
         font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif !important;
-        font-weight: 900;
-        font-stretch: condensed;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.005em;
-        line-height: 1.02;
+        letter-spacing: -0.4em;
+        line-height: 0.75;
         color: #000000;
+        justify-self: start;
+        margin-left: 3rem;
       }
 
       .logos-section .logos-those-line {
         display: block;
-        font-size: clamp(1.5rem, 3.4vw, 2.85rem);
-        font-weight: 900;
+        font-size: 70px;
+        font-weight: 700;
       }
 
       .logos-section .logos-those-line--who {
-        font-size: clamp(2.6rem, 6.4vw, 5.25rem);
-        letter-spacing: 0.02em;
-        margin: 0.08em 0;
-        font-weight: 900;
+        font-size: 70px;
+        font-weight: 700;
+        align-self: flex-end;
       }
 
       .logos-section .logos-bottom {
@@ -1225,8 +1302,12 @@
       .projects-track {
         display: flex;
         align-items: stretch;
-        height: 100%;
-        min-height: 100%;
+        height: 100vh;
+        height: 100svh;
+        height: 100dvh;
+        min-height: 100vh;
+        min-height: 100svh;
+        min-height: 100dvh;
         width: max-content;
         will-change: transform;
       }
@@ -1237,11 +1318,14 @@
         width: 25vw;
         min-width: 25vw;
         align-self: stretch;
-        min-height: 100%;
-        height: 100%;
+        height: 100vh;
+        height: 100svh;
+        height: 100dvh;
+        min-height: 100vh;
+        min-height: 100svh;
+        min-height: 100dvh;
         overflow: hidden;
-        border-left: 1px solid rgba(0, 0, 0, 0.5);
-        border-right: 1px solid rgba(0, 0, 0, 0.5);
+        border: 0;
         cursor: pointer;
       }
 
@@ -1304,7 +1388,6 @@
       /* Make project carousel cards & detail wrap loader-aware */
       .project-card .media-loader { z-index: 2; }
       .project-detail-video-wrap .media-loader { z-index: 2; border-radius: inherit; }
-      .journal-item .media-loader { z-index: 1; }
       .standards-tile .media-loader { z-index: 1; }
 
       /* Image fade-in on load (paired with blur-up data-blur background) */
@@ -1369,6 +1452,7 @@
       }
 
       .project-card video {
+        display: block;
         position: relative;
         z-index: 0;
         width: 100%;
@@ -1948,303 +2032,307 @@
         position: relative;
         min-height: 100vh;
         height: 100vh;
+        height: 100svh;
         height: 100dvh;
         padding: 0;
         border-top: none;
         overflow: hidden;
         background: #000000 !important;
-      }
-
-      .journal-layout {
-        position: relative;
-        min-height: 100vh;
-        height: 100vh;
-        height: 100dvh;
-        display: grid;
-        grid-template-columns: 44% 56%;
-        overflow: hidden;
-      }
-
-      .journal-left {
-        box-sizing: border-box;
-        min-height: 0;
-        height: 100%;
-        padding: clamp(5rem, 11vh, 6.5rem) var(--hero-side-gutter) 3rem;
+        color: #00aa00;
         display: flex;
         flex-direction: column;
-        overflow-y: auto;
+        box-sizing: border-box;
       }
 
-      .journal-quote-wrap {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        min-height: 0;
-      }
-
-      .journal-quote {
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-size: 19px;
-        max-width: 24ch;
-        font-family: "Andale Mono", "AndaleMono", monospace;
-      }
-
-      .journal-bottom {
-        flex: 0 0 auto;
-        display: flex;
-        justify-content: flex-start;
-        align-items: flex-end;
-        gap: clamp(0.75rem, 2vw, 1.5rem);
-        width: 100%;
-      }
-
-      .journal-bottom-logo {
-        flex-shrink: 0;
-        line-height: 0;
-      }
-
-      .journal-bottom-logo a {
-        display: block;
-      }
-
-      .journal-bottom-logo img {
-        width: var(--brand-logo-width);
-        height: var(--brand-logo-height);
-        display: block;
-      }
-
-      .journal-bottom-logo a:hover img {
-        opacity: 0.9;
-      }
-
-      .journal-bottom-tagline {
-        margin: 0;
-        margin-left: auto;
-        margin-right: clamp(0, 0.5vw, 0.35rem);
-        padding-left: 0;
-        padding-right: 0;
-        text-align: right;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        line-height: 1.35;
-        font-size: 14px;
-        font-style:italic;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: #ffffff;
-        max-width: none;
-        flex: 0 0 auto;
-      }
-
-      .journal-collage {
+      .journal-hero {
         position: relative;
-        min-height: 0;
-        height: 100%;
-        background: #000000;
-      }
-
-      .journal-scroll {
-        height: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        -webkit-overflow-scrolling: touch;
-        padding: clamp(0.75rem, 2vw, 1.25rem) clamp(0.25rem, 1vw, 0.65rem) clamp(2rem, 4vh, 3rem);
+        z-index: 4;
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-content: flex-start;
+        flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
-        gap: 0.35rem 0.45rem;
-        background: #000000;
-        scrollbar-color: rgba(255, 255, 255, 0.22) #000000;
-      }
-
-      .journal-scroll::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .journal-scroll::-webkit-scrollbar-track {
-        background: #000000;
-      }
-
-      .journal-scroll::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
-      }
-
-      .journal-item {
-        position: relative;
+        text-align: left;
+        padding: 13.5vh var(--hero-side-gutter) 0;
+        padding-left: calc(var(--hero-side-gutter) + 79px);
+        font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+        font-weight: 900;
+        color: #00aa00;
+        line-height: 0.86;
+        text-transform: uppercase;
+        letter-spacing: 0;
         flex: 0 0 auto;
-        display: block;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        background: #000000;
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
-        box-sizing: border-box;
-        width: var(--journal-w, 68%);
-        height: var(--journal-h, 28vh);
-        max-width: 100%;
-        margin: 0;
-        z-index: 1;
-        cursor: grab;
-        touch-action: none;
-        translate: var(--journal-item-dx, 0px) var(--journal-item-dy, 0px);
-        transition: translate 0.08s linear;
-      }
-
-      .journal-item img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        min-height: 0;
-        object-fit: cover;
         pointer-events: none;
       }
 
-      .journal-item.journal-skeleton {
-        cursor: default;
-        background: rgba(12, 12, 14, 0.96);
+      .journal-hero-line {
+        display: block;
+        font-size: clamp(2.6rem, 11vw, 175px);
+        font-weight: 900;
+        line-height: 0.86;
+        font-stretch: 100%;
+        -webkit-text-stroke: 0.012em currentColor;
       }
-      .journal-item.journal-skeleton .media-loader {
-        background-color: rgba(10, 10, 12, 0.98);
-        background-image: linear-gradient(
-          110deg,
-          rgba(255, 255, 255, 0) 30%,
-          rgba(255, 255, 255, 0.05) 50%,
-          rgba(255, 255, 255, 0) 70%
+
+      .journal-hero-line--explain {
+        
+        margin-top: 0;
+        margin-left: 2.16em;
+      }
+
+      /* Stage fills the entire journal section so images extend behind the
+         footer (logo / DARE.) too. Hero (z:4) and footer (z:5) sit on top.
+         The stage itself is masked horizontally: images fade smoothly to
+         transparent at the left/right edges (the "image 2" look — partial,
+         softly disappearing photos at the sides rather than a frosted blur). */
+      .journal-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        overflow: hidden;
+        cursor: grab;
+        user-select: none;
+        touch-action: pan-y;
+        isolation: isolate;
+        /* Painted-island so the strip's transform updates can't trigger
+           layout / paint work outside this box. */
+        contain: layout paint;
+      }
+
+      /* Edge fade — STATIC gradient overlays painted ON TOP of the moving
+         strip. This replaces a `mask-image` on the stage, which used to
+         force the entire wide strip through an offscreen compositing pass
+         on every frame (the real source of the trackpad jank). The overlays
+         never move or repaint, so the strip can stay a pure GPU layer that
+         just translates. */
+      .journal-stage::before,
+      .journal-stage::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 25%;
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      .journal-stage::before {
+        left: 0;
+        background: linear-gradient(
+          to right,
+          #000000 0%,
+          rgba(0, 0, 0, 0) 100%
         );
       }
-      .journal-item.journal-skeleton .media-loader::after {
-        opacity: 0.55;
+
+      .journal-stage::after {
+        right: 0;
+        background: linear-gradient(
+          to left,
+          #000000 0%,
+          rgba(0, 0, 0, 0) 100%
+        );
       }
 
-      .journal-item.is-dragging {
+      .journal-stage.is-dragging {
         cursor: grabbing;
+      }
+
+      /* Strip — a long horizontal track of identically-laid-out frames.
+         Each frame is exactly the cluster's bounding box (788x373 reference,
+         scaled by viewport) and holds 12 absolutely-positioned slots in the
+         user's exact pixel layout. Frames are tiled flush so when the strip
+         continuously scrolls, the next/prev frames bleed into the L/R fade
+         zones — that's where the "peek" feel now comes from naturally. */
+      .journal-strip {
+        position: absolute;
+        top: 47.75vh;
+        left: 0;
+        height: 46.625vh;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        width: max-content;
+        transform: translate3d(0, 0, 0);
+        will-change: transform;
+        /* Promote to its own compositor layer and keep style / layout work
+           inside it — drastically reduces wheel-induced jank on macOS
+           trackpads where wheel events can fire 120Hz. */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        contain: layout style;
+      }
+
+      .journal-stage.is-dragging .journal-strip {
         transition: none;
       }
 
-      .journal-item.is-dragging img {
-        transition: none;
+      .journal-frame {
+        position: relative;
+        flex: 0 0 auto;
+        width: 61.5625vw;
+        height: 100%;
+        /* Each frame is a layout/paint island so scrolling one frame doesn't
+           force re-layout of its neighbours. */
+        contain: layout paint;
       }
 
-      .journal-item.journal-float-1 {
-        animation: journal-drift-1 calc(10s / 1.69) ease-in-out infinite alternate;
+      /* Unloaded frames (skeletons with no <picture> children yet) are skipped
+         by the browser's layout & paint pipelines entirely. The reserved size
+         keeps the strip's geometry stable so wrap math doesn't need to wait
+         for content. Once loadFrame() mounts a <picture>, the data-loaded
+         flag flips to "true" and the frame becomes a normal painted element. */
+      .journal-frame[data-loaded="false"] {
+        content-visibility: auto;
+        contain-intrinsic-size: 61.5625vw 46.625vh;
       }
 
-      .journal-item.journal-float-2 {
-        animation: journal-drift-2 calc(12s / 1.69) ease-in-out infinite alternate;
+      .journal-slot {
+        position: absolute;
+        overflow: hidden;
+        line-height: 0;
+        background: #0a0a0a;
+        contain: layout paint;
       }
 
-      .journal-item.journal-float-3 {
-        animation: journal-drift-3 calc(9s / 1.69) ease-in-out infinite alternate;
+      .journal-slot picture,
+      .journal-slot img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+        -webkit-user-drag: none;
+        user-select: none;
       }
 
-      .journal-item.journal-float-4 {
-        animation: journal-drift-4 calc(11.5s / 1.69) ease-in-out infinite alternate;
+      /* Row 1 — 6 slots across the upper band of each frame:
+           [0] 102x129 @ ( 74, 38)   [1] 101x129 @ (175, 54)
+           [2]  85x108 @ (267, 30)   [3] 147x137 @ (387, 79)
+           [4] 126x167 @ (533,  0)   [5] 145x183 @ (643, 57)
+         Row 2 — 6 slots across the lower band:
+           [6] 144x164 @ (  0, 168)  [7] 143x180 @ (135, 160)
+           [8] 141x183 @ (251, 137)  [9] 139x158 @ (364, 216)
+          [10] 144x154 @ (500, 163) [11] 113x114 @ (643, 218)
+         (Pixel values from the 788x373 reference, converted to %.) */
+      /* Slot rectangles in the 12-slot cluster (% of 788×373 frame box) plus
+         user-specified stacking order. Higher z-index = on top.
+           slot 4  (row1-img5) z:12 — highest
+           slot 6  (row2-img1) z:11
+           slot 11 (row2-img6) z:10
+           slot 0  (row1-img1) z: 9
+           slot 5  (row1-img6) z: 8
+           slot 1  (row1-img2) z: 7
+           slot 8  (row2-img3) z: 6
+           slot 3  (row1-img4) z: 5
+           slot 7  (row2-img2) z: 4
+           slot 9  (row2-img4) z: 3
+           slot 10 (row2-img5) z: 2
+           slot 2  (row1-img3) z: 1 — lowest */
+      .journal-slot[data-slot="0"]  { left:  9.39%; top: 10.19%; width: 12.94%; height: 34.58%; z-index:  9; }
+      .journal-slot[data-slot="1"]  { left: 22.21%; top: 14.48%; width: 12.82%; height: 34.58%; z-index:  7; }
+      .journal-slot[data-slot="2"]  { left: 33.88%; top:  8.04%; width: 10.79%; height: 28.95%; z-index:  1; }
+      .journal-slot[data-slot="3"]  { left: 49.11%; top: 21.18%; width: 18.65%; height: 36.73%; z-index:  5; }
+      .journal-slot[data-slot="4"]  { left: 67.64%; top:  0%;    width: 15.99%; height: 44.77%; z-index: 12; }
+      .journal-slot[data-slot="5"]  { left: 81.60%; top: 15.28%; width: 18.40%; height: 49.06%; z-index:  8; }
+      .journal-slot[data-slot="6"]  { left:  0%;    top: 45.04%; width: 18.27%; height: 43.97%; z-index: 11; }
+      .journal-slot[data-slot="7"]  { left: 17.13%; top: 42.90%; width: 18.15%; height: 48.26%; z-index:  4; }
+      .journal-slot[data-slot="8"]  { left: 31.85%; top: 36.73%; width: 17.89%; height: 49.06%; z-index:  6; }
+      .journal-slot[data-slot="9"]  { left: 46.19%; top: 57.91%; width: 17.64%; height: 42.36%; z-index:  3; }
+      .journal-slot[data-slot="10"] { left: 63.45%; top: 43.70%; width: 18.27%; height: 41.29%; z-index:  2; }
+      .journal-slot[data-slot="11"] { left: 81.60%; top: 58.45%; width: 14.34%; height: 30.56%; z-index: 10; }
+
+      .journal-arrow {
+        position: absolute;
+        /* 1440×900 reference: arrows at y=622 → 622/900 = 69.111vh */
+        top: 69.111vh;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        color: #00aa00;
+        font-size: clamp(2.25rem, 4.5vw, 4rem);
+        line-height: 1;
+        cursor: pointer;
+        z-index: 7;
+        user-select: none;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-weight: 900;
+        -webkit-text-stroke: 0.05em currentColor;
+        text-shadow: 0 0 0 currentColor;
+        transition: opacity 0.2s ease;
       }
 
-      .journal-item.journal-float-5 {
-        animation: journal-drift-5 calc(13s / 1.69) ease-in-out infinite alternate;
+      .journal-arrow:hover {
+        opacity: 0.78;
       }
 
-      .journal-item.journal-float-6 {
-        animation: journal-drift-6 calc(10.5s / 1.69) ease-in-out infinite alternate;
+      /* 1440×900 reference:
+           ← at x=274 → 19.028vw from the LEFT edge
+           → at x=1170 → mirror that distance from the RIGHT edge so the
+             two arrows are visually symmetric on any viewport
+             (1440 - (1170 + arrow_icon_width) ≈ 19vw from right). */
+      .journal-arrow--prev {
+        left: 19.028vw;
       }
 
-      .journal-item.journal-float-7 {
-        animation: journal-drift-7 calc(11s / 1.69) ease-in-out infinite alternate;
+      .journal-arrow--next {
+        right: 19.028vw;
       }
 
-      .journal-item.journal-float-8 {
-        animation: journal-drift-8 calc(12.5s / 1.69) ease-in-out infinite alternate;
+      .journal-footer {
+        position: relative;
+        z-index: 5;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 1.5rem;
+        padding: clamp(2.5rem, 7vh, 5rem) var(--hero-side-gutter) clamp(2rem, 5vh, 3.5rem);
+        width: 100%;
+        box-sizing: border-box;
+        flex: 0 0 auto;
+        flex-wrap: wrap;
+        pointer-events: none;
+        margin-top: auto;
+        isolation: isolate;
       }
 
-      @keyframes journal-drift-1 {
-        from {
-          transform: rotate(-1.5deg) translate(-8px, 4px);
-        }
-        to {
-          transform: rotate(-0.4deg) translate(10px, -8px);
-        }
+      .journal-footer-logo,
+      .journal-footer-dare {
+        pointer-events: auto;
       }
 
-      @keyframes journal-drift-2 {
-        from {
-          transform: rotate(1.2deg) translate(6px, -6px);
-        }
-        to {
-          transform: rotate(0.3deg) translate(-12px, 8px);
-        }
+      .journal-footer-logo {
+        display: block;
+        line-height: 0;
+        text-decoration: none;
+        color: inherit;
       }
 
-      @keyframes journal-drift-3 {
-        from {
-          transform: rotate(-0.6deg) translate(4px, 10px);
-        }
-        to {
-          transform: rotate(1deg) translate(-6px, -12px);
-        }
+      .journal-footer-logo img {
+        width: clamp(118px, 26vw, var(--brand-logo-width));
+        height: auto;
+        display: block;
       }
 
-      @keyframes journal-drift-4 {
-        from {
-          transform: rotate(1.4deg) translate(-10px, -4px);
-        }
-        to {
-          transform: rotate(-0.5deg) translate(8px, 10px);
-        }
+      .journal-footer-logo:hover img {
+        opacity: 0.88;
       }
 
-      @keyframes journal-drift-5 {
-        from {
-          transform: rotate(-1.1deg) translate(12px, 6px);
-        }
-        to {
-          transform: rotate(0.8deg) translate(-8px, -6px);
-        }
-      }
-
-      @keyframes journal-drift-6 {
-        from {
-          transform: rotate(0.7deg) translate(-6px, 12px);
-        }
-        to {
-          transform: rotate(-1.3deg) translate(10px, -8px);
-        }
-      }
-
-      @keyframes journal-drift-7 {
-        from {
-          transform: rotate(-0.9deg) translate(8px, -10px);
-        }
-        to {
-          transform: rotate(1.1deg) translate(-14px, 6px);
-        }
-      }
-
-      @keyframes journal-drift-8 {
-        from {
-          transform: rotate(1.5deg) translate(-4px, 8px);
-        }
-        to {
-          transform: rotate(-0.7deg) translate(6px, -14px);
-        }
+      .journal-footer-dare {
+        margin: 0;
+        font-family: "Aku & Kamu", "Aku Kamu", system-ui, sans-serif !important;
+        font-weight: 700;
+        font-size: 26px;
+        letter-spacing: normal;
+        text-transform: uppercase;
+        color: #00aa00 !important;
+        max-width: none;
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .journal-item.journal-float-1,
-        .journal-item.journal-float-2,
-        .journal-item.journal-float-3,
-        .journal-item.journal-float-4,
-        .journal-item.journal-float-5,
-        .journal-item.journal-float-6,
-        .journal-item.journal-float-7,
-        .journal-item.journal-float-8 {
-          animation: none;
-          transform: none;
+        .journal-strip {
+          transition: none;
         }
 
         .about-block {
@@ -2342,46 +2430,39 @@
         }
 
         .journal-section {
-          height: auto;
-          min-height: auto;
+          height: 100vh;
+          height: 100svh;
+          height: 100dvh;
+          min-height: 100vh;
+          min-height: 100svh;
+          min-height: 100dvh;
         }
 
-        .journal-layout {
-          grid-template-columns: 1fr;
-          height: auto;
-          min-height: auto;
-          overflow: visible;
+        .journal-hero {
+          padding-top: 13.5vh;
         }
 
-        .journal-left {
-          min-height: auto;
-          height: auto;
-          overflow-y: visible;
-          padding-bottom: 2.5rem;
+        .journal-hero-line {
+          font-size: clamp(2.4rem, 14vw, 6rem);
         }
 
-        .journal-quote-wrap {
-          min-height: 42vh;
-          align-items: center;
+        .journal-hero {
+          padding-left: calc(var(--hero-side-gutter) + 56px);
         }
 
-        .journal-collage {
-          min-height: 50vh;
-          height: auto;
+        .journal-arrow {
+          font-size: clamp(2rem, 7.5vw, 3rem);
         }
 
-        .journal-scroll {
-          height: auto;
-          max-height: none;
-          overflow-y: visible;
-          padding-bottom: 3rem;
-          display: flex;
-          flex-wrap: wrap;
+        .journal-arrow--prev { left: 19.028vw; }
+        .journal-arrow--next { right: 19.028vw; left: auto; }
+
+        .journal-footer-logo img {
+          width: clamp(96px, 26vw, 140px);
         }
 
-        .journal-item {
-          width: min(100%, var(--journal-w, 88vw)) !important;
-          height: var(--journal-h, 30vh) !important;
+        .journal-footer-dare {
+          font-size: 20px;
         }
 
         .projects-detail-view {
@@ -2991,7 +3072,25 @@
         <div class="logos-rule-top" aria-hidden="true"></div>
         <div class="logos-inner">
           <div class="logos-lockup">
-            <div class="logos-alma">ALMA<span class="logos-alma-reg">®</span></div>
+            <div class="logos-cycler" id="logos-cycler" aria-label="Project logos">
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/alma%20logo.001.png" alt="ALMA" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/BESH.001.png" alt="Besh" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/BOKJA%20B.png" alt="Bokja" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/beit%20trad.png" alt="Beit Trad" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/20240514-C9xDEOS-Be%20Batroun%20Logo%20Main%20Logo.png" alt="Be Batroun" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/KT%20LOGO.001.png" alt="KT" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/ORIENT.001.png" alt="Orient" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/Oil%20And%20Gaz%20Black%20Logo%20png.png" alt="Oil & Gaz" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/Soar%20name%20black%20logo.png" alt="Soar" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/ajialouna.png" alt="Ajialouna" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/basma%20lgog.001.png" alt="Basma" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/em-sherif-restaurant-_-logo_Black.png" alt="Em Sherif" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/mararathon%20logo.001.png" alt="Marathon" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/mukhi%20logo.001.png" alt="Mukhi" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/naggiar.png" alt="Naggiar" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/origamilogo.png" alt="Origami" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/phenomena.png" alt="Phenomena" loading="lazy" decoding="async" /></div>
+            </div>
             <div class="logos-those">
               <span class="logos-those-line">- THOSE -</span>
               <span class="logos-those-line logos-those-line--who">WHO</span>
@@ -3014,34 +3113,29 @@
         <div class="logos-rule-bottom" aria-hidden="true"></div>
       </section>
 
-      <section class="section journal-section" id="journal">
-        <div class="journal-layout">
-          <div class="journal-left">
-            <div class="journal-quote-wrap">
-              <p class="journal-quote">" Get Lost In Our Journal "</p>
-            </div>
-
-            <div class="journal-bottom">
-              <div class="journal-bottom-logo">
-                <a href="#home" aria-label="Home">
-                  <img
-                    src="assets/web/homepage/optimized/NOT-SO-CIVILISED-logo-white.png"
-                    alt="Not So Civilized"
-                    decoding="async"
-                  />
-                </a>
-              </div>
-              <p class="journal-bottom-tagline">
-                [ WHOEVER<br />
-                DARES<br />
-                JOINS ]
-              </p>
-            </div>
-          </div>
-
-          <div class="journal-collage" id="journal-collage">
-            <div class="journal-scroll" id="journal-scroll" aria-label="Journal photography" tabindex="0"></div>
-          </div>
+      <section class="section journal-section" id="journal" aria-label="Journal">
+        <div class="journal-hero">
+          <span class="journal-hero-line">- HARD - TO</span>
+          <span class="journal-hero-line journal-hero-line--explain">(EXPLAIN)</span>
+        </div>
+        <div class="journal-stage" id="journal-stage" aria-label="Journal photography">
+          <!-- Single strip; frames are tiled inside by JS. Each frame uses the
+               user's 12-slot pixel layout, so the visible center always shows
+               that exact composition while neighbours bleed in/out the fade
+               zones as the strip continuously scrolls. -->
+          <div class="journal-strip" id="journal-strip"></div>
+        </div>
+        <button type="button" class="journal-arrow journal-arrow--prev" aria-label="Previous">&larr;</button>
+        <button type="button" class="journal-arrow journal-arrow--next" aria-label="Next">&rarr;</button>
+        <div class="journal-footer">
+          <a href="#home" class="journal-footer-logo" aria-label="Not So Civilized home">
+            <img
+              src="assets/web/homepage/optimized/not-so-civilized-green-logo-transparent.png"
+              alt="Not So Civilized"
+              decoding="async"
+            />
+          </a>
+          <p class="journal-footer-dare">DARE.</p>
         </div>
       </section>
 
@@ -3199,6 +3293,7 @@
 
       const contactSectionEl = document.getElementById("contact");
       const logosSectionEl = document.getElementById("logos");
+      const journalSectionEl = document.getElementById("journal");
       const siteHeaderEl = document.querySelector(".site-header");
       const syncLightSectionHeader = () => {
         if (!siteHeaderEl) return;
@@ -3208,14 +3303,38 @@
           const r = el.getBoundingClientRect();
           return r.top <= headerH + 12 && r.bottom > Math.min(headerH * 0.5, 72);
         };
+        const approaching = (el, lookahead = 0.6) => {
+          if (!el) return false;
+          const r = el.getBoundingClientRect();
+          const vh = window.innerHeight || 800;
+          return r.top <= vh * lookahead && r.bottom > 0;
+        };
         document.body.classList.toggle("contact-in-view", overlap(contactSectionEl));
         document.body.classList.toggle("logos-in-view", overlap(logosSectionEl));
+        // Only flip to journal styling when the journal section actually
+        // overlaps the header. Earlier code used `approaching(..., 0.55)`
+        // which fired while the user was still on the white logos page,
+        // turning the header green mid-scroll.
+        document.body.classList.toggle("journal-in-view", overlap(journalSectionEl));
       };
-      if (contactSectionEl || logosSectionEl) {
+      if (contactSectionEl || logosSectionEl || journalSectionEl) {
+        // rAF-throttle: each scroll event only queues one sync. Without this
+        // the scroll handler runs synchronously per scroll event and forces
+        // a layout (getBoundingClientRect()), which on a long, image-heavy
+        // page like this caused noticeable scroll jank.
+        let headerSyncQueued = false;
+        const requestHeaderSync = () => {
+          if (headerSyncQueued) return;
+          headerSyncQueued = true;
+          requestAnimationFrame(() => {
+            headerSyncQueued = false;
+            syncLightSectionHeader();
+          });
+        };
         syncLightSectionHeader();
-        window.addEventListener("scroll", syncLightSectionHeader, { passive: true });
-        window.addEventListener("resize", syncLightSectionHeader);
-        window.addEventListener("hashchange", syncLightSectionHeader);
+        window.addEventListener("scroll", requestHeaderSync, { passive: true });
+        window.addEventListener("resize", requestHeaderSync);
+        window.addEventListener("hashchange", requestHeaderSync);
         requestAnimationFrame(syncLightSectionHeader);
       }
 
@@ -3438,7 +3557,6 @@
         attachMediaLoader(detailVideoWrap, detailVideo);
       }
       const projectsCarouselView = document.querySelector(".projects-carousel-view");
-      const journalScrollEl = document.getElementById("journal-scroll");
       const journalBase = "assets/web/homepage/optimized/JOURNAL/";
 
       let carouselOffset = 0;
@@ -4065,180 +4183,52 @@
         return out;
       };
 
-      let journalDragZCounter = 5;
-      const enableJournalItemDrag = (item) => {
-        let activePointerId = null;
-        let startX = 0;
-        let startY = 0;
-        let baseDx = 0;
-        let baseDy = 0;
+      const initJournalCarousel = async () => {
+        const stageEl = document.getElementById("journal-stage");
+        const stripEl = document.getElementById("journal-strip");
+        if (!stageEl || !stripEl) return;
 
-        const readOffset = (name) => Number(item.dataset[name] || 0);
-        const writeOffset = (dx, dy) => {
-          item.dataset.dx = String(dx);
-          item.dataset.dy = String(dy);
-          item.style.setProperty("--journal-item-dx", `${dx}px`);
-          item.style.setProperty("--journal-item-dy", `${dy}px`);
+        const SLOTS_PER_FRAME = 12;
+        const COPIES = 3; // three copies → the wrap is invisible
+
+        // CRITICAL PERFORMANCE FIX: use the 600px thumbnail variant
+        // (`<stem>.thumb.webp`) instead of the original 2880×2160 file.
+        // The thumbnails were generated by scripts/build-journal-thumbs to
+        // be roughly slot-sized + 2x. The original files decode into ~25 MB
+        // GPU textures EACH; with 432 picture elements visible on the very
+        // wide strip layer, that's many GB of texture pressure and the
+        // compositor downsamples on every composited frame → the FPS drop.
+        // Thumbnails decode to ~1 MB textures each, which the GPU handles
+        // trivially. Also dropped the multi-source <picture> wrapper since
+        // .thumb.webp is the only variant we need (WebP support is universal
+        // in target browsers); each slot is now a bare <img> which saves
+        // ~432 extra <source> nodes too.
+        const buildThumbUrl = (filename) => {
+          const dot = filename.lastIndexOf(".");
+          const stem = dot > 0 ? filename.slice(0, dot) : filename;
+          return `${journalBase}${encodeURIComponent(stem)}.thumb.webp`;
         };
+        const buildFallbackUrl = (filename) =>
+          `${journalBase}${encodeURIComponent(filename)}`;
 
-        writeOffset(readOffset("dx"), readOffset("dy"));
-
-        item.style.cursor = "grab";
-
-        item.addEventListener("pointerdown", (event) => {
-          if (event.button !== 0 && event.pointerType !== "touch") return;
-          activePointerId = event.pointerId;
-          startX = event.clientX;
-          startY = event.clientY;
-          baseDx = readOffset("dx");
-          baseDy = readOffset("dy");
-          item.classList.add("is-dragging");
-          journalDragZCounter += 1;
-          item.style.zIndex = String(journalDragZCounter);
-          item.setPointerCapture(event.pointerId);
-          event.preventDefault();
-        });
-
-        item.addEventListener("pointermove", (event) => {
-          if (activePointerId !== event.pointerId) return;
-          const dx = event.clientX - startX;
-          const dy = event.clientY - startY;
-          const dynamicMaxX = Math.max(window.innerWidth * 0.95, 800);
-          const dynamicMaxY = Math.max(window.innerHeight * 1.35, 1000);
-          const nextDx = Math.max(-dynamicMaxX, Math.min(dynamicMaxX, baseDx + dx));
-          const nextDy = Math.max(-dynamicMaxY, Math.min(dynamicMaxY, baseDy + dy));
-          writeOffset(nextDx, nextDy);
-        });
-
-        const endDrag = (event) => {
-          if (activePointerId !== event.pointerId) return;
-          activePointerId = null;
-          item.classList.remove("is-dragging");
-          item.style.cursor = "grab";
+        const createPicture = (filename, eager) => {
+          const img = document.createElement("img");
+          img.alt = "";
+          img.loading = eager ? "eager" : "lazy";
+          img.decoding = "async";
+          // Hint the intrinsic size so the browser allocates a small
+          // backing texture from the start.
+          img.width = 600;
+          img.height = 600;
+          let triedFallback = false;
+          img.addEventListener("error", () => {
+            if (triedFallback) return;
+            triedFallback = true;
+            img.src = buildFallbackUrl(filename);
+          });
+          img.src = buildThumbUrl(filename);
+          return img;
         };
-
-        item.addEventListener("pointerup", endDrag);
-        item.addEventListener("pointercancel", endDrag);
-      };
-
-      const initJournalGallery = async () => {
-        if (!journalScrollEl) return;
-
-        const journalSizeScale = 1.55;
-        const journalPackedScale = 0.88;
-        const journalLoadPresets = [
-          { ratio: "16:9", h: 20.5, dx: -12, dy: -12 },
-          { ratio: "auto", w: 18.6, h: 23.8, dx: 44, dy: -22 },
-          { ratio: "4:3", h: 18.4, dx: -34, dy: 30 },
-          { ratio: "landscape", h: 16.8, dx: 36, dy: 20 },
-          { ratio: "16:9", h: 21.4, dx: -20, dy: -36 },
-          { ratio: "auto", w: 19.2, h: 23.1, dx: 58, dy: -8 },
-          { ratio: "4:3", h: 17.9, dx: -8, dy: 40 },
-          { ratio: "landscape", h: 16.2, dx: 68, dy: 26 },
-          { ratio: "16:9", h: 19.6, dx: -46, dy: 18 },
-          { ratio: "auto", w: 18.8, h: 22.4, dx: 32, dy: -34 },
-        ];
-
-        const getRatioPresetBox = (preset) => {
-          if (preset.ratio === "16:9") {
-            const h = preset.h;
-            const w = (h * 16) / 9;
-            return { w, h };
-          }
-          if (preset.ratio === "4:3") {
-            const h = preset.h;
-            const w = (h * 4) / 3;
-            return { w, h };
-          }
-          if (preset.ratio === "landscape") {
-            const h = preset.h;
-            const w = (h * 3) / 2;
-            return { w, h };
-          }
-          return { w: preset.w, h: preset.h };
-        };
-
-        const placeVhBox = (targetArticle, wVh, hVh) => {
-          const w = wVh * journalSizeScale * journalPackedScale;
-          const h = hVh * journalSizeScale * journalPackedScale;
-          targetArticle.style.setProperty("--journal-w", `${w.toFixed(2)}vh`);
-          targetArticle.style.setProperty("--journal-h", `${h.toFixed(2)}vh`);
-          targetArticle.style.marginLeft = "";
-          targetArticle.style.marginRight = "";
-        };
-
-        const getInitialJournalOffset = (index) => {
-          if (index < journalLoadPresets.length) {
-            return { dx: journalLoadPresets[index].dx, dy: journalLoadPresets[index].dy };
-          }
-          const rowPhase = index % 6;
-          const baseX = Math.round((journalFrac(index, 41) - 0.5) * 132);
-          const baseY = Math.round((journalFrac(index, 57) - 0.5) * 84);
-          const overlapY = rowPhase >= 2 ? -Math.round(16 + journalFrac(index, 73) * 68) : 0;
-          const overlapX =
-            rowPhase === 1 || rowPhase === 4
-              ? Math.round((journalFrac(index, 89) - 0.5) * 58)
-              : Math.round((journalFrac(index, 101) - 0.5) * 24);
-          return {
-            dx: baseX + overlapX,
-            dy: baseY + overlapY,
-          };
-        };
-
-        const applyJournalItemSizing = (article, index) => {
-          const f = journalFrac;
-          const mode = index % 7;
-          if (index < journalLoadPresets.length) {
-            const presetBox = getRatioPresetBox(journalLoadPresets[index]);
-            placeVhBox(article, presetBox.w, presetBox.h);
-          } else if (mode === 0 || mode === 5) {
-            const side = 17.5 + f(index, 1) * 7.5;
-            placeVhBox(article, side, side);
-          } else if (mode === 1) {
-            const h = 19 + f(index, 3) * 8.5;
-            const w = (h * 4) / 3;
-            placeVhBox(article, w, h);
-          } else if (mode === 2) {
-            const w = 17 + f(index, 4) * 7.5;
-            const h = (w * 4) / 3;
-            placeVhBox(article, w, h);
-          } else if (mode === 3) {
-            const h = 18.5 + f(index, 5) * 8;
-            const w = (h * 3) / 2;
-            placeVhBox(article, w, h);
-          } else if (mode === 4) {
-            const w = 15.5 + f(index, 6) * 6.5;
-            const h = (w * 3) / 2;
-            placeVhBox(article, w, h);
-          } else {
-            const h = 18 + f(index, 7) * 7.5;
-            const w = (h * 5) / 4;
-            placeVhBox(article, w, h);
-          }
-        };
-
-        const paintJournalSkeleton = () => {
-          journalScrollEl.innerHTML = "";
-          const skelFrag = document.createDocumentFragment();
-          const skeletonCount = 12;
-          for (let i = 0; i < skeletonCount; i += 1) {
-            const article = document.createElement("article");
-            const floatClass = (i % 8) + 1;
-            article.className = `journal-item journal-float-${floatClass} journal-skeleton has-media-loader`;
-            article.setAttribute("data-loaded", "false");
-            applyJournalItemSizing(article, i);
-            const loader = document.createElement("div");
-            loader.className = "media-loader";
-            loader.setAttribute("aria-hidden", "true");
-            article.appendChild(loader);
-            const io = getInitialJournalOffset(i);
-            article.dataset.dx = String(io.dx);
-            article.dataset.dy = String(io.dy);
-            skelFrag.appendChild(article);
-          }
-          journalScrollEl.appendChild(skelFrag);
-        };
-        paintJournalSkeleton();
 
         try {
           const res = await fetch(`${journalBase}journal-manifest.json`);
@@ -4248,78 +4238,382 @@
 
           const filesOrdered = editorialInterleaveJournalFiles(files);
 
-          let blurMap = {};
-          try {
-            const blurRes = await fetch(`${journalBase}blur-placeholders.json`);
-            if (blurRes.ok) blurMap = await blurRes.json();
-          } catch (_) {}
+          // Build N unique frames, where each frame is the 12-slot pixel
+          // layout. We then tile three copies of those N frames end-to-end so
+          // the strip can wrap seamlessly at the copy boundary.
+          //
+          // CRITICAL PERFORMANCE NOTE:
+          // With 136 source images and 3 copies, eager-loading every slot
+          // produces ~432 `<picture>` elements — which causes GPU texture
+          // pressure, tile splitting on the compositor (the strip is
+          // ~28k px wide), and that's the real source of trackpad jank.
+          //
+          // Instead we build the slot SKELETONS only (empty divs tagged
+          // with `data-file`) and attach the `<picture>` lazily per frame
+          // once that frame approaches the viewport. The skeleton DOM is
+          // cheap; the GPU only ever holds ~3–5 frames worth of decoded
+          // images at any moment. Frames stay loaded once they've been
+          // visited so re-scrolling is instant.
+          // NO-DUPLICATES: use floor() so every slot of every frame in a
+          // copy maps to a unique manifest file. ceil() would have created an
+          // extra frame at the end whose last 8 slots wrapped via modulo back
+          // to files 0–7 (= visible duplicates within a single scroll-pass).
+          // With 136 files and 12 slots per frame: 11 frames × 12 slots = 132
+          // unique images per copy; 4 manifest entries are unused per copy
+          // (acceptable trade-off vs. duplicates).
+          const uniqueFrameCount = Math.max(1, Math.floor(filesOrdered.length / SLOTS_PER_FRAME));
+          const frag = document.createDocumentFragment();
+          for (let copy = 0; copy < COPIES; copy += 1) {
+            for (let f = 0; f < uniqueFrameCount; f += 1) {
+              const frame = document.createElement("div");
+              frame.className = "journal-frame";
+              frame.dataset.loaded = "false";
+              for (let s = 0; s < SLOTS_PER_FRAME; s += 1) {
+                const fileIdx = f * SLOTS_PER_FRAME + s; // always < uniqueFrameCount*SLOTS_PER_FRAME ≤ filesOrdered.length
+                const slot = document.createElement("div");
+                slot.className = "journal-slot";
+                slot.setAttribute("data-slot", String(s));
+                slot.dataset.file = filesOrdered[fileIdx];
+                frame.appendChild(slot);
+              }
+              frag.appendChild(frame);
+            }
+          }
+          stripEl.appendChild(frag);
 
-          const buildPictureSources = (origUrl) => {
-            const dot = origUrl.lastIndexOf(".");
-            const stem = dot > 0 ? origUrl.slice(0, dot) : origUrl;
-            return {
-              avif: `${stem}.avif`,
-              webp: `${stem}.webp`,
-              orig: origUrl,
-            };
+          // Cache an Array of frame elements (NodeLists are live but indexing
+          // them in a hot loop is slower than a plain Array).
+          const frameEls = Array.from(stripEl.children);
+
+          // Holder for the rAF-throttled re-measure. Defined later but
+          // referenced here via closure so newly created images can request
+          // a remeasure once they've decoded (the only case where layout
+          // could shift, e.g. on first paint while images decide on aspect).
+          let queueMeasureRef = null;
+
+          const loadFrame = (frameEl) => {
+            if (frameEl.dataset.loaded === "true") return;
+            const slots = frameEl.children;
+            for (let i = 0; i < slots.length; i += 1) {
+              const slot = slots[i];
+              if (!slot.firstChild && slot.dataset.file) {
+                const img = createPicture(slot.dataset.file, true);
+                // Only re-measure on initial decode; not on every error retry.
+                if (queueMeasureRef) {
+                  img.addEventListener("load", queueMeasureRef, { once: true });
+                }
+                slot.appendChild(img);
+              }
+            }
+            frameEl.dataset.loaded = "true";
           };
 
-          const frag = document.createDocumentFragment();
-          filesOrdered.forEach((filename, index) => {
-            const article = document.createElement("article");
-            const floatClass = (index % 8) + 1;
-            article.className = `journal-item journal-float-${floatClass}`;
-            applyJournalItemSizing(article, index);
+          // Strip state.
+          //   x:        currently rendered scroll offset (px)
+          //   targetX:  the scroll offset the user has *requested* (px); x
+          //             smoothly lerps toward it so trackpad spikes get
+          //             absorbed instead of slamming the GPU per frame.
+          //   vx:       inertial velocity for drag/touch flings + arrow kicks
+          //   frameW:   one frame's width (px)
+          //   copyW:    full copy width = frameW * uniqueFrameCount
+          //   baseLeft: home transform so the middle copy's first frame is
+          //             centered in the viewport when x = 0
+          const state = {
+            x: 0,
+            targetX: 0,
+            vx: 0,
+            frameW: 0,
+            copyW: 0,
+            baseLeft: 0,
+          };
 
-            const baseUrl = `${journalBase}${encodeURIComponent(filename)}`;
-            const sources = buildPictureSources(baseUrl);
-            const picture = document.createElement("picture");
-            const sAvif = document.createElement("source");
-            sAvif.srcset = sources.avif;
-            sAvif.type = "image/avif";
-            picture.appendChild(sAvif);
-            const sWebp = document.createElement("source");
-            sWebp.srcset = sources.webp;
-            sWebp.type = "image/webp";
-            picture.appendChild(sWebp);
-            const img = document.createElement("img");
-            img.src = sources.orig;
-            img.alt = "";
-            img.loading = index < 10 ? "eager" : "lazy";
-            img.decoding = "async";
-            img.classList.add("fade-in");
-            const onImgLoaded = () => img.classList.add("is-loaded");
-            if (img.complete && img.naturalWidth > 0) {
-              onImgLoaded();
-            } else {
-              img.addEventListener("load", onImgLoaded, { once: true });
-              img.addEventListener("error", onImgLoaded, { once: true });
+          const measure = () => {
+            const firstFrame = stripEl.querySelector(".journal-frame");
+            if (!firstFrame) return;
+            const fw = firstFrame.offsetWidth;
+            if (fw <= 0) return;
+            state.frameW = fw;
+            state.copyW = fw * uniqueFrameCount;
+            const homeOffset = (window.innerWidth - fw) / 2;
+            state.baseLeft = homeOffset - state.copyW;
+            applyStrip();
+            ensureLoaded();
+          };
+
+          const wrap = (x, w) => {
+            if (w <= 0) return 0;
+            return ((x % w) + w) % w;
+          };
+
+          const applyStrip = () => {
+            if (state.copyW <= 0) return;
+            const wrapped = wrap(state.x, state.copyW);
+            const tx = state.baseLeft - wrapped;
+            stripEl.style.transform = `translate3d(${tx}px, 0, 0)`;
+          };
+
+          // Walk frames once per tick and load any whose box is within a
+          // viewport-width buffer on each side. Pure arithmetic on a known
+          // frame width — no getBoundingClientRect() per slot.
+          //
+          // CRITICAL: cap the number of frames loaded per tick. Each loadFrame
+          // creates 12 <picture> elements + queues 12 img.decode() tasks. On
+          // a fast trackpad fling, several frames can enter the load zone in
+          // a single tick — without this cap, we were dumping 60+ DOM creates
+          // into one frame, which is the main source of FPS drops. Capping
+          // to 1 spreads the work across the lerp's settle time (~14 frames)
+          // so the main thread stays responsive.
+          const MAX_LOADS_PER_TICK = 1;
+          const ensureLoaded = () => {
+            if (state.copyW <= 0 || state.frameW <= 0) return;
+            const ww = window.innerWidth;
+            const buffer = ww;
+            const wrapped = wrap(state.x, state.copyW);
+            const stripLeft = state.baseLeft - wrapped;
+            const fw = state.frameW;
+            let loaded = 0;
+            for (let i = 0; i < frameEls.length; i += 1) {
+              const f = frameEls[i];
+              if (f.dataset.loaded === "true") continue;
+              const frameLeft = stripLeft + i * fw;
+              const frameRight = frameLeft + fw;
+              if (frameRight > -buffer && frameLeft < ww + buffer) {
+                loadFrame(f);
+                loaded += 1;
+                if (loaded >= MAX_LOADS_PER_TICK) break;
+              }
             }
-            picture.appendChild(img);
-            article.appendChild(picture);
+          };
 
-            const blurData = blurMap && blurMap[filename];
-            if (blurData) {
-              article.style.backgroundImage = `url("${blurData}")`;
-              article.style.backgroundSize = "cover";
-              article.style.backgroundPosition = "center";
-              article.style.backgroundRepeat = "no-repeat";
+          // Unified motion tick. Two physics models that coexist:
+          //
+          //   1) Velocity model (drag fling, arrow kick): applies vx to the
+          //      target, with friction. Position lerps after the target.
+          //   2) Target lerp (wheel): position smoothly catches up to the
+          //      target each frame.
+          //
+          // Lowering SMOOTH makes the strip feel "heavier" — input pushes
+          // the target instantly, but the visible strip lags behind for a
+          // few frames, which both feels nice and gives image decodes a
+          // chance to land BEFORE the picture is on screen.
+          let rafId = 0;
+          const FRICTION = 0.88;    // faster settle = fewer animated frames after fling
+          const SMOOTH = 0.12;      // 0..1, lower = heavier; lower also reduces per-frame strip delta
+          const MIN_VX = 0.08;
+          const MIN_DIFF = 0.5;
+          const tick = () => {
+            let alive = false;
+
+            // Velocity drives the *target*, position lerps to it.
+            if (Math.abs(state.vx) > MIN_VX) {
+              state.targetX += state.vx;
+              state.vx *= FRICTION;
+              alive = true;
+            } else if (state.vx !== 0) {
+              state.vx = 0;
             }
 
-            attachMediaLoader(article, img);
+            // Lerp the visible position toward the requested target.
+            const diff = state.targetX - state.x;
+            if (Math.abs(diff) > MIN_DIFF) {
+              state.x += diff * SMOOTH;
+              alive = true;
+            } else if (state.x !== state.targetX) {
+              state.x = state.targetX;
+            }
 
-            const initialOffset = getInitialJournalOffset(index);
-            article.dataset.dx = String(initialOffset.dx);
-            article.dataset.dy = String(initialOffset.dy);
+            applyStrip();
+            ensureLoaded();
+            rafId = alive ? requestAnimationFrame(tick) : 0;
+          };
+          const kick = () => { if (!rafId) rafId = requestAnimationFrame(tick); };
+          const addVelocity = (v) => { state.vx += v; kick(); };
 
-            enableJournalItemDrag(article);
-            frag.appendChild(article);
+          // Direct setter used by drag where the user expects 1:1
+          // finger ↔ position mapping (no lerp). rAF-throttled: a fast 120Hz
+          // trackpad / mouse can fire 2 mousemoves per frame, each of which
+          // used to fire a synchronous transform write + 36-frame loaded check.
+          // Now we accumulate and flush once per frame.
+          let dragDeltaAccum = 0;
+          let dragRafId = 0;
+          const flushDrag = () => {
+            dragRafId = 0;
+            if (dragDeltaAccum === 0) return;
+            state.x += dragDeltaAccum;
+            state.targetX = state.x;
+            dragDeltaAccum = 0;
+            applyStrip();
+            ensureLoaded();
+          };
+          const scrollByDelta = (delta) => {
+            dragDeltaAccum += delta;
+            if (!dragRafId) dragRafId = requestAnimationFrame(flushDrag);
+          };
+
+          // Wheel — trackpads fire many events per frame (up to 120Hz on
+          // macOS). We accumulate deltaX into the *target* and let the tick
+          // smoothly catch up. That gives the carousel a weighted feel
+          // (scrolls a beat after the swipe) and avoids per-event transform
+          // writes, which was the source of the frame drops.
+          //
+          // WHEEL_SCALE controls how far one px of trackpad swipe pushes the
+          // target. Lower = slower slide, less per-frame transform delta,
+          // less compositor pressure on the very wide strip layer.
+          const WHEEL_SCALE = 0.55;
+          let wheelDxAccum = 0;
+          let wheelRafId = 0;
+          const flushWheel = () => {
+            wheelRafId = 0;
+            if (wheelDxAccum === 0) return;
+            state.targetX += wheelDxAccum;
+            wheelDxAccum = 0;
+            kick();
+          };
+          stageEl.addEventListener(
+            "wheel",
+            (e) => {
+              const ax = Math.abs(e.deltaX);
+              const ay = Math.abs(e.deltaY);
+              if (ax < 0.5 || ax < ay * 0.5) return;
+              e.preventDefault();
+              // Cancel any in-flight velocity so wheel input is in charge.
+              if (state.vx !== 0) state.vx = 0;
+              wheelDxAccum += e.deltaX * WHEEL_SCALE;
+              if (!wheelRafId) wheelRafId = requestAnimationFrame(flushWheel);
+            },
+            { passive: false }
+          );
+
+          // Mouse drag — grab-and-spin. The release velocity becomes inertia.
+          let dragging = false;
+          let lastClientX = 0;
+          let lastMoveTime = 0;
+          let lastDragVx = 0;
+          let dragMoved = false;
+          stageEl.addEventListener("mousedown", (e) => {
+            if (e.button !== 0) return;
+            dragging = true;
+            dragMoved = false;
+            lastClientX = e.clientX;
+            lastMoveTime = performance.now();
+            lastDragVx = 0;
+            state.vx = 0;
+            stageEl.classList.add("is-dragging");
+            e.preventDefault();
           });
-          journalScrollEl.innerHTML = "";
-          journalScrollEl.appendChild(frag);
-        } catch {
-          journalScrollEl.innerHTML =
-            '<p class="journal-load-fallback" style="color:rgba(255,255,255,0.45);padding:1.25rem;font-family:Andale Mono,monospace;font-size:0.75rem;">Journal images could not be loaded.</p>';
+          window.addEventListener("mousemove", (e) => {
+            if (!dragging) return;
+            const dx = e.clientX - lastClientX;
+            const now = performance.now();
+            const dt = Math.max(1, now - lastMoveTime);
+            lastDragVx = (-dx / dt) * 16; // px / frame at ~60fps
+            lastClientX = e.clientX;
+            lastMoveTime = now;
+            if (Math.abs(dx) > 0) dragMoved = true;
+            scrollByDelta(-dx);
+          });
+          const endDrag = () => {
+            if (!dragging) return;
+            dragging = false;
+            stageEl.classList.remove("is-dragging");
+            if (Math.abs(lastDragVx) > 0.4) { state.vx = lastDragVx; kick(); }
+            lastDragVx = 0;
+          };
+          window.addEventListener("mouseup", endDrag);
+          window.addEventListener("mouseleave", endDrag);
+          stageEl.addEventListener(
+            "click",
+            (e) => { if (dragMoved) { e.preventDefault(); e.stopPropagation(); } },
+            true
+          );
+
+          // Touch swipe — feeds the smoothed target like wheel does. On
+          // touchend, the recent gesture velocity becomes inertia so a flick
+          // glides for a moment.
+          let touchActive = false;
+          let touchLastX = 0;
+          let touchLastT = 0;
+          let touchVx = 0;
+          let touchDxAccum = 0;
+          let touchRafId = 0;
+          const flushTouch = () => {
+            touchRafId = 0;
+            if (touchDxAccum === 0) return;
+            state.targetX += touchDxAccum;
+            touchDxAccum = 0;
+            kick();
+          };
+          stageEl.addEventListener("touchstart", (e) => {
+            if (e.touches.length !== 1) return;
+            touchActive = true;
+            touchLastX = e.touches[0].clientX;
+            touchLastT = performance.now();
+            touchVx = 0;
+            state.vx = 0;
+          }, { passive: true });
+          stageEl.addEventListener("touchmove", (e) => {
+            if (!touchActive || e.touches.length !== 1) return;
+            const x = e.touches[0].clientX;
+            const dx = x - touchLastX;
+            const now = performance.now();
+            const dt = Math.max(1, now - touchLastT);
+            touchVx = (-dx / dt) * 16;
+            touchLastX = x;
+            touchLastT = now;
+            if (Math.abs(dx) > 6 && e.cancelable) e.preventDefault();
+            touchDxAccum += -dx;
+            if (!touchRafId) touchRafId = requestAnimationFrame(flushTouch);
+          }, { passive: false });
+          stageEl.addEventListener("touchend", () => {
+            if (!touchActive) return;
+            touchActive = false;
+            if (Math.abs(touchVx) > 0.4) { state.vx = touchVx; kick(); }
+          }, { passive: true });
+
+          // Arrows + keyboard — soft pushes that accumulate. The kick is sized
+          // so a single click feels like ~one frame width of glide.
+          const ARROW_KICK = 14; // px / frame
+          document
+            .querySelector(".journal-arrow--prev")
+            ?.addEventListener("click", () => addVelocity(-ARROW_KICK));
+          document
+            .querySelector(".journal-arrow--next")
+            ?.addEventListener("click", () => addVelocity(ARROW_KICK));
+
+          window.addEventListener("keydown", (e) => {
+            const sectionEl = document.getElementById("journal");
+            if (!sectionEl) return;
+            const r = sectionEl.getBoundingClientRect();
+            const inView = r.top < window.innerHeight * 0.5 && r.bottom > window.innerHeight * 0.5;
+            if (!inView) return;
+            if (e.key === "ArrowRight") { e.preventDefault(); addVelocity(ARROW_KICK); }
+            else if (e.key === "ArrowLeft") { e.preventDefault(); addVelocity(-ARROW_KICK); }
+          });
+
+          // Re-measure on resize and as lazily-loaded images finish decoding,
+          // so the wrap point stays exactly on a frame boundary.
+          let measureQueued = false;
+          const queueMeasure = () => {
+            if (measureQueued) return;
+            measureQueued = true;
+            requestAnimationFrame(() => {
+              measureQueued = false;
+              measure();
+            });
+          };
+          // Expose to loadFrame() above for newly-mounted images.
+          queueMeasureRef = queueMeasure;
+          window.addEventListener("resize", queueMeasure);
+
+          measure();
+          setTimeout(measure, 250);
+          setTimeout(measure, 800);
+          setTimeout(measure, 2000);
+        } catch (err) {
+          if (stageEl) {
+            stageEl.innerHTML =
+              '<p style="color:#00aa00;padding:1.25rem;font-family:Andale Mono,monospace;font-size:0.75rem;">Journal images could not be loaded.</p>';
+          }
         }
       };
 
@@ -5334,8 +5628,83 @@
         });
       }
 
-      initJournalGallery();
+      initJournalCarousel();
       initStandardsBoard();
+
+      // Project-logos cycler — automatic 650ms cycle. Each logo fades in,
+      // holds briefly, fades out, and the next one takes over. Pauses when
+      // off-screen / tab hidden so the timer isn't burning CPU when nobody
+      // can see it.
+      (() => {
+        const cyclerEl = document.getElementById("logos-cycler");
+        if (!cyclerEl) return;
+        const slides = Array.from(cyclerEl.querySelectorAll(".logo-slide"));
+        if (!slides.length) return;
+
+        // Reduced motion: just show the first logo statically.
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          slides[0].classList.add("is-active");
+          return;
+        }
+
+        // STEP_MS — interval between consecutive logos appearing. Must
+        // match the CSS @keyframes duration so the previous exit and the
+        // next entrance line up cleanly.
+        const STEP_MS = 650;
+
+        let idx = 0;
+        let timerId = null;
+        let running = false;
+
+        const showCurrent = () => {
+          // Clear the active class from all slides (the offsetWidth read
+          // forces a reflow so the animation restarts cleanly if the same
+          // element is ever re-tagged), then activate the next one.
+          for (let i = 0; i < slides.length; i += 1) {
+            slides[i].classList.remove("is-active");
+          }
+          const el = slides[idx];
+          void el.offsetWidth;
+          el.classList.add("is-active");
+          idx = (idx + 1) % slides.length;
+        };
+
+        const start = () => {
+          if (running) return;
+          running = true;
+          showCurrent();
+          timerId = setInterval(showCurrent, STEP_MS);
+        };
+
+        const stop = () => {
+          running = false;
+          if (timerId) { clearInterval(timerId); timerId = null; }
+        };
+
+        if (typeof IntersectionObserver === "undefined") {
+          start();
+          return;
+        }
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) start();
+              else stop();
+            }
+          },
+          { threshold: 0.15 }
+        );
+        io.observe(cyclerEl);
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) stop();
+          else {
+            const r = cyclerEl.getBoundingClientRect();
+            const onScreen = r.bottom > 0 && r.top < window.innerHeight;
+            if (onScreen) start();
+          }
+        });
+      })();
 
       startContinuousCarousel();
 
