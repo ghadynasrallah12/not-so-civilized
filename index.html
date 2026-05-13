@@ -1387,6 +1387,15 @@
 
       /* Make project carousel cards & detail wrap loader-aware */
       .project-card .media-loader { z-index: 2; }
+      /* Project cards paint their poster as a CSS background, so the loader
+         overlay just needs to be a subtle shimmer that lets the poster show
+         through — no opaque grey/black panel while bytes load. */
+      .project-card > .media-loader {
+        background-color: transparent;
+      }
+      .project-card > .media-loader::after {
+        display: none;
+      }
       .project-detail-video-wrap .media-loader { z-index: 2; border-radius: inherit; }
       .standards-tile .media-loader { z-index: 1; }
 
@@ -3473,6 +3482,18 @@
           card.appendChild(loader);
         }
 
+        // Paint the poster as the card's CSS background so an image is ALWAYS
+        // visible while the video bytes are still loading — no more grey/black
+        // boxes during scroll. The <video>'s own poster attribute is honoured
+        // by some browsers but unreliably; CSS background-image is rock-solid.
+        if (project.poster) {
+          card.style.backgroundImage = `url("${encodeURI(project.poster)}")`;
+          card.style.backgroundSize = "cover";
+          card.style.backgroundPosition = "center";
+          card.style.backgroundRepeat = "no-repeat";
+          card.style.backgroundColor = "#000";
+        }
+
         const v = card.querySelector("video");
         if (!v) return;
         v.loop = true;
@@ -4000,6 +4021,22 @@
 
           // Open the detail page (CSS fade-in begins) — flyer will sit on top.
           projectsSection.classList.add("detail-open");
+
+          // SILENCE EVERYTHING ELSE while the user is watching one video.
+          // This frees up network + decode + GPU + CPU so the detail video
+          // plays smoothly without competing with background animations.
+          window.__nscDetailOpen = true;
+          // 1) Pause the homepage hero video.
+          if (bgVideo && !bgVideo.paused) {
+            try { bgVideo.pause(); } catch (_) {}
+          }
+          // 2) Pause every project carousel preview video (syncCarouselVideoPlayback
+          //    will also do this on next tick, but we want it immediate so there's
+          //    no audio/decoding contention with the detail player).
+          projectsTrack.querySelectorAll("video").forEach((cv) => {
+            try { cv.pause(); } catch (_) {}
+            cv.dataset.shouldPlay = "0";
+          });
           window.addEventListener("wheel", preventWheelWhileProjectDetail, { passive: false });
           window.addEventListener("touchmove", preventTouchMoveWhileProjectDetail, { passive: false });
 
@@ -4075,6 +4112,16 @@
           cancelAnimationFrame(detailProgressFrameId);
           detailProgressFrameId = null;
         }
+
+        // Resume background activity that openProjectDetail paused.
+        window.__nscDetailOpen = false;
+        if (bgVideo) {
+          try {
+            const p = bgVideo.play();
+            if (p && typeof p.catch === "function") p.catch(() => {});
+          } catch (_) {}
+        }
+
         syncCarouselVideoPlayback();
       };
 
@@ -4402,6 +4449,15 @@
           const MIN_VX = 0.08;
           const MIN_DIFF = 0.5;
           const tick = () => {
+            // FREEZE while the user is in the project detail overlay — we
+            // don't want this carousel competing with the detail video for
+            // CPU / GPU / image-decode bandwidth.
+            if (window.__nscDetailOpen) {
+              state.vx = 0;
+              rafId = 0;
+              return;
+            }
+
             let alive = false;
 
             // Velocity drives the *target*, position lerps to it.
@@ -4426,7 +4482,10 @@
             ensureLoaded();
             rafId = alive ? requestAnimationFrame(tick) : 0;
           };
-          const kick = () => { if (!rafId) rafId = requestAnimationFrame(tick); };
+          const kick = () => {
+            if (window.__nscDetailOpen) return;
+            if (!rafId) rafId = requestAnimationFrame(tick);
+          };
           const addVelocity = (v) => { state.vx += v; kick(); };
 
           // Direct setter used by drag where the user expects 1:1
@@ -5628,8 +5687,30 @@
         });
       }
 
-      initJournalCarousel();
-      initStandardsBoard();
+      // Defer heavy below-the-fold initialization until the hero video has
+      // started playing (or a generous 3s safety fallback). This keeps the
+      // first-paint network/CPU budget reserved for the homepage video,
+      // which is what the visitor actually sees on load.
+      const startDeferredInit = (() => {
+        let ran = false;
+        return () => {
+          if (ran) return;
+          ran = true;
+          initJournalCarousel();
+          initStandardsBoard();
+        };
+      })();
+      if (bgVideo) {
+        if (bgVideo.readyState >= 3) {
+          startDeferredInit();
+        } else {
+          bgVideo.addEventListener("playing", startDeferredInit, { once: true });
+          bgVideo.addEventListener("canplaythrough", startDeferredInit, { once: true });
+        }
+      }
+      // Fallback so deferred init always runs even if the video never
+      // signals "playing" (slow networks, autoplay blocked, etc.).
+      setTimeout(startDeferredInit, 3000);
 
       // Project-logos cycler — automatic 650ms cycle. Each logo fades in,
       // holds briefly, fades out, and the next one takes over. Pauses when
