@@ -1421,45 +1421,6 @@
         }
       }
 
-      .project-shared-flyer {
-        position: fixed;
-        margin: 0;
-        top: 0;
-        left: 0;
-        pointer-events: none;
-        z-index: 80;
-        overflow: hidden;
-        background: #000;
-        will-change: transform, top, left, width, height, opacity;
-        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
-      }
-
-      .project-shared-flyer video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-
-      .project-shared-flyer-shadow {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: linear-gradient(
-          90deg,
-          rgba(0, 0, 0, 0.92) 0%,
-          rgba(0, 0, 0, 0.55) 22%,
-          rgba(0, 0, 0, 0.18) 50%,
-          rgba(0, 0, 0, 0) 80%
-        );
-        opacity: 0;
-        transition: opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      .project-shared-flyer.is-flying .project-shared-flyer-shadow {
-        opacity: 1;
-      }
-
       .project-card video {
         display: block;
         position: relative;
@@ -1610,7 +1571,7 @@
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
-        transition: opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.95s;
+        transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.38s;
         background: #000000;
       }
 
@@ -1618,7 +1579,7 @@
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
-        transition: opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0s;
+        transition: opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0s;
       }
 
       .projects-section.detail-open .projects-carousel-view {
@@ -1868,6 +1829,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transform: scale(0.94);
+        opacity: 0;
+        transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+        will-change: transform;
+      }
+
+      .projects-section.detail-open .project-detail-video-wrap {
+        transform: scale(1);
+        opacity: 1;
       }
 
       .project-detail-video {
@@ -1885,6 +1855,27 @@
 
       .projects-section.detail-open.detail-flyer-landed .project-detail-video {
         opacity: 1;
+      }
+
+      /* Cushion video: the already-cached carousel FRAMESET clip plays here
+         instantly so the user sees motion the moment they click — while the
+         full master streams underneath. Fades out once the master is ready. */
+      .project-detail-cushion-video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        z-index: 3;
+        opacity: 1;
+        transition: opacity 0.45s ease;
+        pointer-events: none;
+        background: #000;
+      }
+
+      .project-detail-cushion-video.is-fading {
+        opacity: 0;
       }
 
 
@@ -3071,10 +3062,8 @@
                 muted
                 loop
                 playsinline
-                preload="metadata"
-              >
-                <source src="assets/web/PROJECT/optimized/aki-web.mp4" type="video/mp4" />
-              </video>
+                preload="none"
+              ></video>
               <div class="media-loader" id="project-detail-loader" aria-hidden="true"></div>
               <button id="project-detail-mute" class="project-detail-mute" type="button" aria-label="Mute">
                 <svg id="mute-icon-on" class="control-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -3763,84 +3752,53 @@
         }
       };
 
-      // Hot-swap the detail player from preview clip → full-HD master once the
-      // master is sufficiently buffered. We do this with a hidden <video> so
-      // the visible player keeps looping the preview during the wait.
-      let masterUpgradeProbeEl = null;
-      const cancelDetailMasterUpgrade = () => {
-        if (masterUpgradeProbeEl) {
-          masterUpgradeProbeEl.onloadeddata = null;
-          masterUpgradeProbeEl.oncanplaythrough = null;
-          masterUpgradeProbeEl.onerror = null;
-          masterUpgradeProbeEl.removeAttribute("src");
-          try { masterUpgradeProbeEl.load(); } catch (_) {}
-          masterUpgradeProbeEl = null;
+      // Cushion video: drop the already-cached FRAMESET clip into the detail
+      // wrap so the user sees motion the instant they click — while the big
+      // master streams underneath. Fades out the moment master can play.
+      let detailCushionEl = null;
+      const removeDetailCushion = (immediate = false) => {
+        if (!detailCushionEl) return;
+        const node = detailCushionEl;
+        detailCushionEl = null;
+        if (immediate) {
+          try { node.pause(); } catch (_) {}
+          node.remove();
+          return;
         }
+        node.classList.add("is-fading");
+        window.setTimeout(() => {
+          try { node.pause(); } catch (_) {}
+          node.remove();
+        }, 480);
       };
 
-      const scheduleDetailVideoMasterUpgrade = (token, masterUrl) => {
-        if (!masterUrl) return;
-        cancelDetailMasterUpgrade();
-
-        const probe = document.createElement("video");
-        probe.preload = "auto";
-        probe.muted = true;
-        probe.playsInline = true;
-        probe.style.display = "none";
-        probe.src = masterUrl;
-        masterUpgradeProbeEl = probe;
-        document.body.appendChild(probe);
-
-        const swapToMaster = () => {
-          if (token !== detailVideoLoadToken) {
-            cancelDetailMasterUpgrade();
-            return;
-          }
-          if (!projectsSection.classList.contains("detail-open")) {
-            cancelDetailMasterUpgrade();
-            return;
-          }
-          // Preserve playback position when upgrading preview → master (same timeline).
-          const dur = Number.isFinite(detailVideo.duration) ? detailVideo.duration : 0;
-          const resumeAt =
-            Number.isFinite(detailVideo.currentTime) && dur > 0.1
-              ? Math.min(Math.max(0, detailVideo.currentTime), dur - 0.05)
-              : 0;
-          const wasPlaying = !detailVideo.paused;
-          detailVideo.loop = true;
-          detailVideo.setAttribute("loop", "");
-          detailVideo.src = masterUrl;
-          detailVideo.load();
-          const onReady = () => {
-            try {
-              detailVideo.currentTime = Math.min(resumeAt, Math.max(0, (detailVideo.duration || resumeAt) - 0.1));
-            } catch (_) {}
-            if (wasPlaying) attemptDetailVideoPlay();
-          };
-          if (detailVideo.readyState >= 1) {
-            onReady();
-          } else {
-            detailVideo.addEventListener("loadedmetadata", onReady, { once: true });
-          }
-          cancelDetailMasterUpgrade();
-        };
-
-        probe.addEventListener("canplaythrough", swapToMaster, { once: true });
-        probe.addEventListener(
-          "loadeddata",
-          () => {
-            // Some browsers don't fire canplaythrough; fall back to a small
-            // buffered slice (scales with clip length for long previews).
-            try {
-              const pd = Number.isFinite(probe.duration) && probe.duration > 0 ? probe.duration : 30;
-              const minBuf = Math.min(5, Math.max(1.5, pd * 0.08));
-              if (probe.buffered.length && probe.buffered.end(0) >= minBuf) swapToMaster();
-            } catch (_) {}
-          },
-          { once: true }
-        );
-        probe.addEventListener("error", () => cancelDetailMasterUpgrade(), { once: true });
-        try { probe.load(); } catch (_) {}
+      const injectDetailCushion = (project) => {
+        if (!detailVideoWrap) return;
+        removeDetailCushion(true);
+        const framesetUrl = project?.frameset
+          ? `assets/PROJECT PANEL FRAMSETS/${project.frameset}`
+          : "";
+        if (!framesetUrl) return;
+        const cushion = document.createElement("video");
+        cushion.className = "project-detail-cushion-video";
+        cushion.muted = true;
+        cushion.loop = true;
+        cushion.playsInline = true;
+        cushion.autoplay = true;
+        cushion.preload = "auto";
+        cushion.setAttribute("muted", "");
+        cushion.setAttribute("loop", "");
+        cushion.setAttribute("playsinline", "");
+        if (project.poster) cushion.setAttribute("poster", project.poster);
+        cushion.src = encodeURI(framesetUrl);
+        detailVideoWrap.appendChild(cushion);
+        detailCushionEl = cushion;
+        // Spinner sits below cushion (z-index 2 vs 3) so it's hidden as long
+        // as the cushion is up — flip data-loaded to true so the loader CSS
+        // doesn't try to draw on top.
+        detailVideoWrap.setAttribute("data-loaded", "true");
+        const p = cushion.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
       };
 
       const scheduleDetailVideoRetry = (token, delayMs = 420) => {
@@ -3853,134 +3811,6 @@
           detailVideo.load();
           attemptDetailVideoPlay();
         }, delayMs);
-      };
-
-      const animateProjectCardToDetail = (sourceCard, project, startTime = 0) => {
-        const revealDetailVideoWithoutFlyer = () => {
-          projectsSection.classList.add("detail-flyer-landed");
-        };
-
-        if (!sourceCard) {
-          revealDetailVideoWithoutFlyer();
-          return Promise.resolve();
-        }
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          revealDetailVideoWithoutFlyer();
-          return Promise.resolve();
-        }
-
-        const sourceRect = sourceCard.getBoundingClientRect();
-        if (!sourceRect.width || !sourceRect.height) {
-          revealDetailVideoWithoutFlyer();
-          return Promise.resolve();
-        }
-
-        const sourceVideo = sourceCard.querySelector("video");
-        const flyer = document.createElement("div");
-        flyer.className = "project-shared-flyer";
-
-        const flyerVideo = document.createElement("video");
-        // Never pull multi‑MB full masters for the flyer — use the already-small carousel preview
-        // (or the explicit preview URL). Detail `<video>` loads the full clip underneath.
-        const flyerSrc =
-          (sourceVideo &&
-            sourceVideo.readyState >= 2 &&
-            String(sourceVideo.currentSrc || sourceVideo.src || "").trim()) ||
-          buildPreviewUrl(project?.video) ||
-          project?.video ||
-          "";
-        flyerVideo.src = flyerSrc;
-        flyerVideo.muted = true;
-        flyerVideo.loop = true;
-        flyerVideo.playsInline = true;
-        flyerVideo.autoplay = true;
-        flyerVideo.setAttribute("muted", "");
-        flyerVideo.setAttribute("playsinline", "");
-        if (Number.isFinite(startTime) && startTime > 0) {
-          try {
-            flyerVideo.currentTime = startTime;
-          } catch (_) {}
-        }
-        flyer.appendChild(flyerVideo);
-
-        const flyerShadow = document.createElement("div");
-        flyerShadow.className = "project-shared-flyer-shadow";
-        flyer.appendChild(flyerShadow);
-
-        flyer.style.top = `${sourceRect.top}px`;
-        flyer.style.left = `${sourceRect.left}px`;
-        flyer.style.width = `${sourceRect.width}px`;
-        flyer.style.height = `${sourceRect.height}px`;
-        flyer.style.opacity = "1";
-        document.body.appendChild(flyer);
-
-        flyerVideo.play().catch(() => {});
-
-        return new Promise((resolve) => {
-          requestAnimationFrame(() => {
-            const detailMediaEl = document.querySelector(".project-detail-media");
-            if (!detailMediaEl) {
-              flyer.remove();
-              projectsSection.classList.add("detail-flyer-landed");
-              resolve();
-              return;
-            }
-            const targetRect = detailMediaEl.getBoundingClientRect();
-            if (!targetRect.width || !targetRect.height) {
-              flyer.remove();
-              projectsSection.classList.add("detail-flyer-landed");
-              resolve();
-              return;
-            }
-
-            const finish = () => {
-              try {
-                if (Number.isFinite(flyerVideo.currentTime)) {
-                  detailVideo.currentTime = flyerVideo.currentTime;
-                }
-              } catch (_) {}
-              attemptDetailVideoPlay();
-
-              // Reveal the real detail video underneath at the exact same rect,
-              // and cross-fade the flyer out so the swap is invisible.
-              projectsSection.classList.add("detail-flyer-landed");
-              flyer.style.transition = "opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1)";
-              flyer.style.opacity = "0";
-              window.setTimeout(() => {
-                flyer.remove();
-                resolve();
-              }, 440);
-            };
-
-            const duration = 1.5;
-            flyer.classList.add("is-flying");
-
-            if (window.gsap) {
-              gsap.to(flyer, {
-                top: targetRect.top,
-                left: targetRect.left,
-                width: targetRect.width,
-                height: targetRect.height,
-                duration,
-                ease: "power3.inOut",
-                onComplete: finish,
-              });
-            } else {
-              flyer.style.transition =
-                `top ${duration}s cubic-bezier(0.65, 0, 0.35, 1),` +
-                `left ${duration}s cubic-bezier(0.65, 0, 0.35, 1),` +
-                `width ${duration}s cubic-bezier(0.65, 0, 0.35, 1),` +
-                `height ${duration}s cubic-bezier(0.65, 0, 0.35, 1)`;
-              requestAnimationFrame(() => {
-                flyer.style.top = `${targetRect.top}px`;
-                flyer.style.left = `${targetRect.left}px`;
-                flyer.style.width = `${targetRect.width}px`;
-                flyer.style.height = `${targetRect.height}px`;
-              });
-              window.setTimeout(finish, duration * 1000 + 60);
-            }
-          });
-        });
       };
 
       const openProjectDetail = async (index, sourceCard = null) => {
@@ -4025,36 +3855,15 @@
               detailVideoWrap.style.backgroundColor = "#000";
             }
           }
-          // Use the optimized master directly. The previously-used
-          // "preview" mp4 files are SILENT (no audio track), so the
-          // two-stage preview→master strategy meant the user heard
-          // nothing until the master finished pre-buffering — sometimes
-          // 10+ seconds on real networks. Playing the master from the
-          // start guarantees audio the moment the video can play.
-          // The poster + spinner on the wrap covers the loading state.
-          if (detailVideoWrap) detailVideoWrap.setAttribute("data-loaded", "false");
+          // Kick the master download IMMEDIATELY so the network is busy
+          // pulling the real film while the cushion clip covers the wait.
+          // preload="auto" tells the browser to buffer aggressively.
+          detailVideo.preload = "auto";
+          detailVideo.setAttribute("preload", "auto");
           detailVideo.src = project.video;
           detailVideo.loop = true;
           detailVideo.setAttribute("loop", "");
           detailVideo.load();
-          // Pre-warm the NEXT project's master so navigating to it via the
-          // next-button is near-instant. We prefetch the master (which has
-          // audio) — not the preview, which is silent.
-          (() => {
-            const nextProject = projectData[(index + 1) % projectData.length];
-            if (!nextProject || !nextProject.video) return;
-            const id = "nsc-prefetch-next-project";
-            let link = document.getElementById(id);
-            if (!link) {
-              link = document.createElement("link");
-              link.id = id;
-              link.rel = "prefetch";
-              link.as = "video";
-              link.type = "video/mp4";
-              document.head.appendChild(link);
-            }
-            link.href = nextProject.video;
-          })();
           try {
             detailVideo.currentTime = 0;
           } catch (_) {}
@@ -4073,8 +3882,17 @@
           document.body.classList.add("projects-detail-open");
           document.body.style.top = `-${projectDetailScrollY}px`;
 
-          // Open the detail page (CSS fade-in begins) — flyer will sit on top.
+          // Open the detail page (CSS zoom-in begins).
           projectsSection.classList.add("detail-open");
+
+          // Drop the FRAMESET clip (already cached from the carousel) into the
+          // video wrap so the user sees motion the instant they click —
+          // bridges the wait for the real master to buffer.
+          injectDetailCushion(project);
+
+          // Reveal the real <video> straight away so it can fade in as soon
+          // as bytes are available; cushion sits on top until canplay.
+          projectsSection.classList.add("detail-flyer-landed");
 
           // SILENCE EVERYTHING ELSE while the user is watching one video.
           // This frees up network + decode + GPU + CPU so the detail video
@@ -4101,27 +3919,19 @@
           detailReplayButton.classList.remove("show");
           progressFill.style.width = "0%";
 
-          // Run the shared element animation. While it flies, title/text fade in
-          // via CSS, and the detail page background cross-fades to black.
-          await animateProjectCardToDetail(sourceCard, project, startTime);
-          if (!projectsSection.classList.contains("detail-flyer-landed")) {
-            projectsSection.classList.add("detail-flyer-landed");
-          }
-
           updateProjectDetailCopyScrollState();
           requestAnimationFrame(() => updateProjectDetailCopyScrollState());
 
-          // Make sure the real detail video keeps playing once flyer is gone.
-          attemptDetailVideoPlay();
-          detailVideo.addEventListener("canplay", attemptDetailVideoPlay, { once: true });
-          detailVideo.addEventListener(
-            "loadeddata",
-            () => {
-              if (loadToken !== detailVideoLoadToken) return;
-              attemptDetailVideoPlay();
-            },
-            { once: true }
-          );
+          // Once the master can play, drop the cushion and let the real
+          // film take over (with audio). canplay = enough buffered to play
+          // forward; loadeddata fires earlier and is a safe fallback.
+          const handleMasterReady = () => {
+            if (loadToken !== detailVideoLoadToken) return;
+            attemptDetailVideoPlay();
+            removeDetailCushion();
+          };
+          detailVideo.addEventListener("canplay", handleMasterReady, { once: true });
+          detailVideo.addEventListener("loadeddata", handleMasterReady, { once: true });
           detailVideo.addEventListener(
             "stalled",
             () => scheduleDetailVideoRetry(loadToken, 360),
@@ -4144,7 +3954,7 @@
       const closeProjectDetail = () => {
         isProjectOpening = false;
         detailVideoLoadToken += 1;
-        cancelDetailMasterUpgrade();
+        removeDetailCushion(true);
         if (detailVideoRetryTimer) {
           clearTimeout(detailVideoRetryTimer);
           detailVideoRetryTimer = null;
