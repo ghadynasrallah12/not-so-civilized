@@ -1468,7 +1468,11 @@
         height: 100%;
         object-fit: cover;
         transform: scale(1);
-        transition: transform 0.55s ease;
+        opacity: 0;
+        transition: transform 0.55s ease, opacity 0.28s ease;
+      }
+      .project-card[data-loaded="true"] video {
+        opacity: 1;
       }
 
       .project-card:hover video {
@@ -2201,6 +2205,40 @@
         line-height: 0;
         background: #0a0a0a;
         contain: layout paint;
+      }
+
+      /* Empty slot (frame not loaded yet → no <img> child mounted) AND
+         slots whose <img> hasn't finished decoding yet both show a shimmer
+         skeleton so the user knows images are coming instead of staring at
+         a black rectangle. The shimmer stops the moment the .is-loaded
+         class lands on the img (see createPicture in initJournalCarousel). */
+      .journal-slot:empty,
+      .journal-slot:has(img:not(.is-loaded)) {
+        background-color: #15151a;
+        background-image: linear-gradient(
+          110deg,
+          rgba(255, 255, 255, 0) 30%,
+          rgba(255, 255, 255, 0.07) 50%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        background-size: 220% 100%;
+        background-repeat: no-repeat;
+        background-position: 110% 0;
+        animation: media-loader-shimmer 1.8s linear infinite;
+      }
+      .journal-slot:empty::after,
+      .journal-slot:has(img:not(.is-loaded))::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 14px;
+        height: 14px;
+        margin: -7px 0 0 -7px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.18);
+        border-top-color: rgba(255, 255, 255, 0.6);
+        animation: media-loader-spin 1s linear infinite;
       }
 
       .journal-slot picture,
@@ -3474,7 +3512,12 @@
         if (!project) return;
 
         card.classList.add("has-media-loader");
-        card.setAttribute("data-loaded", "true");
+        // Start in the loading state so the poster background-image (set
+        // below) is visible while the carousel preview is still streaming.
+        // attachMediaLoader() flips this to "true" once the <video>'s first
+        // frame is decoded — at which point the video fades in over the
+        // poster (see .project-card[data-loaded] CSS).
+        card.setAttribute("data-loaded", "false");
         if (!card.querySelector(":scope > .media-loader")) {
           const loader = document.createElement("div");
           loader.className = "media-loader";
@@ -3506,6 +3549,27 @@
         const source = v.querySelector("source");
         if (source) source.removeAttribute("src");
         attachMediaLoader(card, v);
+
+        // Warm-up the detail-view preview URL on first hover / focus so by
+        // the time the user actually clicks the card, the file is already
+        // (partly) cached in the browser. Cuts the perceived click→play
+        // delay by a lot on real-world networks. One-shot per card.
+        const previewToWarm = buildPreviewUrl(project.video);
+        if (previewToWarm) {
+          const warm = () => {
+            const id = `nsc-preview-prefetch-${idx}`;
+            if (document.getElementById(id)) return;
+            const link = document.createElement("link");
+            link.id = id;
+            link.rel = "prefetch";
+            link.as = "video";
+            link.type = "video/mp4";
+            link.href = previewToWarm;
+            document.head.appendChild(link);
+          };
+          card.addEventListener("pointerenter", warm, { once: true, passive: true });
+          card.addEventListener("focus", warm, { once: true, passive: true });
+        }
       };
 
       // Apply posters to every project card video so cards show an image
@@ -3982,8 +4046,19 @@
           detailVideo.setAttribute("loop", "");
           detailVideo.load();
 
+          // Wait until the preview can actually play before pulling the
+          // master down in the background. Doing both fetches in parallel
+          // splits bandwidth and made the first-frame wait noticeable on
+          // slow connections — the preview is what the user is staring at,
+          // so let it have the pipe to itself for the first second.
           if (previewUrl && previewUrl !== project.video) {
-            scheduleDetailVideoMasterUpgrade(loadToken, project.video);
+            const triggerMasterUpgrade = () => {
+              if (loadToken !== detailVideoLoadToken) return;
+              scheduleDetailVideoMasterUpgrade(loadToken, project.video);
+            };
+            detailVideo.addEventListener("canplay", triggerMasterUpgrade, { once: true });
+            // Safety net in case canplay is delayed (some Safari versions).
+            setTimeout(triggerMasterUpgrade, 2500);
           }
           // Pre-warm the NEXT project so the user gets near-instant transitions.
           (() => {
@@ -4267,13 +4342,21 @@
           // backing texture from the start.
           img.width = 600;
           img.height = 600;
+          // Fade the image in once it has actually decoded — paired with the
+          // .journal-slot:empty shimmer skeleton, this means the user sees
+          // a "loading" cell first, then the image gently appears (instead
+          // of a flash of black between mount and decode).
+          img.classList.add("fade-in");
+          const onLoaded = () => img.classList.add("is-loaded");
+          img.addEventListener("load", onLoaded, { once: true });
           let triedFallback = false;
           img.addEventListener("error", () => {
-            if (triedFallback) return;
+            if (triedFallback) { onLoaded(); return; }
             triedFallback = true;
             img.src = buildFallbackUrl(filename);
           });
           img.src = buildThumbUrl(filename);
+          if (img.complete && img.naturalWidth > 0) onLoaded();
           return img;
         };
 
