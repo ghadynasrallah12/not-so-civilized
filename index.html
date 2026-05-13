@@ -4025,35 +4025,21 @@
               detailVideoWrap.style.backgroundColor = "#000";
             }
           }
-          // Two-stage source strategy for INSTANT playback:
-          //   1. Boot the detail player with the small carousel preview that is
-          //      already cached (or loading) → playback starts the moment the
-          //      flyer animation lands, no buffering wait.
-          //   2. In parallel, pre-buffer the full-HD master in a hidden video
-          //      element. Once it's ready, hot-swap the source so the user gets
-          //      audio + the full clip without seeing a loading state.
-          const previewUrl = buildPreviewUrl(project.video);
+          // Use the optimized master directly. The previously-used
+          // "preview" mp4 files are SILENT (no audio track), so the
+          // two-stage preview→master strategy meant the user heard
+          // nothing until the master finished pre-buffering — sometimes
+          // 10+ seconds on real networks. Playing the master from the
+          // start guarantees audio the moment the video can play.
+          // The poster + spinner on the wrap covers the loading state.
           if (detailVideoWrap) detailVideoWrap.setAttribute("data-loaded", "false");
-          detailVideo.src = previewUrl || project.video;
+          detailVideo.src = project.video;
           detailVideo.loop = true;
           detailVideo.setAttribute("loop", "");
           detailVideo.load();
-
-          // Wait until the preview can actually play before pulling the
-          // master down in the background. Doing both fetches in parallel
-          // splits bandwidth and made the first-frame wait noticeable on
-          // slow connections — the preview is what the user is staring at,
-          // so let it have the pipe to itself for the first second.
-          if (previewUrl && previewUrl !== project.video) {
-            const triggerMasterUpgrade = () => {
-              if (loadToken !== detailVideoLoadToken) return;
-              scheduleDetailVideoMasterUpgrade(loadToken, project.video);
-            };
-            detailVideo.addEventListener("canplay", triggerMasterUpgrade, { once: true });
-            // Safety net in case canplay is delayed (some Safari versions).
-            setTimeout(triggerMasterUpgrade, 2500);
-          }
-          // Pre-warm the NEXT project so the user gets near-instant transitions.
+          // Pre-warm the NEXT project's master so navigating to it via the
+          // next-button is near-instant. We prefetch the master (which has
+          // audio) — not the preview, which is silent.
           (() => {
             const nextProject = projectData[(index + 1) % projectData.length];
             if (!nextProject || !nextProject.video) return;
@@ -4067,7 +4053,7 @@
               link.type = "video/mp4";
               document.head.appendChild(link);
             }
-            link.href = buildPreviewUrl(nextProject.video) || nextProject.video;
+            link.href = nextProject.video;
           })();
           try {
             detailVideo.currentTime = 0;
