@@ -3542,86 +3542,21 @@
         v.loop = true;
         v.setAttribute("loop", "");
         if (project.poster && !v.poster) v.setAttribute("poster", project.poster);
-        // CRITICAL: the carousel preview MUST be the same file as the detail
-        // player's preview. Previously the carousel used a separate ~5.6 MB
-        // "frameset" file while the detail player used a ~2 MB preview file,
-        // so clicking a project triggered a fresh download every time. By
-        // unifying both to buildPreviewUrl(...), once the user has seen a
-        // card in the carousel (it loaded the preview, SW cached it) clicking
-        // = instant cache hit, no network round-trip.
-        const carouselUrl = buildPreviewUrl(project.video) || project.video;
+        // Carousel uses the high-quality PROJECT PANEL FRAMSETS clip
+        // (unchanged behaviour from before — we are not touching video files).
+        const carouselUrl = project.frameset
+          ? `assets/PROJECT PANEL FRAMSETS/${project.frameset}`
+          : buildPreviewUrl(project.video);
         if (carouselUrl) v.dataset.carouselSrc = encodeURI(carouselUrl);
         const source = v.querySelector("source");
         if (source) source.removeAttribute("src");
         attachMediaLoader(card, v);
-
-        // Warm-up the detail-view preview URL on first hover / focus so by
-        // the time the user actually clicks the card, the file is already
-        // (partly) cached in the browser. Cuts the perceived click→play
-        // delay by a lot on real-world networks. One-shot per card.
-        const previewToWarm = buildPreviewUrl(project.video);
-        if (previewToWarm) {
-          const warm = () => {
-            const id = `nsc-preview-prefetch-${idx}`;
-            if (document.getElementById(id)) return;
-            const link = document.createElement("link");
-            link.id = id;
-            link.rel = "prefetch";
-            link.as = "video";
-            link.type = "video/mp4";
-            link.href = previewToWarm;
-            document.head.appendChild(link);
-          };
-          card.addEventListener("pointerenter", warm, { once: true, passive: true });
-          card.addEventListener("focus", warm, { once: true, passive: true });
-        }
       };
 
       // Apply posters to every project card video so cards show an image
       // instantly instead of a blank black box while video bytes load.
       (() => {
         document.querySelectorAll("#projects-track .project-card").forEach(wireProjectCardCarouselMedia);
-      })();
-
-      // Pre-warm ALL project preview files in the background as soon as the
-      // projects section comes within one viewport of the visitor. Combined
-      // with Fix #1 (carousel uses the same preview URL as the detail
-      // player), this means by the time the visitor clicks a card the file
-      // is already cached locally → playback is instant.
-      // Browser HTTP/2 multiplexing + service-worker MEDIA_CACHE handle the
-      // throughput; ~24 MB upfront for all 12 projects, never re-downloaded.
-      (() => {
-        const projectsSectionForWarm = document.getElementById("projects");
-        if (!projectsSectionForWarm || typeof IntersectionObserver === "undefined") return;
-        const prewarmAll = () => {
-          projectData.forEach((p, idx) => {
-            if (!p || !p.video) return;
-            const url = buildPreviewUrl(p.video);
-            if (!url) return;
-            const id = `nsc-preview-prefetch-${idx}`;
-            if (document.getElementById(id)) return;
-            const link = document.createElement("link");
-            link.id = id;
-            link.rel = "prefetch";
-            link.as = "video";
-            link.type = "video/mp4";
-            link.href = encodeURI(url);
-            document.head.appendChild(link);
-          });
-        };
-        const io = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              if (entry.isIntersecting) {
-                io.disconnect();
-                prewarmAll();
-                break;
-              }
-            }
-          },
-          { rootMargin: "100% 0px" }
-        );
-        io.observe(projectsSectionForWarm);
       })();
 
       const projectsSection = document.querySelector(".projects-section");
