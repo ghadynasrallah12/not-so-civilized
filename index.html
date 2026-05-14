@@ -3725,6 +3725,13 @@
 
       const attemptDetailVideoPlay = () => {
         if (!projectsSection.classList.contains("detail-open")) return;
+        // Snapshot the load generation: if the panel is closed (or another
+        // open happens) before play() resolves, we must NOT retry, otherwise
+        // the master starts playing off-screen with audio after close.
+        const callToken = detailVideoLoadToken;
+        const stillActive = () =>
+          projectsSection.classList.contains("detail-open") &&
+          callToken === detailVideoLoadToken;
         detailVideo.muted = false;
         detailVideo.defaultMuted = false;
         detailVideo.volume = 1;
@@ -3733,6 +3740,7 @@
         const playPromise = detailVideo.play();
         if (playPromise && typeof playPromise.catch === "function") {
           playPromise.catch(() => {
+            if (!stillActive()) return;
             detailVideo.muted = true;
             detailVideo.defaultMuted = true;
             detailVideo.setAttribute("muted", "");
@@ -3740,6 +3748,10 @@
             detailVideo
               .play()
               .then(() => {
+                if (!stillActive()) {
+                  try { detailVideo.pause(); } catch (_) {}
+                  return;
+                }
                 // If autoplay only works muted, unmute immediately after playback starts.
                 detailVideo.muted = false;
                 detailVideo.defaultMuted = false;
@@ -3968,8 +3980,18 @@
         document.body.classList.remove("projects-detail-open");
         document.body.style.top = "";
         window.scrollTo(0, projectDetailScrollY);
-        detailVideo.pause();
-        detailVideo.currentTime = 0;
+        try { detailVideo.pause(); } catch (_) {}
+        try { detailVideo.currentTime = 0; } catch (_) {}
+        // Hard-stop: clearing src + calling load() aborts any in-flight
+        // network fetch AND rejects the pending play() promise, which
+        // prevents the master from auto-resuming with sound after the user
+        // has already closed the detail panel.
+        detailVideo.muted = true;
+        detailVideo.defaultMuted = true;
+        detailVideo.setAttribute("muted", "");
+        detailVideo.removeAttribute("src");
+        try { detailVideo.load(); } catch (_) {}
+        syncDetailMuteUi();
         detailReplayButton.classList.remove("show");
         progressFill.style.width = "0%";
         if (detailProgressFrameId) {
