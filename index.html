@@ -3655,7 +3655,7 @@
       let detailVideoLoadToken = 0;
       let detailVideoRetryTimer = null;
       let isProjectOpening = false;
-      const baseCarouselSpeed = 24; // px per second
+      const baseCarouselSpeed = 24; // px/s — projects + journal auto-slide
 
       const getCarouselLoopWidth = () => projectsTrack.scrollWidth / 2;
 
@@ -4372,11 +4372,19 @@
           // few frames, which both feels nice and gives image decodes a
           // chance to land BEFORE the picture is on screen.
           let rafId = 0;
+          let lastTickTime = 0;
+          let isJournalInView = false;
+          let journalUserPauseUntil = 0;
+          let dragging = false;
+          let touchActive = false;
           const FRICTION = 0.88;    // faster settle = fewer animated frames after fling
           const SMOOTH = 0.12;      // 0..1, lower = heavier; lower also reduces per-frame strip delta
           const MIN_VX = 0.08;
           const MIN_DIFF = 0.5;
-          const tick = () => {
+          const pauseJournalAuto = (ms = 520) => {
+            journalUserPauseUntil = performance.now() + ms;
+          };
+          const tick = (timestamp) => {
             // FREEZE while the user is in the project detail overlay — we
             // don't want this carousel competing with the detail video for
             // CPU / GPU / image-decode bandwidth.
@@ -4386,7 +4394,30 @@
               return;
             }
 
+            if (!lastTickTime) lastTickTime = timestamp;
+            const deltaMs = Math.min(timestamp - lastTickTime, 64);
+            lastTickTime = timestamp;
+
             let alive = false;
+            const autoPlay =
+              isJournalInView &&
+              performance.now() >= journalUserPauseUntil &&
+              !dragging &&
+              !touchActive &&
+              Math.abs(state.vx) <= MIN_VX &&
+              state.copyW > 0;
+
+            // Continuous auto-slide — same px/s as projects carousel.
+            if (autoPlay) {
+              const autoDelta = (baseCarouselSpeed * deltaMs) / 1000;
+              state.targetX += autoDelta;
+              state.x += autoDelta;
+              if (state.copyW > 0) {
+                state.x = wrap(state.x, state.copyW);
+                state.targetX = wrap(state.targetX, state.copyW);
+              }
+              alive = true;
+            }
 
             // Velocity drives the *target*, position lerps to it.
             if (Math.abs(state.vx) > MIN_VX) {
@@ -4408,13 +4439,20 @@
 
             applyStrip();
             ensureLoaded();
-            rafId = alive ? requestAnimationFrame(tick) : 0;
+            // Keep ticking while the section is visible so auto-slide can
+            // resume after wheel/drag pause without needing another kick().
+            const keepLoop = isJournalInView && !window.__nscDetailOpen;
+            rafId = alive || autoPlay || keepLoop ? requestAnimationFrame(tick) : 0;
           };
           const kick = () => {
             if (window.__nscDetailOpen) return;
             if (!rafId) rafId = requestAnimationFrame(tick);
           };
-          const addVelocity = (v) => { state.vx += v; kick(); };
+          const addVelocity = (v) => {
+            pauseJournalAuto();
+            state.vx += v;
+            kick();
+          };
 
           // Direct setter used by drag where the user expects 1:1
           // finger ↔ position mapping (no lerp). rAF-throttled: a fast 120Hz
@@ -4463,6 +4501,8 @@
               const ay = Math.abs(e.deltaY);
               if (ax < 0.5 || ax < ay * 0.5) return;
               e.preventDefault();
+              // Short pause per wheel burst — auto resumes soon after you stop scrolling.
+              pauseJournalAuto(120);
               // Cancel any in-flight velocity so wheel input is in charge.
               if (state.vx !== 0) state.vx = 0;
               wheelDxAccum += e.deltaX * WHEEL_SCALE;
@@ -4472,13 +4512,13 @@
           );
 
           // Mouse drag — grab-and-spin. The release velocity becomes inertia.
-          let dragging = false;
           let lastClientX = 0;
           let lastMoveTime = 0;
           let lastDragVx = 0;
           let dragMoved = false;
           stageEl.addEventListener("mousedown", (e) => {
             if (e.button !== 0) return;
+            pauseJournalAuto();
             dragging = true;
             dragMoved = false;
             lastClientX = e.clientX;
@@ -4517,7 +4557,6 @@
           // Touch swipe — feeds the smoothed target like wheel does. On
           // touchend, the recent gesture velocity becomes inertia so a flick
           // glides for a moment.
-          let touchActive = false;
           let touchLastX = 0;
           let touchLastT = 0;
           let touchVx = 0;
@@ -4532,6 +4571,7 @@
           };
           stageEl.addEventListener("touchstart", (e) => {
             if (e.touches.length !== 1) return;
+            pauseJournalAuto();
             touchActive = true;
             touchLastX = e.touches[0].clientX;
             touchLastT = performance.now();
@@ -4591,6 +4631,19 @@
           // Expose to loadFrame() above for newly-mounted images.
           queueMeasureRef = queueMeasure;
           window.addEventListener("resize", queueMeasure);
+
+          const journalSectionEl = document.getElementById("journal");
+          if (journalSectionEl) {
+            const journalObserver = new IntersectionObserver(
+              (entries) => {
+                const [entry] = entries;
+                isJournalInView = entry.isIntersecting && entry.intersectionRatio > 0.35;
+                if (isJournalInView) kick();
+              },
+              { threshold: [0, 0.35, 0.65, 1] }
+            );
+            journalObserver.observe(journalSectionEl);
+          }
 
           measure();
           setTimeout(measure, 250);
