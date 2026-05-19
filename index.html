@@ -1192,7 +1192,7 @@
         display: block;
       }
 
-      /* Instant swap — one visible logo; interval matches JS STEP_MS (200ms). */
+      /* Instant swap — one visible logo; interval matches JS STEP_MS (350ms). */
       .logos-section .logo-slide.is-active {
         z-index: 1;
         opacity: 1;
@@ -5693,7 +5693,7 @@
       // signals "playing" (slow networks, autoplay blocked, etc.).
       setTimeout(startDeferredInit, 3000);
 
-      // Project-logos cycler — 200ms instant swap. Visibility is tracked from the
+      // Project-logos cycler — 350ms instant swap. Visibility is tracked from the
       // section box (not IO on transparent slides). Preloads JPEGs so lazy
       // load cannot stall the loop mid-run.
       (() => {
@@ -5708,7 +5708,7 @@
           return;
         }
 
-        const STEP_MS = 200;
+        const STEP_MS = 350;
         let idx = 0;
         let timerId = null;
         let didPreloadAll = false;
