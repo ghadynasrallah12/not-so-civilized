@@ -1099,17 +1099,20 @@
         min-height: 100vh;
         min-height: 100svh;
         min-height: 100dvh;
-        height: auto;
+        height: 100dvh;
+        max-height: 100dvh;
         background: #ffffff !important;
         color: #0a0a0a;
         border-top: none;
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
-        overflow-x: clip;
+        overflow: hidden;
       }
 
       .logos-section .logos-rule-top {
+        position: relative;
+        z-index: 2;
         height: 10px;
         width: 100%;
         flex-shrink: 0;
@@ -1117,13 +1120,31 @@
       }
 
       .logos-section .logos-rule-bottom {
+        position: relative;
+        z-index: 2;
         height: 1px;
         width: 100%;
         flex-shrink: 0;
         background: #000000;
       }
 
+      .logos-section {
+        --logos-artboard-width: 3840;
+        --logos-artboard-height: 2160;
+      }
+
+      /* Full-section artboard layer — lowest stack; JPEG layout is authoritative. */
+      .logos-section .logos-cycler {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
       .logos-section .logos-inner {
+        position: relative;
+        z-index: 1;
         flex: 1 1 auto;
         display: flex;
         flex-direction: column;
@@ -1133,6 +1154,12 @@
         box-sizing: border-box;
         width: 100%;
         min-height: 0;
+        pointer-events: none;
+      }
+
+      .logos-section .logos-inner a,
+      .logos-section .logos-inner p {
+        pointer-events: auto;
       }
 
       .logos-section .logos-lockup {
@@ -1141,54 +1168,40 @@
         gap: clamp(1.5rem, 4vw, 3.5rem);
         align-items: center;
         flex: 1;
+        min-height: 0;
       }
 
-      /* Project-logos cycler — replaces the old ALMA wordmark.
-         Shows ONE logo at a time, then animates it out as the next one
-         animates in. JS rotates the `.is-active` class on a timer; all
-         visual work is done by the CSS `@keyframes` so the main thread
-         stays free. */
-      .logos-section .logos-cycler {
-        position: relative;
-        width: 100%;
-        min-height: clamp(220px, 36vh, 380px);
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
+      .logos-section .logos-lockup-spacer {
+        min-height: 1px;
       }
 
-      /* Left-align the slides with a small left inset so each logo sits
-         just to the right of the section's hero-side-gutter (76px) ruler. */
       .logos-section .logo-slide {
         position: absolute;
         inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 0 0 0 1.5rem;
-        box-sizing: border-box;
         opacity: 0;
         pointer-events: none;
-        will-change: opacity, transform, filter;
+        transform-origin: left center;
+        contain: layout paint;
       }
 
-      /* Every logo occupies the *same* display rectangle inside the cycler.
-         Fixed width + height means each logo slot is identical; object-fit
-         keeps each logo's own aspect ratio while fitting inside that slot,
-         so the perceived sizing is consistent regardless of source aspect. */
+      .logos-section .logo-slide.is-active {
+        will-change: opacity, transform;
+      }
+
       .logos-section .logo-slide img {
-        width: 70%;
-        height: 60%;
+        width: 100%;
+        height: 100%;
         object-fit: contain;
-        object-position: left center;
+        object-position: left top;
         display: block;
       }
 
-      /* 650ms showcase: enter → hold → exit. Paced so 17 logos cycle in
-         ~11s and the next can interrupt cleanly. */
+      /* 650ms showcase: enter → hold → exit. One logo at a time across the
+         full client set; interval matches JS STEP_MS below. */
       .logos-section .logo-slide.is-active {
         z-index: 1;
         animation: logoShowcase 650ms cubic-bezier(0.22, 1, 0.36, 1);
+        animation-fill-mode: both;
       }
 
       @keyframes logoShowcase {
@@ -3106,27 +3119,66 @@
 
       <section class="section logos-section" id="logos" aria-label="Logos">
         <div class="logos-rule-top" aria-hidden="true"></div>
+        <div class="logos-cycler" id="logos-cycler" aria-label="Project logos">
+
+
+
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.001.jpeg" alt="Client logo 001" loading="eager" fetchpriority="high" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.002.jpeg" alt="Client logo 002" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.003.jpeg" alt="Client logo 003" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.004.jpeg" alt="Client logo 004" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.005.jpeg" alt="Client logo 005" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.006.jpeg" alt="Client logo 006" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.007.jpeg" alt="Client logo 007" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.008.jpeg" alt="Client logo 008" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.009.jpeg" alt="Client logo 009" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.010.jpeg" alt="Client logo 010" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.011.jpeg" alt="Client logo 011" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.012.jpeg" alt="Client logo 012" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.013.jpeg" alt="Client logo 013" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.014.jpeg" alt="Client logo 014" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.015.jpeg" alt="Client logo 015" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.016.jpeg" alt="Client logo 016" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.017.jpeg" alt="Client logo 017" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.018.jpeg" alt="Client logo 018" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.019.jpeg" alt="Client logo 019" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.020.jpeg" alt="Client logo 020" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.021.jpeg" alt="Client logo 021" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.022.jpeg" alt="Client logo 022" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.023.jpeg" alt="Client logo 023" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.024.jpeg" alt="Client logo 024" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.025.jpeg" alt="Client logo 025" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.026.jpeg" alt="Client logo 026" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.027.jpeg" alt="Client logo 027" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.028.jpeg" alt="Client logo 028" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.029.jpeg" alt="Client logo 029" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.030.jpeg" alt="Client logo 030" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.031.jpeg" alt="Client logo 031" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.032.jpeg" alt="Client logo 032" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.033.jpeg" alt="Client logo 033" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.034.jpeg" alt="Client logo 034" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.035.jpeg" alt="Client logo 035" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.036.jpeg" alt="Client logo 036" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.037.jpeg" alt="Client logo 037" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.038.jpeg" alt="Client logo 038" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.039.jpeg" alt="Client logo 039" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.040.jpeg" alt="Client logo 040" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.041.jpeg" alt="Client logo 041" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.042.jpeg" alt="Client logo 042" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.043.jpeg" alt="Client logo 043" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.044.jpeg" alt="Client logo 044" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.045.jpeg" alt="Client logo 045" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.046.jpeg" alt="Client logo 046" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.047.jpeg" alt="Client logo 047" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.048.jpeg" alt="Client logo 048" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.049.jpeg" alt="Client logo 049" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.050.jpeg" alt="Client logo 050" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.051.jpeg" alt="Client logo 051" loading="lazy" decoding="async" /></div>
+              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.052.jpeg" alt="Client logo 052" loading="lazy" decoding="async" /></div>
+                              </div>
         <div class="logos-inner">
           <div class="logos-lockup">
-            <div class="logos-cycler" id="logos-cycler" aria-label="Project logos">
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/alma%20logo.001.png" alt="ALMA" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/BESH.001.png" alt="Besh" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/BOKJA%20B.png" alt="Bokja" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/beit%20trad.png" alt="Beit Trad" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/20240514-C9xDEOS-Be%20Batroun%20Logo%20Main%20Logo.png" alt="Be Batroun" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/KT%20LOGO.001.png" alt="KT" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/ORIENT.001.png" alt="Orient" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/Oil%20And%20Gaz%20Black%20Logo%20png.png" alt="Oil & Gaz" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/Soar%20name%20black%20logo.png" alt="Soar" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/ajialouna.png" alt="Ajialouna" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/basma%20lgog.001.png" alt="Basma" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/em-sherif-restaurant-_-logo_Black.png" alt="Em Sherif" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/mararathon%20logo.001.png" alt="Marathon" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/mukhi%20logo.001.png" alt="Mukhi" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/naggiar.png" alt="Naggiar" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/origamilogo.png" alt="Origami" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BLACK/phenomena.png" alt="Phenomena" loading="lazy" decoding="async" /></div>
-            </div>
+            <div class="logos-lockup-spacer" aria-hidden="true"></div>
             <div class="logos-those">
               <span class="logos-those-line">- THOSE -</span>
               <span class="logos-those-line logos-those-line--who">WHO</span>
@@ -3331,6 +3383,16 @@
       const logosSectionEl = document.getElementById("logos");
       const journalSectionEl = document.getElementById("journal");
       const siteHeaderEl = document.querySelector(".site-header");
+      const logosSectionVisible = (el) => {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight || 800;
+        if (r.bottom <= 0 || r.top >= vh) return false;
+        const visibleH = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+        if (visibleH >= vh * 0.12) return true;
+        const midY = (r.top + r.bottom) * 0.5;
+        return midY > 0 && midY < vh;
+      };
       const syncLightSectionHeader = () => {
         if (!siteHeaderEl) return;
         const headerH = siteHeaderEl.getBoundingClientRect().height ?? 88;
@@ -3346,7 +3408,7 @@
           return r.top <= vh * lookahead && r.bottom > 0;
         };
         document.body.classList.toggle("contact-in-view", overlap(contactSectionEl));
-        document.body.classList.toggle("logos-in-view", overlap(logosSectionEl));
+        document.body.classList.toggle("logos-in-view", logosSectionVisible(logosSectionEl));
         // Only flip to journal styling when the journal section actually
         // overlaps the header. Earlier code used `approaching(..., 0.55)`
         // which fired while the user was still on the white logos page,
@@ -5609,78 +5671,97 @@
       // signals "playing" (slow networks, autoplay blocked, etc.).
       setTimeout(startDeferredInit, 3000);
 
-      // Project-logos cycler — automatic 650ms cycle. Each logo fades in,
-      // holds briefly, fades out, and the next one takes over. Pauses when
-      // off-screen / tab hidden so the timer isn't burning CPU when nobody
-      // can see it.
+      // Project-logos cycler — 650ms cycle. Visibility is tracked from the
+      // section box (not IO on transparent slides). Preloads JPEGs so lazy
+      // load cannot stall the loop mid-run.
       (() => {
         const cyclerEl = document.getElementById("logos-cycler");
-        if (!cyclerEl) return;
+        const logosSection = document.getElementById("logos");
+        if (!cyclerEl || !logosSection) return;
         const slides = Array.from(cyclerEl.querySelectorAll(".logo-slide"));
         if (!slides.length) return;
 
-        // Reduced motion: just show the first logo statically.
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           slides[0].classList.add("is-active");
           return;
         }
 
-        // STEP_MS — interval between consecutive logos appearing. Must
-        // match the CSS @keyframes duration so the previous exit and the
-        // next entrance line up cleanly.
         const STEP_MS = 650;
-
         let idx = 0;
         let timerId = null;
-        let running = false;
+        let didPreloadAll = false;
+
+        const preloadSlide = (slide) => {
+          const img = slide?.querySelector("img");
+          if (!img?.src || img.complete) return;
+          const loader = new Image();
+          loader.src = img.src;
+        };
+
+        const preloadAll = () => {
+          if (didPreloadAll) return;
+          didPreloadAll = true;
+          slides.forEach(preloadSlide);
+        };
+
+        const preloadAhead = (fromIdx, count = 5) => {
+          for (let i = 0; i < count; i += 1) {
+            preloadSlide(slides[(fromIdx + i) % slides.length]);
+          }
+        };
 
         const showCurrent = () => {
-          // Clear the active class from all slides (the offsetWidth read
-          // forces a reflow so the animation restarts cleanly if the same
-          // element is ever re-tagged), then activate the next one.
-          for (let i = 0; i < slides.length; i += 1) {
-            slides[i].classList.remove("is-active");
-          }
+          slides.forEach((slide) => slide.classList.remove("is-active"));
           const el = slides[idx];
+          if (!el) return;
           void el.offsetWidth;
           el.classList.add("is-active");
+          preloadAhead(idx + 1);
           idx = (idx + 1) % slides.length;
         };
 
-        const start = () => {
-          if (running) return;
-          running = true;
-          showCurrent();
-          timerId = setInterval(showCurrent, STEP_MS);
-        };
+        const shouldPlay = () => logosSectionVisible(logosSection);
 
         const stop = () => {
-          running = false;
-          if (timerId) { clearInterval(timerId); timerId = null; }
+          if (timerId) {
+            clearInterval(timerId);
+            timerId = null;
+          }
         };
 
-        if (typeof IntersectionObserver === "undefined") {
-          start();
-          return;
-        }
-        const io = new IntersectionObserver(
-          (entries) => {
-            for (const e of entries) {
-              if (e.isIntersecting) start();
-              else stop();
+        const start = () => {
+          if (timerId || !shouldPlay()) return;
+          preloadAll();
+          showCurrent();
+          timerId = setInterval(() => {
+            if (!shouldPlay()) {
+              stop();
+              return;
             }
-          },
-          { threshold: 0.15 }
-        );
-        io.observe(cyclerEl);
+            showCurrent();
+          }, STEP_MS);
+        };
 
+        const syncPlayback = () => {
+          if (shouldPlay()) start();
+          else stop();
+        };
+
+        syncPlayback();
+        let syncQueued = false;
+        const queueSync = () => {
+          if (syncQueued) return;
+          syncQueued = true;
+          requestAnimationFrame(() => {
+            syncQueued = false;
+            syncPlayback();
+          });
+        };
+        window.addEventListener("scroll", queueSync, { passive: true });
+        window.addEventListener("resize", queueSync);
         document.addEventListener("visibilitychange", () => {
           if (document.hidden) stop();
-          else {
-            const r = cyclerEl.getBoundingClientRect();
-            const onScreen = r.bottom > 0 && r.top < window.innerHeight;
-            if (onScreen) start();
-          }
+          else queueSync();
         });
       })();
 
