@@ -1184,10 +1184,6 @@
         contain: layout paint;
       }
 
-      .logos-section .logo-slide.is-active {
-        will-change: opacity, transform;
-      }
-
       .logos-section .logo-slide img {
         width: 100%;
         height: 100%;
@@ -1196,37 +1192,10 @@
         display: block;
       }
 
-      /* 650ms showcase: enter → hold → exit. One logo at a time across the
-         full client set; interval matches JS STEP_MS below. */
+      /* Instant swap — one visible logo; interval matches JS STEP_MS (400ms). */
       .logos-section .logo-slide.is-active {
         z-index: 1;
-        animation: logoShowcase 650ms cubic-bezier(0.22, 1, 0.36, 1);
-        animation-fill-mode: both;
-      }
-
-      @keyframes logoShowcase {
-        0% {
-          opacity: 0;
-          transform: scale(0.85);
-          filter: blur(4px);
-        }
-        30%, 70% {
-          opacity: 1;
-          transform: scale(1);
-          filter: blur(0);
-        }
-        100% {
-          opacity: 0;
-          transform: scale(1.08);
-          filter: blur(2px);
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .logos-section .logo-slide.is-active {
-          animation: none;
-          opacity: 1;
-        }
+        opacity: 1;
       }
 
       .logos-section .logos-those {
@@ -5671,7 +5640,7 @@
       // signals "playing" (slow networks, autoplay blocked, etc.).
       setTimeout(startDeferredInit, 3000);
 
-      // Project-logos cycler — 650ms cycle. Visibility is tracked from the
+      // Project-logos cycler — 400ms instant swap. Visibility is tracked from the
       // section box (not IO on transparent slides). Preloads JPEGs so lazy
       // load cannot stall the loop mid-run.
       (() => {
@@ -5686,7 +5655,7 @@
           return;
         }
 
-        const STEP_MS = 650;
+        const STEP_MS = 400;
         let idx = 0;
         let timerId = null;
         let didPreloadAll = false;
@@ -5714,7 +5683,6 @@
           slides.forEach((slide) => slide.classList.remove("is-active"));
           const el = slides[idx];
           if (!el) return;
-          void el.offsetWidth;
           el.classList.add("is-active");
           preloadAhead(idx + 1);
           idx = (idx + 1) % slides.length;
