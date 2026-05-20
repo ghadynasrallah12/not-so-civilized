@@ -1050,14 +1050,28 @@
         margin: 0;
         padding-top: 0.4rem;
         max-width: 56ch;
-        opacity: 0;
         max-height: 0;
         overflow: hidden;
-        transform: translateY(12px);
+        opacity: 0;
+        line-height: 15px !important;
         transition:
-          opacity 0.35s ease,
-          transform 0.35s ease,
-          max-height 0.45s ease;
+          max-height 0.45s ease,
+          opacity 0.35s ease;
+      }
+
+      .service-band:hover .service-extra,
+      .service-band:focus-within .service-extra {
+        max-height: 14rem;
+        opacity: 1;
+      }
+
+      .service-line {
+        display: block;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        transform: translateY(22px);
+        will-change: opacity, transform;
         color: #ffffff;
         text-transform: uppercase;
         letter-spacing: 0.06em;
@@ -1066,10 +1080,9 @@
         font-family: "Andale Mono", "AndaleMono", monospace;
       }
 
-      .service-band:hover .service-extra {
-        opacity: 1;
-        max-height: 9rem;
-        transform: translateY(0);
+      .service-line.is-visible {
+        animation: service-fade-up 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation-delay: calc(var(--line-index, 0) * 0.2s);
       }
 
       .projects-section {
@@ -1731,6 +1744,72 @@
           transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
       }
 
+      .project-detail-heading {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.15rem 1.35rem;
+      }
+
+      .project-detail-watch {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin: 0;
+        padding: 0.62rem 1.15rem;
+        border: 1px solid rgba(255, 255, 255, 0.88);
+        background: transparent;
+        color: #ffffff;
+        font-family: "Andale Mono", "AndaleMono", monospace;
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-decoration: none;
+        line-height: 1;
+        white-space: nowrap;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(28px);
+        transition:
+          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.52s,
+          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.52s,
+          background 0.18s ease,
+          color 0.18s ease,
+          border-color 0.18s ease,
+          opacity 0.18s ease;
+      }
+
+      .project-detail-watch:hover {
+        background: #ffffff;
+        color: #0a0a0a;
+      }
+
+      .project-detail-watch.is-disabled,
+      .project-detail-watch.is-disabled:hover {
+        opacity: 0.38;
+        background: transparent;
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.38);
+        cursor: default;
+        pointer-events: none;
+      }
+
+      .project-detail-watch:focus-visible {
+        outline: 1px solid rgba(255, 255, 255, 0.85);
+        outline-offset: 3px;
+      }
+
+      .projects-section.detail-open .project-detail-watch {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .projects-section.detail-open .project-detail-watch.is-disabled {
+        opacity: 0.38;
+      }
+
       .projects-section.detail-open .project-detail-title {
         opacity: 1;
         transform: translateY(0);
@@ -1921,13 +2000,16 @@
         width: 2.9rem;
         height: 2.9rem;
         padding: 0.2rem;
+        display: none;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.2s ease;
       }
 
       .project-detail-play-toggle.show {
+        display: grid;
         opacity: 1;
+        pointer-events: auto;
       }
 
       .control-icon {
@@ -2377,6 +2459,17 @@
         }
       }
 
+      @keyframes service-fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(22px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       @media (max-width: 900px) {
         :root {
           --hero-side-gutter: clamp(1rem, 4vw, 1.75rem);
@@ -2433,9 +2526,14 @@
         }
 
         .service-extra {
+          max-height: none;
           opacity: 1;
-          max-height: 9rem;
+        }
+
+        .service-line {
+          opacity: 1;
           transform: none;
+          animation: none;
         }
 
         .project-card {
@@ -2533,6 +2631,16 @@
           bottom: 0.65rem;
           right: 0.65rem;
         }
+
+        .project-detail-heading {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.85rem;
+        }
+
+        .project-detail-watch {
+          margin-bottom: 0;
+        }
       }
     </style>
   </head>
@@ -2617,8 +2725,9 @@
             <div class="service-left">
               <h2 class="service-title">Creative<br />Consultancy</h2>
               <p class="service-extra">
-                The puzzle. It’s the creative foundation of every project. It defines the core vision
-                through a clear presentation, treatment, and strategic plan that becomes the creative bible.
+                <span class="service-line">The puzzle.</span>
+                <span class="service-line">It’s the creative foundation of every project.</span>
+                <span class="service-line">It defines the core vision through a clear presentation, treatment, and strategic plan that becomes the creative bible.</span>
               </p>
             </div>
           </article>
@@ -2627,9 +2736,9 @@
             <div class="service-left">
               <h2 class="service-title">Concept Creation<br />&amp; Development</h2>
               <p class="service-extra">
-                It defines the direction for all materials and makes the work creative. If the puzzle is
-                the creative strategy, the pieces are the creative directions. Guiding execution across any
-                medium, not just film.
+                <span class="service-line">It defines the direction for all materials and makes the work creative.</span>
+                <span class="service-line">If the puzzle is the creative strategy, the pieces are the creative directions.</span>
+                <span class="service-line">Guiding execution across any medium, not just film.</span>
               </p>
             </div>
           </article>
@@ -2638,9 +2747,9 @@
             <div class="service-left">
               <h2 class="service-title">Creative<br />Execution</h2>
               <p class="service-extra">
-                It’s the process of building the puzzle itself,best done by the ones who created it. It’s
-                where the idea comes to life, whatever it takes. Each idea has its own way of being
-                executed, with its own process, timeline, and team.
+                <span class="service-line">It’s the process of building the puzzle itself, best done by the ones who created it.</span>
+                <span class="service-line">It’s where the idea comes to life, whatever it takes.</span>
+                <span class="service-line">Each idea has its own way of being executed, with its own process, timeline, and team.</span>
               </p>
             </div>
           </article>
@@ -3028,7 +3137,14 @@
             <button type="button" class="project-detail-back" id="project-detail-back" aria-label="Back to projects">
               <span class="project-detail-back-arrow" aria-hidden="true">&larr;</span>
             </button>
-            <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
+            <div class="project-detail-heading">
+              <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
+              <a
+                class="project-detail-watch is-disabled"
+                id="project-detail-watch"
+                aria-disabled="true"
+              >Watch here</a>
+            </div>
             <div class="project-detail-copy-scroll" id="project-detail-copy-scroll">
               <p class="project-detail-text" id="project-detail-text">
                 A CALL TO REORIENT. ORIENT CAN MEAN SEVERAL DIFFERENT THINGS. AS A VERB "TO ORIENT" IS TO
@@ -3095,7 +3211,6 @@
               <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.001.jpeg" alt="Client logo 001" loading="eager" fetchpriority="high" decoding="async" /></div>
               <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.002.jpeg" alt="Client logo 002" loading="lazy" decoding="async" /></div>
               <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.003.jpeg" alt="Client logo 003" loading="lazy" decoding="async" /></div>
-              <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.004.jpeg" alt="Client logo 004" loading="lazy" decoding="async" /></div>
               <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.005.jpeg" alt="Client logo 005" loading="lazy" decoding="async" /></div>
               <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.006.jpeg" alt="Client logo 006" loading="lazy" decoding="async" /></div>
               <div class="logo-slide"><img src="assets/LOGOS%20IN%20BALCK%20WEBSITE/logos.007.jpeg" alt="Client logo 007" loading="lazy" decoding="async" /></div>
@@ -3434,18 +3549,30 @@
         { title: "STEAKBAR SUSHI", text: "", video: "assets/web/PROJECT/optimized/steakbar-sushi-web.mp4", poster: "assets/web/PROJECT/optimized/posters/steakbar-sushi.jpg", frameset: "STEAKBAR FRAMESET.mp4" },
       ];
 
-      const projectCopyReady = fetch("assets/web/projects-detail-copy.json")
-        .then((res) => {
-          if (!res.ok) throw new Error("copy");
-          return res.json();
-        })
-        .then((copy) => {
-          projectData.forEach((p) => {
-            const t = copy[p.title];
-            if (typeof t === "string" && t.length) p.text = t;
-          });
-        })
-        .catch(() => {});
+      const projectCopyReady = Promise.all([
+        fetch("assets/web/projects-detail-copy.json")
+          .then((res) => {
+            if (!res.ok) throw new Error("copy");
+            return res.json();
+          })
+          .then((copy) => {
+            projectData.forEach((p) => {
+              const t = copy[p.title];
+              if (typeof t === "string" && t.length) p.text = t;
+            });
+          }),
+        fetch("assets/web/projects-instagram.json")
+          .then((res) => {
+            if (!res.ok) throw new Error("instagram");
+            return res.json();
+          })
+          .then((links) => {
+            projectData.forEach((p) => {
+              const url = links[p.title];
+              if (typeof url === "string" && url.trim().length) p.instagram = url.trim();
+            });
+          }),
+      ]).catch(() => {});
 
       // Build a preview-clip URL from the full-quality web URL.
       // Carousel uses short lightweight previews; detail view uses the full clip with audio.
@@ -3603,6 +3730,7 @@
       const prevButton = document.getElementById("projects-prev");
       const detailTitle = document.getElementById("project-detail-title");
       const detailText = document.getElementById("project-detail-text");
+      const detailWatch = document.getElementById("project-detail-watch");
       const detailCopyScroll = document.getElementById("project-detail-copy-scroll");
       const updateProjectDetailCopyScrollState = () => {
         if (!detailCopyScroll) return;
@@ -3624,10 +3752,11 @@
         detailVideo.muted = true;
         detailVideo.defaultMuted = true;
         detailVideo.loop = true;
-        detailVideo.volume = 0;
+        detailVideo.volume = 1;
         detailVideo.setAttribute("loop", "");
         detailVideo.setAttribute("muted", "");
       }
+      let detailVideoHasPlayed = false;
       const detailBack = document.getElementById("project-detail-back");
       const progressBar = document.getElementById("project-progress-bar");
       const progressFill = document.getElementById("project-progress-fill");
@@ -3856,6 +3985,25 @@
         }, delayMs);
       };
 
+      const syncDetailWatchButton = (project) => {
+        if (!detailWatch) return;
+        if (project?.instagram) {
+          detailWatch.href = project.instagram;
+          detailWatch.target = "_blank";
+          detailWatch.rel = "noopener noreferrer";
+          detailWatch.classList.remove("is-disabled");
+          detailWatch.removeAttribute("aria-disabled");
+          detailWatch.removeAttribute("tabindex");
+        } else {
+          detailWatch.removeAttribute("href");
+          detailWatch.removeAttribute("target");
+          detailWatch.removeAttribute("rel");
+          detailWatch.classList.add("is-disabled");
+          detailWatch.setAttribute("aria-disabled", "true");
+          detailWatch.setAttribute("tabindex", "-1");
+        }
+      };
+
       const openProjectDetail = async (index, sourceCard = null) => {
         const project = projectData[index];
         if (!project || isProjectOpening || projectsSection.classList.contains("detail-open")) return;
@@ -3875,6 +4023,8 @@
 
           detailTitle.textContent = project.title;
           detailText.textContent = project.text;
+          syncDetailWatchButton(project);
+          detailVideoHasPlayed = false;
           if (detailCopyScroll) detailCopyScroll.scrollTop = 0;
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -4032,6 +4182,8 @@
         if (detailVideoWrap) {
           detailVideoWrap.style.backgroundImage = "";
         }
+        detailVideoHasPlayed = false;
+        detailPlayToggleButton.classList.remove("show");
 
         // Resume background activity that openProjectDetail paused.
         window.__nscDetailOpen = false;
@@ -5449,6 +5601,11 @@
       }
 
       detailVideo.addEventListener("play", startDetailProgressLoop);
+      detailVideo.addEventListener("playing", () => {
+        detailVideoHasPlayed = true;
+        detailVideo.volume = 1;
+        if (!detailVideo.muted) syncDetailMuteUi();
+      });
       detailVideo.addEventListener("play", () => {
         playTogglePauseIcon.style.display = "block";
         playTogglePlayIcon.style.display = "none";
@@ -5461,11 +5618,17 @@
           cancelAnimationFrame(detailProgressFrameId);
           detailProgressFrameId = null;
         }
-        if (!detailVideo.ended && projectsSection.classList.contains("detail-open")) {
+        if (
+          detailVideoHasPlayed &&
+          !detailVideo.ended &&
+          projectsSection.classList.contains("detail-open")
+        ) {
           playTogglePauseIcon.style.display = "none";
           playTogglePlayIcon.style.display = "block";
           detailPlayToggleButton.setAttribute("aria-label", "Play");
           detailPlayToggleButton.classList.add("show");
+        } else {
+          detailPlayToggleButton.classList.remove("show");
         }
       });
 
@@ -5636,6 +5799,7 @@
 
       const servicesSection = document.getElementById("services");
       const serviceTitles = Array.from(document.querySelectorAll(".service-band .service-title"));
+      const serviceBands = Array.from(document.querySelectorAll(".service-band"));
       if (servicesSection && serviceTitles.length) {
         let servicesInView = false;
         const replayServicesTitles = () => {
@@ -5643,6 +5807,27 @@
           void servicesSection.offsetHeight;
           serviceTitles.forEach((title) => title.classList.add("is-visible"));
         };
+
+        serviceBands.forEach((band) => {
+          const lines = Array.from(band.querySelectorAll(".service-line"));
+          lines.forEach((line, idx) => {
+            line.style.setProperty("--line-index", String(idx));
+          });
+          const replayServiceLines = () => {
+            lines.forEach((line) => line.classList.remove("is-visible"));
+            void band.offsetHeight;
+            lines.forEach((line) => line.classList.add("is-visible"));
+          };
+          const resetServiceLines = () => {
+            lines.forEach((line) => line.classList.remove("is-visible"));
+          };
+          band.addEventListener("mouseenter", replayServiceLines);
+          band.addEventListener("mouseleave", resetServiceLines);
+          band.addEventListener("focusin", replayServiceLines);
+          band.addEventListener("focusout", (event) => {
+            if (!band.contains(event.relatedTarget)) resetServiceLines();
+          });
+        });
 
         const servicesObserver = new IntersectionObserver(
           (entries) => {
