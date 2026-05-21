@@ -1604,9 +1604,7 @@
       }
 
       .project-detail-back {
-        position: absolute;
-        top: calc(env(safe-area-inset-top, 0px) + clamp(4.9rem, 10.75vh, 6.6rem));
-        left: calc(var(--hero-side-gutter) - 2px);
+        position: static;
         margin: 0;
         padding: 0.35rem 0.5rem 0.35rem 0;
         border: 0;
@@ -1614,11 +1612,11 @@
         color: #ffffff;
         cursor: pointer;
         opacity: 0.88;
-        z-index: 8;
         transition: opacity 0.18s ease;
         display: flex;
         align-items: center;
         justify-content: flex-start;
+        flex-shrink: 0;
       }
 
       .project-detail-back:hover {
@@ -1744,11 +1742,21 @@
           transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.45s;
       }
 
-      .project-detail-heading {
+      .project-detail-topbar {
+        position: absolute;
+        top: calc(env(safe-area-inset-top, 0px) + clamp(4.9rem, 10.75vh, 6.6rem));
+        left: calc(var(--hero-side-gutter) - 2px);
+        z-index: 8;
         display: flex;
         align-items: center;
+        gap: clamp(0.75rem, 1.8vw, 1.25rem);
         flex-wrap: wrap;
-        gap: 1.15rem 1.35rem;
+        max-width: min(96%, 52rem);
+      }
+
+      .project-detail-heading {
+        display: block;
+        margin-top: clamp(2.35rem, 5.5vh, 3.1rem);
       }
 
       .project-detail-watch {
@@ -1756,13 +1764,13 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        margin: 0;
-        padding: 0.62rem 1.15rem;
+        margin: 0.5rem 0 0;
+        padding: 0.5rem 0.95rem;
         border: 1px solid rgba(255, 255, 255, 0.88);
         background: transparent;
         color: #ffffff;
         font-family: "Andale Mono", "AndaleMono", monospace;
-        font-size: 13px;
+        font-size: 11px;
         font-weight: 400;
         letter-spacing: 0.1em;
         text-transform: uppercase;
@@ -1771,14 +1779,13 @@
         white-space: nowrap;
         cursor: pointer;
         opacity: 0;
-        transform: translateY(28px);
+        transform: translateY(10px);
         transition:
-          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.52s,
-          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.52s,
+          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.42s,
+          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.42s,
           background 0.18s ease,
           color 0.18s ease,
-          border-color 0.18s ease,
-          opacity 0.18s ease;
+          border-color 0.18s ease;
       }
 
       .project-detail-watch:hover {
@@ -2612,10 +2619,23 @@
         }
 
         .project-detail-back {
-          top: calc(env(safe-area-inset-top, 0px) + clamp(4.35rem, 9.5vh, 5.85rem));
           min-height: 44px;
           min-width: 44px;
           padding: 0.45rem 0.65rem 0.45rem 0;
+        }
+
+        .project-detail-topbar {
+          top: calc(env(safe-area-inset-top, 0px) + clamp(4.35rem, 9.5vh, 5.85rem));
+          max-width: calc(100% - 2 * var(--hero-side-gutter));
+        }
+
+        .project-detail-heading {
+          margin-top: clamp(2.75rem, 7vh, 3.5rem);
+        }
+
+        .project-detail-watch {
+          font-size: 10px;
+          padding: 0.45rem 0.75rem;
         }
 
         .project-detail-back-arrow {
@@ -2631,16 +2651,6 @@
           bottom: 0.65rem;
           right: 0.65rem;
         }
-
-        .project-detail-heading {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 0.85rem;
-        }
-
-        .project-detail-watch {
-          margin-bottom: 0;
-        }
       }
     </style>
   </head>
@@ -2648,7 +2658,7 @@
     <header class="site-header">
       <div class="hero-top">
         <a href="#standards" class="logo">The ! To All Your ?</a>
-        <a href="#home" class="center-tagline">[ WHOEVER DARES JOINS ]</a>
+        <a href="#logos" class="center-tagline">[ WHOEVER DARES JOINS ]</a>
         <div class="clock">[09:34:56]</div>
       </div>
     </header>
@@ -3134,16 +3144,18 @@
 
         <div class="projects-detail-view" id="projects-detail">
           <div class="project-detail-copy">
-            <button type="button" class="project-detail-back" id="project-detail-back" aria-label="Back to projects">
-              <span class="project-detail-back-arrow" aria-hidden="true">&larr;</span>
-            </button>
-            <div class="project-detail-heading">
-              <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
+            <div class="project-detail-topbar">
+              <button type="button" class="project-detail-back" id="project-detail-back" aria-label="Back to projects">
+                <span class="project-detail-back-arrow" aria-hidden="true">&larr;</span>
+              </button>
               <a
                 class="project-detail-watch is-disabled"
                 id="project-detail-watch"
                 aria-disabled="true"
-              >Watch here</a>
+              >DARE TO WATCH</a>
+            </div>
+            <div class="project-detail-heading">
+              <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
             </div>
             <div class="project-detail-copy-scroll" id="project-detail-copy-scroll">
               <p class="project-detail-text" id="project-detail-text">
@@ -5679,6 +5691,28 @@
           return;
         }
         detailVideo.pause();
+      });
+
+      const toggleDetailVideoPlayback = () => {
+        if (!projectsSection.classList.contains("detail-open")) return;
+        if (detailVideo.paused || detailVideo.ended) {
+          detailReplayButton.classList.remove("show");
+          attemptDetailVideoPlay();
+        } else {
+          detailVideo.pause();
+        }
+      };
+
+      window.addEventListener("keydown", (event) => {
+        if (!projectsSection.classList.contains("detail-open")) return;
+        if (event.code !== "Space" && event.key !== " ") return;
+        const tag = event.target && event.target.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A") {
+          return;
+        }
+        if (event.target && event.target.isContentEditable) return;
+        event.preventDefault();
+        toggleDetailVideoPlayback();
       });
 
       detailReplayButton.addEventListener("click", (event) => {
