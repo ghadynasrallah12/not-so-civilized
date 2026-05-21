@@ -1747,15 +1747,13 @@
         top: calc(env(safe-area-inset-top, 0px) + clamp(4.9rem, 10.75vh, 6.6rem));
         left: calc(var(--hero-side-gutter) - 2px);
         z-index: 8;
-        display: flex;
-        align-items: center;
-        gap: clamp(0.75rem, 1.8vw, 1.25rem);
-        flex-wrap: wrap;
-        max-width: min(96%, 52rem);
       }
 
       .project-detail-heading {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: clamp(0.65rem, 1.4vh, 0.9rem);
         margin-top: clamp(2.35rem, 5.5vh, 3.1rem);
       }
 
@@ -1764,7 +1762,7 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        margin: 0.5rem 0 0;
+        margin: 0;
         padding: 0.5rem 0.95rem;
         border: 1px solid rgba(255, 255, 255, 0.88);
         background: transparent;
@@ -1781,8 +1779,8 @@
         opacity: 0;
         transform: translateY(10px);
         transition:
-          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.42s,
-          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.42s,
+          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.58s,
+          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.58s,
           background 0.18s ease,
           color 0.18s ease,
           border-color 0.18s ease;
@@ -2631,11 +2629,13 @@
 
         .project-detail-heading {
           margin-top: clamp(2.75rem, 7vh, 3.5rem);
+          gap: 0.75rem;
         }
 
         .project-detail-watch {
           font-size: 10px;
           padding: 0.45rem 0.75rem;
+          margin: 0;
         }
 
         .project-detail-back-arrow {
@@ -3148,14 +3148,14 @@
               <button type="button" class="project-detail-back" id="project-detail-back" aria-label="Back to projects">
                 <span class="project-detail-back-arrow" aria-hidden="true">&larr;</span>
               </button>
+            </div>
+            <div class="project-detail-heading">
+              <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
               <a
                 class="project-detail-watch is-disabled"
                 id="project-detail-watch"
                 aria-disabled="true"
               >DARE TO WATCH</a>
-            </div>
-            <div class="project-detail-heading">
-              <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
             </div>
             <div class="project-detail-copy-scroll" id="project-detail-copy-scroll">
               <p class="project-detail-text" id="project-detail-text">
