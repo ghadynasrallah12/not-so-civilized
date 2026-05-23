@@ -4,8 +4,8 @@
   "private": true,
   "description": "Client portfolio website starter",
   "scripts": {
-    "dev": "python3 scripts/dev-server.py",
-    "start": "python3 scripts/dev-server.py",
-    "serve": "python3 scripts/dev-server.py"
+    "dev": "npx --yes http-server -a 0.0.0.0 -p 8000 -c-1",
+    "start": "npx --yes http-server -a 0.0.0.0 -p 8000 -c-1",
+    "serve": "npx --yes http-server -a 0.0.0.0 -p 8000 -c-1"
   }
 }
