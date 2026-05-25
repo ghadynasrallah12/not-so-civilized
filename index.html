@@ -1441,11 +1441,13 @@
 
       .project-card video {
         display: block;
-        position: relative;
+        position: absolute;
+        inset: 0;
         z-index: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
+        object-position: center;
         transform: scale(1);
         opacity: 0;
         transition: transform 0.55s ease, opacity 0.28s ease;
@@ -1605,6 +1607,7 @@
       }
 
       .project-detail-copy {
+        --detail-watch-gap: clamp(0.4rem, 0.9vh, 0.55rem);
         position: relative;
         box-sizing: border-box;
         min-height: 0;
@@ -1617,7 +1620,7 @@
         flex-direction: column;
         justify-content: flex-start;
         align-items: stretch;
-        gap: clamp(0.35rem, 1vh, 0.55rem);
+        gap: var(--detail-watch-gap);
         overflow-x: hidden;
         overflow-y: visible;
         z-index: 5;
@@ -1679,7 +1682,8 @@
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;
         touch-action: pan-y;
-        padding-top: 0.2rem;
+        padding-top: 0;
+        margin-top: 0;
         padding-right: max(18px, 0.65rem);
         padding-bottom: clamp(0.75rem, 2vh, 1.25rem);
         scrollbar-width: thin;
@@ -1775,34 +1779,16 @@
       .project-detail-heading {
         display: flex;
         flex-direction: column;
-        align-items: stretch;
-        gap: 0;
-        margin-top: clamp(2.35rem, 5.5vh, 3.1rem);
-      }
-
-      .project-detail-title-row {
-        display: inline-flex;
-        align-items: center;
-        flex-wrap: nowrap;
-        gap: clamp(0.55rem, 1.1vw, 0.85rem);
-        max-width: 100%;
-        vertical-align: top;
-      }
-
-      .project-detail-title-row .project-detail-title {
-        margin: 0;
-        flex: 0 1 auto;
-        width: auto;
-      }
-
-      .project-detail-watch-row {
-        display: flex;
-        justify-content: flex-start;
         align-items: flex-start;
-        width: 100%;
-        margin-left: max(0px, calc(76px - var(--hero-side-gutter)));
-        padding: clamp(0.45rem, 1.1vh, 0.65rem) 0 clamp(0.2rem, 0.5vh, 0.35rem);
-        box-sizing: border-box;
+        gap: var(--detail-watch-gap);
+        margin-top: clamp(2.35rem, 5.5vh, 3.1rem);
+        margin-bottom: 0;
+      }
+
+      .project-detail-heading .project-detail-title {
+        margin: 0;
+        width: auto;
+        max-width: 100%;
       }
 
       .project-detail-watch {
@@ -1810,8 +1796,8 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        margin: 0;
-        padding: 0.5rem 0.95rem;
+        margin: clamp(-1.6rem, -2.7vh, -1.1rem) 0 clamp(1.5rem, 3.6vh, 2.1rem);
+        padding: 0.42rem 0.95rem;
         border: 1px solid rgba(255, 255, 255, 0.88);
         background: transparent;
         color: #ffffff;
@@ -1861,26 +1847,6 @@
 
       .projects-section.detail-open .project-detail-watch.is-disabled {
         opacity: 0.38;
-      }
-
-      .project-detail-watch--here {
-        flex: 0 0 auto;
-        align-self: center;
-        transition:
-          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.52s,
-          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.52s,
-          background 0.18s ease,
-          color 0.18s ease,
-          border-color 0.18s ease;
-      }
-
-      .project-detail-watch--dare {
-        transition:
-          opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.68s,
-          transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.68s,
-          background 0.18s ease,
-          color 0.18s ease,
-          border-color 0.18s ease;
       }
 
       .projects-section.detail-open .project-detail-title {
@@ -2905,8 +2871,9 @@
         }
 
         .project-detail-copy {
+          --detail-watch-gap: clamp(0.35rem, 0.85vh, 0.5rem);
           justify-content: flex-start;
-          gap: 0.75rem;
+          gap: var(--detail-watch-gap);
           padding: calc(env(safe-area-inset-top, 0px) + clamp(7rem, 16vh, 9.5rem)) var(--hero-side-gutter)
             clamp(2.25rem, 6vh, 3.5rem);
           min-height: auto;
@@ -2954,7 +2921,8 @@
           /* Keep the text area scrollable — without a cap, a long description
              on mobile would push the video panel below the fold entirely. */
           max-height: 28vh;
-          padding-top: 0.15rem;
+          padding-top: 0;
+          margin-top: 0;
           padding-bottom: clamp(0.5rem, 2vh, 0.85rem);
         }
 
@@ -2977,18 +2945,10 @@
           margin-top: clamp(0.85rem, 3vh, 1.5rem);
         }
 
-        .project-detail-watch-row {
-          /* Desktop indents WATCH HERE / DARE TO WATCH to match the wordmark
-             gutter; on a phone there's no gutter to match, so align them with
-             the title left edge instead. */
-          margin-left: 0;
-          padding: clamp(0.35rem, 1.2vh, 0.55rem) 0 0;
-        }
-
         .project-detail-watch {
           font-size: 10.5px;
           padding: 0.55rem 0.85rem;
-          margin: 0;
+          margin:0px;
           /* iOS tap target. */
           min-height: 36px;
         }
@@ -3571,21 +3531,12 @@
               </button>
             </div>
             <div class="project-detail-heading">
-              <div class="project-detail-title-row">
-                <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
-                <a
-                  class="project-detail-watch project-detail-watch--here is-disabled"
-                  id="project-detail-watch-here"
-                  aria-disabled="true"
-                >WATCH HERE</a>
-              </div>
-              <div class="project-detail-watch-row">
-                <a
-                  class="project-detail-watch project-detail-watch--dare is-disabled"
-                  id="project-detail-watch-dare"
-                  aria-disabled="true"
-                >DARE TO WATCH</a>
-              </div>
+              <h3 class="project-detail-title" id="project-detail-title">ORIENT 499</h3>
+              <a
+                class="project-detail-watch is-disabled"
+                id="project-detail-watch"
+                aria-disabled="true"
+              >DARE TO WATCH</a>
             </div>
             <div class="project-detail-copy-scroll" id="project-detail-copy-scroll">
               <p class="project-detail-text" id="project-detail-text">
@@ -4170,8 +4121,7 @@
       const prevButton = document.getElementById("projects-prev");
       const detailTitle = document.getElementById("project-detail-title");
       const detailText = document.getElementById("project-detail-text");
-      const detailWatchHere = document.getElementById("project-detail-watch-here");
-      const detailWatchDare = document.getElementById("project-detail-watch-dare");
+      const detailWatch = document.getElementById("project-detail-watch");
       const detailCopyScroll = document.getElementById("project-detail-copy-scroll");
       const updateProjectDetailCopyScrollState = () => {
         if (!detailCopyScroll) return;
@@ -4446,8 +4396,7 @@
       };
 
       const syncDetailWatchButton = (project) => {
-        syncDetailWatchLink(detailWatchHere, project);
-        syncDetailWatchLink(detailWatchDare, project);
+        syncDetailWatchLink(detailWatch, project);
       };
 
       const openProjectDetail = async (index, sourceCard = null) => {
