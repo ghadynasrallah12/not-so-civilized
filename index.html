@@ -149,9 +149,7 @@
       }
 
       html.projects-detail-open,
-      body.projects-detail-open,
-      html.standards-zoom-open,
-      body.standards-zoom-open {
+      body.projects-detail-open {
         overflow: hidden;
         overscroll-behavior: none;
         height: 100%;
@@ -165,12 +163,20 @@
         touch-action: none;
       }
 
-      /* Standards zoom: keep body in normal flow (no position:fixed) so the
-         backdrop-filter behind the zoom overlay can actually blur the real
-         page underneath — otherwise the only thing visible behind would be
-         the dark body background. Scroll is blocked via overflow + JS. */
+      /* Standards zoom: keep body in NORMAL FLOW (no position:fixed, no
+         height:100%, no overflow:hidden on <html>) so the real page stays
+         visible behind the overlay for the backdrop-filter to blur. Setting
+         height:100% with overflow:hidden snaps the scroll back to the top
+         of the document — which is why the user ended up at the homepage.
+         Scroll is blocked instead via touch/wheel preventers in JS while
+         the zoom is open. */
+      html.standards-zoom-open {
+        overscroll-behavior: none;
+      }
+
       body.standards-zoom-open {
         touch-action: none;
+        overscroll-behavior: none;
       }
 
       .hero {
