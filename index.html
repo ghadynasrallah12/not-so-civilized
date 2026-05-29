@@ -1286,7 +1286,7 @@
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
-          right: calc(var(--hero-side-gutter) * -0.4);
+          left: calc(var(--hero-side-gutter) * -0.4);
           top: 50%;
           transform: translateY(-50%);
           width: clamp(280px, 78vw, 520px);
@@ -1300,8 +1300,10 @@
         }
 
         .logos-section .logos-those {
-          align-items: flex-start;
-          text-align: left;
+          grid-column: 2;
+          justify-self: end;
+          align-items: flex-end;
+          text-align: right;
           margin-left: 0;
           max-width: 100%;
           letter-spacing: -0.12em;
@@ -1314,7 +1316,7 @@
         }
 
         .logos-section .logos-those-line--who {
-          align-self: flex-start;
+          align-self: flex-end;
         }
 
         .logos-section .logos-bottom {
