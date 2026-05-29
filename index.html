@@ -507,8 +507,8 @@
         position: absolute;
         inset: 0;
         background: rgba(8, 8, 10, 0);
-        backdrop-filter: blur(0px);
-        -webkit-backdrop-filter: blur(0px);
+        backdrop-filter: blur(0px) saturate(100%);
+        -webkit-backdrop-filter: blur(0px) saturate(100%);
         transition:
           background 520ms cubic-bezier(0.42, 0, 0.58, 1),
           backdrop-filter 520ms cubic-bezier(0.42, 0, 0.58, 1),
@@ -516,9 +516,11 @@
       }
 
       .standards-zoom-overlay.is-open .zoom-backdrop {
-        background: rgba(8, 8, 10, 0.52);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
+        /* Very light tint so the blurred page shows through clearly instead of
+           reading as a flat black panel. */
+        background: rgba(8, 8, 10, 0.12);
+        backdrop-filter: blur(22px) saturate(140%);
+        -webkit-backdrop-filter: blur(22px) saturate(140%);
       }
 
       .standards-zoom-shell {
@@ -537,6 +539,51 @@
 
       .standards-zoom-overlay.is-open .standards-zoom-shell {
         opacity: 1;
+      }
+
+      .standards-zoom-close {
+        position: absolute;
+        top: calc(env(safe-area-inset-top, 0px) + clamp(0.75rem, 2.5vw, 1.25rem));
+        right: clamp(0.75rem, 3.5vw, 1.5rem);
+        z-index: 2204;
+        width: clamp(2.4rem, 9vw, 3rem);
+        height: clamp(2.4rem, 9vw, 3rem);
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(20, 20, 22, 0.55);
+        color: #ffffff;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, background 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .standards-zoom-overlay.is-open .standards-zoom-close {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .standards-zoom-close:hover,
+      .standards-zoom-close:focus-visible {
+        background: rgba(20, 20, 22, 0.78);
+      }
+
+      .standards-zoom-close:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.85);
+        outline-offset: 3px;
+      }
+
+      .standards-zoom-close svg {
+        width: 55%;
+        height: 55%;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        fill: none;
       }
 
       .standards-zoom-nav {
@@ -3875,6 +3922,12 @@
       </section>
       <div class="standards-zoom-overlay" id="standards-zoom-overlay" aria-hidden="true" tabindex="-1">
         <div class="zoom-backdrop"></div>
+        <button type="button" class="standards-zoom-close" id="standards-zoom-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+          </svg>
+        </button>
         <div class="standards-zoom-shell">
           <button type="button" class="standards-zoom-nav standards-zoom-nav--prev" id="standards-zoom-prev" aria-label="Previous standard">&larr;</button>
           <div class="standards-zoom-viewport" id="standards-zoom-viewport"></div>
@@ -6102,6 +6155,13 @@
           const endZoomTouch = () => { zoomTouchActive = false; };
           standardsZoomOverlay.addEventListener("touchend", endZoomTouch, { passive: true });
           standardsZoomOverlay.addEventListener("touchcancel", endZoomTouch, { passive: true });
+        }
+        const standardsZoomClose = document.getElementById("standards-zoom-close");
+        if (standardsZoomClose) {
+          standardsZoomClose.addEventListener("click", (event) => {
+            event.stopPropagation();
+            closeStandardsZoom();
+          });
         }
         if (standardsZoomPrev) {
           standardsZoomPrev.addEventListener("click", (event) => {
