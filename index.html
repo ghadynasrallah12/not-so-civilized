@@ -149,13 +149,16 @@
       }
 
       html.projects-detail-open,
-      body.projects-detail-open {
+      body.projects-detail-open,
+      html.standards-zoom-open,
+      body.standards-zoom-open {
         overflow: hidden;
         overscroll-behavior: none;
         height: 100%;
       }
 
-      body.projects-detail-open {
+      body.projects-detail-open,
+      body.standards-zoom-open {
         position: fixed;
         left: 0;
         right: 0;
@@ -429,6 +432,10 @@
       .standards-tile {
         overflow: hidden;
         cursor: zoom-in;
+        /* Isolate paint/layout so each tile's repaint is bounded — meaningful
+           on a 27-tile grid where the whole section enters/leaves view
+           together. */
+        contain: layout paint style;
       }
 
       /* Staggered entrance when the section scrolls into view (IO + fallback in JS). */
@@ -5901,13 +5908,27 @@
           article.appendChild(picture);
 
           // Blur-up placeholder behind the image so users see the composition
-          // immediately, even on slow connections.
+          // immediately, even on slow connections. Cleared once the foreground
+          // image loads — leaving the blur in place forces the browser to
+          // composite a second layer per tile during every scroll repaint.
           const blurData = standardsBlurMap && standardsBlurMap[filename];
           if (blurData) {
             article.style.backgroundImage = `url("${blurData}")`;
             article.style.backgroundSize = "cover";
             article.style.backgroundPosition = "center";
             article.style.backgroundRepeat = "no-repeat";
+            const clearBlur = () => {
+              article.style.backgroundImage = "";
+              article.style.backgroundSize = "";
+              article.style.backgroundPosition = "";
+              article.style.backgroundRepeat = "";
+            };
+            if (img.complete && img.naturalWidth > 0) {
+              clearBlur();
+            } else {
+              img.addEventListener("load", clearBlur, { once: true });
+              img.addEventListener("error", clearBlur, { once: true });
+            }
           }
 
           attachMediaLoader(article, img);
@@ -5977,6 +5998,30 @@
         });
 
         if (standardsZoomOverlay) {
+          // Lock body scroll while the zoom is open. We snapshot scrollY and
+          // restore it on close so the page doesn't jump to the top when the
+          // body becomes `position: fixed`. A single MutationObserver keeps
+          // the lock in sync no matter which code path opens or closes.
+          let standardsZoomScrollY = 0;
+          let standardsZoomLocked = false;
+          const observeZoomLock = new MutationObserver(() => {
+            const isOpen = standardsZoomOverlay.classList.contains("is-open");
+            if (isOpen && !standardsZoomLocked) {
+              standardsZoomScrollY = window.scrollY || window.pageYOffset || 0;
+              standardsZoomLocked = true;
+              document.documentElement.classList.add("standards-zoom-open");
+              document.body.classList.add("standards-zoom-open");
+              document.body.style.top = `-${standardsZoomScrollY}px`;
+            } else if (!isOpen && standardsZoomLocked) {
+              standardsZoomLocked = false;
+              document.documentElement.classList.remove("standards-zoom-open");
+              document.body.classList.remove("standards-zoom-open");
+              document.body.style.top = "";
+              window.scrollTo(0, standardsZoomScrollY);
+            }
+          });
+          observeZoomLock.observe(standardsZoomOverlay, { attributes: true, attributeFilter: ["class"] });
+
           standardsZoomOverlay.addEventListener("click", (event) => {
             if (event.target === standardsZoomOverlay || event.target.classList.contains("zoom-backdrop")) {
               closeStandardsZoom();
@@ -6090,26 +6135,68 @@
         openProjectDetail(index, projectCard);
       });
 
-      // Touch swipe — lets mobile users drag the projects carousel with a finger.
-      // While the user is dragging we cancel auto-advance, accumulate dx into the
-      // offset, and on a flick we add a brief inertia nudge in that direction.
-      // If the gesture moved past a small threshold we suppress the trailing click
-      // so a swipe doesn't accidentally open the detail panel.
+      // Touch swipe — drag follows the finger 1:1, and a flick glides with
+      // friction-decayed inertia. Every transform update is batched into one
+      // rAF tick so we never push more work than the screen can paint.
       let projectsCarouselSwipeMoved = false;
       if (projectsCarouselView) {
         let touchStartX = 0;
         let touchStartY = 0;
         let touchLastX = 0;
         let touchLastT = 0;
-        let touchVx = 0;
+        let touchVxPxMs = 0;
         let touchActive = false;
         let touchHorizontal = false;
+        let pendingDx = 0;
+        let renderRaf = 0;
+        let inertiaRaf = 0;
+        let inertiaVx = 0;
+        let inertiaLastT = 0;
+
+        const flushPendingDx = () => {
+          renderRaf = 0;
+          if (pendingDx === 0) return;
+          carouselOffset -= pendingDx;
+          pendingDx = 0;
+          normalizeCarouselOffset();
+          renderProjectPosition();
+        };
+
+        const stopInertia = () => {
+          if (inertiaRaf) {
+            cancelAnimationFrame(inertiaRaf);
+            inertiaRaf = 0;
+          }
+          inertiaVx = 0;
+        };
+
+        const runInertia = (timestamp) => {
+          inertiaRaf = 0;
+          if (!inertiaLastT) inertiaLastT = timestamp;
+          const dt = Math.max(1, timestamp - inertiaLastT);
+          inertiaLastT = timestamp;
+          // Move opposite the finger flick: positive vx = swipe right = panel
+          // moves left visually, so we subtract vx * dt from offset.
+          const step = inertiaVx * dt;
+          carouselOffset -= step;
+          normalizeCarouselOffset();
+          renderProjectPosition();
+          // Exponential decay so the flick eases out instead of stopping dead.
+          inertiaVx *= Math.pow(0.0028, dt / 1000);
+          carouselUserPauseUntil = performance.now() + 320;
+          if (Math.abs(inertiaVx) > 0.012) {
+            inertiaRaf = requestAnimationFrame(runInertia);
+          } else {
+            inertiaVx = 0;
+          }
+        };
 
         projectsCarouselView.addEventListener(
           "touchstart",
           (event) => {
             if (projectsSection.classList.contains("detail-open") || isProjectOpening) return;
             if (event.touches.length !== 1) return;
+            stopInertia();
             touchActive = true;
             touchHorizontal = false;
             projectsCarouselSwipeMoved = false;
@@ -6117,7 +6204,7 @@
             touchStartX = touchLastX = t.clientX;
             touchStartY = t.clientY;
             touchLastT = performance.now();
-            touchVx = 0;
+            touchVxPxMs = 0;
           },
           { passive: true }
         );
@@ -6142,7 +6229,10 @@
             const dx = t.clientX - touchLastX;
             const now = performance.now();
             const dt = Math.max(1, now - touchLastT);
-            touchVx = dx / dt;
+            // Low-pass filter the velocity so a final jitter frame doesn't
+            // swallow the otherwise-strong flick reading.
+            const sampleVx = dx / dt;
+            touchVxPxMs = touchVxPxMs * 0.55 + sampleVx * 0.45;
             touchLastX = t.clientX;
             touchLastT = now;
 
@@ -6150,9 +6240,8 @@
 
             if (event.cancelable) event.preventDefault();
             carouselUserPauseUntil = performance.now() + 520;
-            carouselOffset -= dx;
-            normalizeCarouselOffset();
-            renderProjectPosition();
+            pendingDx += dx;
+            if (!renderRaf) renderRaf = requestAnimationFrame(flushPendingDx);
           },
           { passive: false }
         );
@@ -6160,9 +6249,15 @@
         const endTouch = () => {
           if (!touchActive) return;
           touchActive = false;
+          if (renderRaf) flushPendingDx();
           if (!touchHorizontal) return;
-          if (Math.abs(touchVx) > 0.35) {
-            nudgeCarousel(touchVx < 0 ? 1 : -1);
+          // Hand the gesture's exit velocity to the inertia loop. The threshold
+          // is intentionally low so even a light flick glides a bit further.
+          if (Math.abs(touchVxPxMs) > 0.05) {
+            inertiaVx = touchVxPxMs;
+            inertiaLastT = 0;
+            carouselUserPauseUntil = performance.now() + 1200;
+            inertiaRaf = requestAnimationFrame(runInertia);
           }
           // Clear the swipe-flag after the click event has had a chance to fire.
           window.setTimeout(() => { projectsCarouselSwipeMoved = false; }, 60);
