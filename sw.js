@@ -5,7 +5,7 @@
  *   carousel preview clips). Network-first with cache fallback for HTML.
  *   Bumping CACHE_VERSION invalidates everything.
  */
-const CACHE_VERSION = "nsc-v45";
+const CACHE_VERSION = "nsc-v46";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const MEDIA_CACHE = `${CACHE_VERSION}-media`;
 
@@ -65,10 +65,15 @@ self.addEventListener("fetch", (event) => {
   if (request.headers.has("range")) return;
 
   if (isMediaRequest(url)) {
-    const isStandardsManifest =
-      url.pathname.endsWith("/assets/web/standards/optimized/standards-manifest.json");
+    // Network-first for content JSON so editorial updates (project URLs,
+    // descriptions, manifests) can't get stuck on a stale cached copy from
+    // a previous visit. Cache is the offline fallback.
+    const isContentJson =
+      url.pathname.endsWith("/assets/web/standards/optimized/standards-manifest.json") ||
+      url.pathname.endsWith("/assets/web/projects-instagram.json") ||
+      url.pathname.endsWith("/assets/web/projects-detail-copy.json");
 
-    if (isStandardsManifest) {
+    if (isContentJson) {
       event.respondWith(
         fetch(request)
           .then((response) => {
