@@ -1279,20 +1279,24 @@
           gap: clamp(1rem, 3vh, 1.75rem);
         }
 
-        /* Constrain the cycling logos to sit beside the smaller text instead of
-           covering the whole section. Anchored to the same row as the text. */
+        /* Big cycling logo panel beside the headline. The source JPEGs have
+           internal padding, so we both enlarge the container and scale the
+           image within it — otherwise the visible logo looks tiny inside a
+           large white frame. */
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
-          right: var(--hero-side-gutter);
+          right: calc(var(--hero-side-gutter) * -0.4);
           top: 50%;
           transform: translateY(-50%);
-          width: clamp(220px, 60vw, 360px);
-          height: clamp(220px, 60vw, 360px);
+          width: clamp(280px, 78vw, 520px);
+          height: clamp(280px, 78vw, 520px);
         }
 
         .logos-section .logo-slide img {
           object-position: center center;
+          transform: scale(1.45);
+          transform-origin: center center;
         }
 
         .logos-section .logos-those {
