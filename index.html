@@ -520,8 +520,11 @@
         position: absolute;
         inset: 0;
         background: rgba(8, 8, 10, 0);
-        backdrop-filter: blur(0px) saturate(100%);
-        -webkit-backdrop-filter: blur(0px) saturate(100%);
+        /* `none` (vs `blur(0px)`) tells the browser not to allocate a
+           compositor layer for this filter while the overlay is closed —
+           which would otherwise tax every paint pass on the page. */
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
         transition:
           background 520ms cubic-bezier(0.42, 0, 0.58, 1),
           backdrop-filter 520ms cubic-bezier(0.42, 0, 0.58, 1),
@@ -4422,16 +4425,21 @@
         carouselOffset += direction * panelWidth;
         normalizeCarouselOffset();
         renderProjectPosition();
+        if (isProjectsInView) ensureCarouselFrameRunning();
       };
 
+      let carouselFrameId = 0;
       const runCarouselFrame = (timestamp) => {
+        carouselFrameId = 0;
         if (!lastFrameTime) lastFrameTime = timestamp;
         const deltaMs = timestamp - lastFrameTime;
         lastFrameTime = timestamp;
 
+        const detailOpen = projectsSection.classList.contains("detail-open");
+
         if (
           isProjectsInView &&
-          !projectsSection.classList.contains("detail-open") &&
+          !detailOpen &&
           !isProjectOpening &&
           performance.now() >= carouselUserPauseUntil
         ) {
@@ -4447,7 +4455,21 @@
           syncCarouselVideoPlayback();
         }
 
-        window.requestAnimationFrame(runCarouselFrame);
+        /* Stop the RAF loop entirely when the carousel is off-screen and the
+           detail panel is closed. Without this the loop kept burning a frame
+           every ~16ms even on completely unrelated pages, which contributed
+           to perceived scroll lag. The loop is restarted by the
+           IntersectionObserver when projects come back into view. */
+        if (isProjectsInView || detailOpen || isProjectOpening) {
+          carouselFrameId = window.requestAnimationFrame(runCarouselFrame);
+        } else {
+          lastFrameTime = 0;
+        }
+      };
+      const ensureCarouselFrameRunning = () => {
+        if (!carouselFrameId) {
+          carouselFrameId = window.requestAnimationFrame(runCarouselFrame);
+        }
       };
 
       const startContinuousCarousel = () => {
@@ -4467,7 +4489,7 @@
           video.dataset.shouldPlay = "0";
         });
         renderProjectPosition();
-        window.requestAnimationFrame(runCarouselFrame);
+        ensureCarouselFrameRunning();
       };
 
       const preventWheelWhileProjectDetail = (event) => {
@@ -6427,16 +6449,19 @@
 
       const projectsDetailView = document.getElementById("projects-detail");
       const projectDetailWheelBackThreshold = 50;
+      // Passive: true. Body already has position:fixed + touch-action:none when
+      // detail is open, so scrolling is locked at the CSS level — we don't need
+      // preventDefault, and dropping passive:false on a window-level wheel
+      // listener removes a big source of trackpad scroll lag site-wide.
       const onProjectDetailWheelBack = (event) => {
         if (!document.body.classList.contains("projects-detail-open")) return;
         const dx = event.deltaX;
         const dy = event.deltaY;
         if (Math.abs(dx) < projectDetailWheelBackThreshold) return;
         if (Math.abs(dx) <= Math.abs(dy) * 1.2) return;
-        event.preventDefault();
         closeProjectDetail();
       };
-      window.addEventListener("wheel", onProjectDetailWheelBack, { passive: false, capture: true });
+      window.addEventListener("wheel", onProjectDetailWheelBack, { passive: true, capture: true });
 
       let projectDetailTouchStartX = 0;
       let projectDetailTouchStartY = 0;
@@ -6658,6 +6683,7 @@
           const [entry] = entries;
           isProjectsInView = entry.isIntersecting && entry.intersectionRatio > 0.35;
           syncCarouselVideoPlayback();
+          if (isProjectsInView) ensureCarouselFrameRunning();
         },
         { threshold: [0, 0.35, 0.65, 1] }
       );
