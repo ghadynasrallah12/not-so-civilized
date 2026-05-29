@@ -157,12 +157,19 @@
         height: 100%;
       }
 
-      body.projects-detail-open,
-      body.standards-zoom-open {
+      body.projects-detail-open {
         position: fixed;
         left: 0;
         right: 0;
         width: 100%;
+        touch-action: none;
+      }
+
+      /* Standards zoom: keep body in normal flow (no position:fixed) so the
+         backdrop-filter behind the zoom overlay can actually blur the real
+         page underneath — otherwise the only thing visible behind would be
+         the dark body background. Scroll is blocked via overflow + JS. */
+      body.standards-zoom-open {
         touch-action: none;
       }
 
@@ -516,11 +523,12 @@
       }
 
       .standards-zoom-overlay.is-open .zoom-backdrop {
-        /* Very light tint so the blurred page shows through clearly instead of
+        /* No dark tint — let the frosted-glass blur reveal the page underneath.
+           Strong blur + saturate bump gives the iOS frosted look without
            reading as a flat black panel. */
-        background: rgba(8, 8, 10, 0.12);
-        backdrop-filter: blur(22px) saturate(140%);
-        -webkit-backdrop-filter: blur(22px) saturate(140%);
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(28px) saturate(160%);
+        -webkit-backdrop-filter: blur(28px) saturate(160%);
       }
 
       .standards-zoom-shell {
@@ -2995,13 +3003,12 @@
         }
 
         .journal-hero {
-          padding-top: 13.5vh;
+          padding-top: 24vh;
         }
 
         .journal-hero-line {
-          /* Slightly smaller than before so the desktop-style indent on
-             "(EXPLAIN)" can fit without spilling off the right edge. */
-          font-size: clamp(1.85rem, 9.5vw, 4.5rem);
+          /* Bigger headline, closer in size to the desktop version. */
+          font-size: clamp(2.5rem, 13vw, 6rem);
         }
 
         .journal-hero {
@@ -3011,7 +3018,7 @@
         /* Match desktop: "(EXPLAIN)" sits well to the right, visually beside
            the second half of "- HARD - TO" rather than directly under it. */
         .journal-hero-line--explain {
-          margin-left: 2em;
+          margin-left: 1.4em;
         }
 
         .journal-arrow {
@@ -3028,7 +3035,7 @@
         .journal-strip {
           /* Pushed down so the photos sit at the same vertical level as the
              prev/next arrows (which are anchored at ~69vh). */
-          top: 56vh;
+          top: 60vh;
           height: auto;
         }
 
@@ -6065,26 +6072,35 @@
         });
 
         if (standardsZoomOverlay) {
-          // Lock body scroll while the zoom is open. We snapshot scrollY and
-          // restore it on close so the page doesn't jump to the top when the
-          // body becomes `position: fixed`. A single MutationObserver keeps
-          // the lock in sync no matter which code path opens or closes.
-          let standardsZoomScrollY = 0;
+          // Lock page scroll while zoom is open WITHOUT taking body out of
+          // flow (no position:fixed). Keeping body in flow lets the backdrop
+          // filter on the overlay actually blur the real page underneath
+          // instead of showing only the dark body background. Scroll is
+          // blocked via `overflow:hidden` on html+body plus wheel/touchmove
+          // preventers — and any zoom-overlay or close-button interaction is
+          // allowed to pass through.
           let standardsZoomLocked = false;
+          const preventStandardsZoomScroll = (event) => {
+            if (event.target && event.target.closest &&
+                event.target.closest("#standards-zoom-overlay")) {
+              return;
+            }
+            if (event.cancelable) event.preventDefault();
+          };
           const observeZoomLock = new MutationObserver(() => {
             const isOpen = standardsZoomOverlay.classList.contains("is-open");
             if (isOpen && !standardsZoomLocked) {
-              standardsZoomScrollY = window.scrollY || window.pageYOffset || 0;
               standardsZoomLocked = true;
               document.documentElement.classList.add("standards-zoom-open");
               document.body.classList.add("standards-zoom-open");
-              document.body.style.top = `-${standardsZoomScrollY}px`;
+              window.addEventListener("wheel", preventStandardsZoomScroll, { passive: false, capture: true });
+              window.addEventListener("touchmove", preventStandardsZoomScroll, { passive: false, capture: true });
             } else if (!isOpen && standardsZoomLocked) {
               standardsZoomLocked = false;
               document.documentElement.classList.remove("standards-zoom-open");
               document.body.classList.remove("standards-zoom-open");
-              document.body.style.top = "";
-              window.scrollTo(0, standardsZoomScrollY);
+              window.removeEventListener("wheel", preventStandardsZoomScroll, { capture: true });
+              window.removeEventListener("touchmove", preventStandardsZoomScroll, { capture: true });
             }
           });
           observeZoomLock.observe(standardsZoomOverlay, { attributes: true, attributeFilter: ["class"] });
