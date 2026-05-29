@@ -2743,9 +2743,18 @@
         .service-band,
         .service-band:hover {
           flex: none;
-          min-height: 33.33vh;
-          padding-top: 2rem;
-          padding-bottom: 2rem;
+          min-height: 18vh;
+          padding-top: 1.4rem;
+          padding-bottom: 1.4rem;
+          padding-right: calc(var(--hero-side-gutter) + 3.25rem);
+          transition: min-height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Tapped band expands so the background image gets a taller, fuller
+           presence and the body copy has room to breathe. */
+        .service-band.is-open,
+        .service-band.is-open:hover {
+          min-height: 56vh;
         }
 
         /* On mobile the desktop "100% auto" crop turns into a short letterbox
@@ -2817,48 +2826,43 @@
           margin-bottom: 0;
         }
 
-        /* "Tap to read" affordance — sits next to the title so it's obvious
-           the band is interactive. Flips to "Tap to close" when open. */
+        /* Icon-only clickability cue — small circle on the right edge of the
+           band that rotates its plus into an × when the band is open. */
         .service-toggle {
+          position: absolute;
+          top: 50%;
+          right: var(--hero-side-gutter);
+          z-index: 2;
           display: inline-flex;
           align-items: center;
-          gap: 0.45rem;
-          margin-top: 0.55rem;
-          padding: 0.32rem 0.6rem;
-          border: 1px solid rgba(255, 255, 255, 0.45);
-          border-radius: 999px;
-          background: rgba(255, 255, 255, 0.04);
-          color: #ffffff;
-          font-family: "Andale Mono", "AndaleMono", monospace;
-          font-size: 11px;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          line-height: 1;
-          transition: background 0.25s ease, border-color 0.25s ease;
+          justify-content: center;
+          width: 34px;
+          height: 34px;
+          border: 1px solid rgba(255, 255, 255, 0.55);
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.06);
+          transform: translateY(-50%);
+          transition:
+            background 0.25s ease,
+            border-color 0.25s ease,
+            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          pointer-events: none;
         }
 
         .service-toggle::after {
-          content: "+";
-          font-size: 14px;
-          line-height: 1;
-          transition: transform 0.3s ease;
+          content: "";
+          width: 12px;
+          height: 12px;
+          background:
+            linear-gradient(#ffffff, #ffffff) center/12px 1.5px no-repeat,
+            linear-gradient(#ffffff, #ffffff) center/1.5px 12px no-repeat;
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .service-band.is-open .service-toggle {
-          background: rgba(255, 255, 255, 0.14);
-          border-color: rgba(255, 255, 255, 0.8);
-        }
-
-        .service-band.is-open .service-toggle::after {
-          transform: rotate(45deg);
-        }
-
-        .service-toggle-label::before {
-          content: "Tap to read";
-        }
-
-        .service-band.is-open .service-toggle-label::before {
-          content: "Tap to close";
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.85);
+          transform: translateY(-50%) rotate(45deg);
         }
 
         .project-card {
@@ -3025,11 +3029,11 @@
         }
 
         .project-detail-watch {
-          font-size: 10.5px;
-          padding: 0.55rem 0.85rem;
-          margin:0px;
-          /* iOS tap target. */
-          min-height: 36px;
+          font-size: 9px;
+          letter-spacing: 0.08em;
+          padding: 0.32rem 0.55rem;
+          margin: 0;
+          min-height: 0;
         }
 
         .project-detail-back {
@@ -3194,37 +3198,37 @@
           <article class="service-band consultancy" role="button" tabindex="0" aria-expanded="false">
             <div class="service-left">
               <h2 class="service-title">Creative<br />Consultancy</h2>
-              <span class="service-toggle" aria-hidden="true"><span class="service-toggle-label"></span></span>
               <p class="service-extra">
                 <span class="service-line" style="--line-index:0">The puzzle.</span>
                 <span class="service-line" style="--line-index:1">It’s the creative foundation of every project.</span>
                 <span class="service-line" style="--line-index:2">It defines the core vision through a clear presentation, treatment, and strategic plan that becomes the creative bible.</span>
               </p>
             </div>
+            <span class="service-toggle" aria-hidden="true"></span>
           </article>
 
           <article class="service-band creation" role="button" tabindex="0" aria-expanded="false">
             <div class="service-left">
               <h2 class="service-title">Concept Creation<br />&amp; Development</h2>
-              <span class="service-toggle" aria-hidden="true"><span class="service-toggle-label"></span></span>
               <p class="service-extra">
                 <span class="service-line" style="--line-index:0">It defines the direction for all materials and makes the work creative.</span>
                 <span class="service-line" style="--line-index:1">If the puzzle is the creative strategy, the pieces are the creative directions.</span>
                 <span class="service-line" style="--line-index:2">Guiding execution across any medium, not just film.</span>
               </p>
             </div>
+            <span class="service-toggle" aria-hidden="true"></span>
           </article>
 
           <article class="service-band execution" role="button" tabindex="0" aria-expanded="false">
             <div class="service-left">
               <h2 class="service-title">Creative<br />Execution</h2>
-              <span class="service-toggle" aria-hidden="true"><span class="service-toggle-label"></span></span>
               <p class="service-extra">
                 <span class="service-line" style="--line-index:0">It’s the process of building the puzzle itself, best done by the ones who created it.</span>
                 <span class="service-line" style="--line-index:1">It’s where the idea comes to life, whatever it takes.</span>
                 <span class="service-line" style="--line-index:2">Each idea has its own way of being executed, with its own process, timeline, and team.</span>
               </p>
             </div>
+            <span class="service-toggle" aria-hidden="true"></span>
           </article>
         </div>
       </section>
