@@ -1305,6 +1305,9 @@
           align-items: flex-end;
           text-align: right;
           margin-left: 0;
+          /* Pull the headline in from the page edge so it sits at the same
+             horizontal level as the clock in the header. */
+          margin-right: clamp(0.5rem, 3vw, 1.25rem);
           max-width: 100%;
           letter-spacing: -0.12em;
           line-height: 0.82;
