@@ -2979,7 +2979,9 @@
            come out vertically squished. Force the frame to keep the design
            aspect ratio and let the strip height follow. */
         .journal-strip {
-          top: 38vh;
+          /* Pushed down so the photos sit at the same vertical level as the
+             prev/next arrows (which are anchored at ~69vh). */
+          top: 56vh;
           height: auto;
         }
 
