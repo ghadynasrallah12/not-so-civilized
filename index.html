@@ -1256,7 +1256,10 @@
 
       @media (max-width: 768px) {
         .logos-section .logos-lockup {
-          grid-template-columns: 1fr;
+          /* Two columns: smaller text on the left, the cycling logos beside it. */
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+          gap: clamp(0.85rem, 3.5vw, 1.5rem);
+          align-items: center;
         }
 
         .logos-section .logos-lockup-spacer {
@@ -1269,18 +1272,34 @@
           gap: clamp(1rem, 3vh, 1.75rem);
         }
 
+        /* Constrain the cycling logos to sit beside the smaller text instead of
+           covering the whole section. Anchored to the same row as the text. */
+        .logos-section .logos-cycler {
+          inset: auto;
+          position: absolute;
+          right: var(--hero-side-gutter);
+          top: 50%;
+          transform: translateY(-50%);
+          width: clamp(140px, 44vw, 230px);
+          height: clamp(140px, 44vw, 230px);
+        }
+
+        .logos-section .logo-slide img {
+          object-position: center center;
+        }
+
         .logos-section .logos-those {
           align-items: flex-start;
           text-align: left;
           margin-left: 0;
           max-width: 100%;
-          letter-spacing: -0.14em;
+          letter-spacing: -0.12em;
           line-height: 0.82;
         }
 
         .logos-section .logos-those-line,
         .logos-section .logos-those-line--who {
-          font-size: clamp(2.15rem, 12vw, 3.35rem);
+          font-size: clamp(1.45rem, 7.5vw, 2.05rem);
         }
 
         .logos-section .logos-those-line--who {
@@ -1984,6 +2003,7 @@
       }
 
       .project-detail-mute,
+      .project-detail-fullscreen,
       .project-detail-play-toggle {
         position: absolute;
         z-index: 26;
@@ -1998,11 +2018,13 @@
       }
 
       .project-detail-mute:hover,
+      .project-detail-fullscreen:hover,
       .project-detail-play-toggle:hover {
         opacity: 1;
       }
 
       .project-detail-mute:focus-visible,
+      .project-detail-fullscreen:focus-visible,
       .project-detail-play-toggle:focus-visible {
         outline: 1px solid rgba(255, 255, 255, 0.85);
         outline-offset: 2px;
@@ -2016,6 +2038,17 @@
         width: 2.15rem;
         height: 2.15rem;
         padding: 0.15rem;
+        z-index: 28;
+      }
+
+      .project-detail-fullscreen {
+        top: auto;
+        left: auto;
+        bottom: clamp(0.85rem, 2vh, 1.25rem);
+        right: calc(clamp(0.75rem, 2vw, 1.15rem) + 2.65rem);
+        width: 2.15rem;
+        height: 2.15rem;
+        padding: 0.2rem;
         z-index: 28;
       }
 
@@ -2736,6 +2769,11 @@
           height: auto;
         }
 
+        .services-section,
+        section.section.services-section {
+          min-height: 0;
+        }
+
         .services-layout {
           min-height: auto;
         }
@@ -2826,8 +2864,8 @@
           margin-bottom: 0;
         }
 
-        /* Icon-only clickability cue — small circle on the right edge of the
-           band that rotates its plus into an × when the band is open. */
+        /* Borderless down-chevron on the right of each band — flips upward
+           when the band is open. No background, no circle, just the glyph. */
         .service-toggle {
           position: absolute;
           top: 50%;
@@ -2836,16 +2874,12 @@
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 34px;
-          height: 34px;
-          border: 1px solid rgba(255, 255, 255, 0.55);
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.06);
+          width: 28px;
+          height: 28px;
+          border: 0;
+          background: transparent;
           transform: translateY(-50%);
-          transition:
-            background 0.25s ease,
-            border-color 0.25s ease,
-            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
           pointer-events: none;
         }
 
@@ -2853,16 +2887,18 @@
           content: "";
           width: 12px;
           height: 12px;
-          background:
-            linear-gradient(#ffffff, #ffffff) center/12px 1.5px no-repeat,
-            linear-gradient(#ffffff, #ffffff) center/1.5px 12px no-repeat;
+          border-right: 1.6px solid #ffffff;
+          border-bottom: 1.6px solid #ffffff;
+          /* Sit a touch above the geometric center so the chevron looks
+             optically centered inside its bounding box. */
+          margin-top: -4px;
+          transform: rotate(45deg);
           transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .service-band.is-open .service-toggle {
-          background: rgba(255, 255, 255, 0.16);
-          border-color: rgba(255, 255, 255, 0.85);
-          transform: translateY(-50%) rotate(45deg);
+        .service-band.is-open .service-toggle::after {
+          margin-top: 4px;
+          transform: rotate(-135deg);
         }
 
         .project-card {
@@ -3058,6 +3094,13 @@
           height: 2.5rem;
         }
 
+        .project-detail-fullscreen {
+          bottom: 0.6rem;
+          right: 3.3rem;
+          width: 2.5rem;
+          height: 2.5rem;
+        }
+
         .project-detail-play-toggle {
           width: 3.25rem;
           height: 3.25rem;
@@ -3090,6 +3133,7 @@
           .project-detail-back,
           .project-detail-watch:not(.is-disabled),
           .project-detail-mute,
+          .project-detail-fullscreen,
           .project-detail-play-toggle,
           .project-detail-video-wrap,
           .project-detail-video,
@@ -3652,6 +3696,20 @@
                   <path d="M3 10v4h4l5 4V6l-5 4H3z"></path>
                   <line x1="17.25" y1="9.25" x2="22.25" y2="14.75"></line>
                   <line x1="22.25" y1="9.25" x2="17.25" y2="14.75"></line>
+                </svg>
+              </button>
+              <button id="project-detail-fullscreen" class="project-detail-fullscreen" type="button" aria-label="Watch fullscreen">
+                <svg id="fullscreen-icon-enter" class="control-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <polyline points="4 9 4 4 9 4"></polyline>
+                  <polyline points="20 9 20 4 15 4"></polyline>
+                  <polyline points="4 15 4 20 9 20"></polyline>
+                  <polyline points="20 15 20 20 15 20"></polyline>
+                </svg>
+                <svg id="fullscreen-icon-exit" class="control-icon" viewBox="0 0 24 24" aria-hidden="true" style="display: none">
+                  <polyline points="9 4 9 9 4 9"></polyline>
+                  <polyline points="15 4 15 9 20 9"></polyline>
+                  <polyline points="9 20 9 15 4 15"></polyline>
+                  <polyline points="15 20 15 15 20 15"></polyline>
                 </svg>
               </button>
               <button id="project-detail-play-toggle" class="project-detail-play-toggle" type="button" aria-label="Pause">
@@ -5897,7 +5955,19 @@
 
         renderStandardsTiles();
         let standardsResizeTimer = null;
+        let standardsLastWidth = window.innerWidth;
+        let standardsLastCols = getGridShape(standardsImages.length).cols;
         window.addEventListener("resize", () => {
+          // Mobile Safari fires resize whenever the address bar shows/hides
+          // during a scroll. Re-rendering the entire grid on every such tick
+          // makes the photos flicker / appear to "re-load." Only re-render
+          // when the viewport width (and therefore the grid shape) actually
+          // changes — height-only resizes are ignored.
+          const w = window.innerWidth;
+          const nextCols = getGridShape(standardsImages.length).cols;
+          if (w === standardsLastWidth && nextCols === standardsLastCols) return;
+          standardsLastWidth = w;
+          standardsLastCols = nextCols;
           if (standardsResizeTimer) clearTimeout(standardsResizeTimer);
           standardsResizeTimer = setTimeout(() => {
             if (currentZoom) closeStandardsZoom();
@@ -5926,6 +5996,53 @@
             },
             { passive: false }
           );
+
+          // Touch swipe to navigate between standards while zoomed.
+          let zoomTouchStartX = 0;
+          let zoomTouchStartY = 0;
+          let zoomTouchActive = false;
+          let zoomTouchHorizontal = false;
+          let zoomTouchTriggered = false;
+          const ZOOM_SWIPE_THRESHOLD = 48;
+          standardsZoomOverlay.addEventListener(
+            "touchstart",
+            (event) => {
+              if (!currentZoom || currentZoom.phase !== "ready") return;
+              if (event.touches.length !== 1) return;
+              zoomTouchActive = true;
+              zoomTouchHorizontal = false;
+              zoomTouchTriggered = false;
+              zoomTouchStartX = event.touches[0].clientX;
+              zoomTouchStartY = event.touches[0].clientY;
+            },
+            { passive: true }
+          );
+          standardsZoomOverlay.addEventListener(
+            "touchmove",
+            (event) => {
+              if (!zoomTouchActive || zoomTouchTriggered) return;
+              if (event.touches.length !== 1) return;
+              const dx = event.touches[0].clientX - zoomTouchStartX;
+              const dy = event.touches[0].clientY - zoomTouchStartY;
+              if (!zoomTouchHorizontal) {
+                if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+                if (Math.abs(dx) <= Math.abs(dy)) {
+                  zoomTouchActive = false;
+                  return;
+                }
+                zoomTouchHorizontal = true;
+              }
+              if (event.cancelable) event.preventDefault();
+              if (Math.abs(dx) > ZOOM_SWIPE_THRESHOLD && !currentZoom.isAnimating) {
+                zoomTouchTriggered = true;
+                navigateStandardsZoom(dx < 0 ? 1 : -1);
+              }
+            },
+            { passive: false }
+          );
+          const endZoomTouch = () => { zoomTouchActive = false; };
+          standardsZoomOverlay.addEventListener("touchend", endZoomTouch, { passive: true });
+          standardsZoomOverlay.addEventListener("touchcancel", endZoomTouch, { passive: true });
         }
         if (standardsZoomPrev) {
           standardsZoomPrev.addEventListener("click", (event) => {
@@ -6208,6 +6325,66 @@
         detailVideo.muted = !detailVideo.muted;
         syncDetailMuteUi();
       });
+
+      const detailFullscreenButton = document.getElementById("project-detail-fullscreen");
+      const fullscreenIconEnter = document.getElementById("fullscreen-icon-enter");
+      const fullscreenIconExit = document.getElementById("fullscreen-icon-exit");
+      const isAnyFullscreen = () =>
+        Boolean(
+          document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.msFullscreenElement ||
+            detailVideo.webkitDisplayingFullscreen
+        );
+      const syncDetailFullscreenUi = () => {
+        if (!detailFullscreenButton) return;
+        const active = isAnyFullscreen();
+        if (fullscreenIconEnter) fullscreenIconEnter.style.display = active ? "none" : "block";
+        if (fullscreenIconExit) fullscreenIconExit.style.display = active ? "block" : "none";
+        detailFullscreenButton.setAttribute("aria-label", active ? "Exit fullscreen" : "Watch fullscreen");
+      };
+      if (detailFullscreenButton) {
+        detailFullscreenButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (isAnyFullscreen()) {
+            const exit =
+              document.exitFullscreen ||
+              document.webkitExitFullscreen ||
+              document.mozCancelFullScreen ||
+              document.msExitFullscreen;
+            if (exit) exit.call(document);
+            return;
+          }
+          // On iOS Safari the only path to true fullscreen video is the
+          // proprietary webkitEnterFullscreen() on the <video> element itself.
+          // Other browsers get the standard Fullscreen API on the wrapper so
+          // the controls (mute, progress) stay visible above the video.
+          if (typeof detailVideo.webkitEnterFullscreen === "function" && !detailVideoWrap.requestFullscreen) {
+            try { detailVideo.webkitEnterFullscreen(); } catch (_) {}
+            return;
+          }
+          const target = detailVideoWrap || detailVideo;
+          const req =
+            target.requestFullscreen ||
+            target.webkitRequestFullscreen ||
+            target.mozRequestFullScreen ||
+            target.msRequestFullscreen;
+          if (req) {
+            try {
+              const result = req.call(target);
+              if (result && typeof result.catch === "function") result.catch(() => {});
+            } catch (_) {}
+          } else if (typeof detailVideo.webkitEnterFullscreen === "function") {
+            try { detailVideo.webkitEnterFullscreen(); } catch (_) {}
+          }
+        });
+        document.addEventListener("fullscreenchange", syncDetailFullscreenUi);
+        document.addEventListener("webkitfullscreenchange", syncDetailFullscreenUi);
+        detailVideo.addEventListener("webkitbeginfullscreen", syncDetailFullscreenUi);
+        detailVideo.addEventListener("webkitendfullscreen", syncDetailFullscreenUi);
+        syncDetailFullscreenUi();
+      }
 
       detailVideoWrap.addEventListener("click", () => {
         if (detailVideo.paused || detailVideo.ended) {
