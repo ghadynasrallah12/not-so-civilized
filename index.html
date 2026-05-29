@@ -2952,18 +2952,19 @@
         }
 
         .journal-hero-line {
-          font-size: clamp(2.1rem, 11vw, 5rem);
+          /* Slightly smaller than before so the desktop-style indent on
+             "(EXPLAIN)" can fit without spilling off the right edge. */
+          font-size: clamp(1.85rem, 9.5vw, 4.5rem);
         }
 
         .journal-hero {
-          padding-left: calc(var(--hero-side-gutter) + 28px);
+          padding-left: calc(var(--hero-side-gutter) + 18px);
         }
 
-        /* The desktop indent (2.16em on (EXPLAIN)) pushes the line past the
-           right edge at the mobile font-size. Pull it in so the parenthesis
-           stays inside the screen. */
+        /* Match desktop: "(EXPLAIN)" sits well to the right, visually beside
+           the second half of "- HARD - TO" rather than directly under it. */
         .journal-hero-line--explain {
-          margin-left: 0.85em;
+          margin-left: 2em;
         }
 
         .journal-arrow {
@@ -2985,11 +2986,13 @@
         .journal-frame {
           width: 92vw;
           height: auto;
-          aspect-ratio: 788 / 373;
+          /* Taller ratio than the 788/373 source so the photo cluster has
+             more vertical presence, matching the desktop layout's feel. */
+          aspect-ratio: 788 / 520;
         }
 
         .journal-frame[data-loaded="false"] {
-          contain-intrinsic-size: 92vw calc(92vw * 373 / 788);
+          contain-intrinsic-size: 92vw calc(92vw * 520 / 788);
         }
 
         .journal-footer-logo img {
