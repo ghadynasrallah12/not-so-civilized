@@ -5436,11 +5436,19 @@
           // Touch swipe — feeds the smoothed target like wheel does. On
           // touchend, the recent gesture velocity becomes inertia so a flick
           // glides for a moment.
+          let touchStartX = 0;
+          let touchStartY = 0;
           let touchLastX = 0;
           let touchLastT = 0;
           let touchVx = 0;
           let touchDxAccum = 0;
           let touchRafId = 0;
+          // Direction lock — null until we know intent, then "h" or "v".
+          // Locking to "v" lets the browser scroll the page naturally; "h"
+          // claims the gesture for the carousel. Without this, a finger drift
+          // of 6px sideways during a vertical scroll over the journal would
+          // hijack the gesture (felt like "refuses to scroll down" / glitch).
+          let touchAxis = null;
           const flushTouch = () => {
             touchRafId = 0;
             if (touchDxAccum === 0) return;
@@ -5452,7 +5460,9 @@
             if (e.touches.length !== 1) return;
             pauseJournalAuto();
             touchActive = true;
-            touchLastX = e.touches[0].clientX;
+            touchAxis = null;
+            touchStartX = touchLastX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
             touchLastT = performance.now();
             touchVx = 0;
             state.vx = 0;
@@ -5460,20 +5470,41 @@
           stageEl.addEventListener("touchmove", (e) => {
             if (!touchActive || e.touches.length !== 1) return;
             const x = e.touches[0].clientX;
+            const y = e.touches[0].clientY;
+            const dxTotal = x - touchStartX;
+            const dyTotal = y - touchStartY;
+
+            // Lock direction once movement crosses a small threshold. If the
+            // user is panning vertically, bail out entirely so the page can
+            // scroll without any interference from our handler.
+            if (touchAxis === null) {
+              const ax = Math.abs(dxTotal);
+              const ay = Math.abs(dyTotal);
+              if (ax < 8 && ay < 8) return;
+              touchAxis = ax > ay ? "h" : "v";
+              if (touchAxis === "v") {
+                touchActive = false;
+                return;
+              }
+            }
+            if (touchAxis !== "h") return;
+
             const dx = x - touchLastX;
             const now = performance.now();
             const dt = Math.max(1, now - touchLastT);
             touchVx = (-dx / dt) * 16;
             touchLastX = x;
             touchLastT = now;
-            if (Math.abs(dx) > 6 && e.cancelable) e.preventDefault();
+            if (e.cancelable) e.preventDefault();
             touchDxAccum += -dx;
             if (!touchRafId) touchRafId = requestAnimationFrame(flushTouch);
           }, { passive: false });
           stageEl.addEventListener("touchend", () => {
             if (!touchActive) return;
             touchActive = false;
-            if (Math.abs(touchVx) > 0.4) { state.vx = touchVx; kick(); }
+            const wasHorizontal = touchAxis === "h";
+            touchAxis = null;
+            if (wasHorizontal && Math.abs(touchVx) > 0.4) { state.vx = touchVx; kick(); }
           }, { passive: true });
 
           // Arrows + keyboard — soft pushes that accumulate. The kick is sized
