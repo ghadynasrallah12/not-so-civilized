@@ -1357,12 +1357,14 @@
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
-          left: clamp(0.5rem, 2vw, 1rem);
+          /* Shift right and tighten width so logos that sit on the left of
+             their source JPEG aren't clipped at the viewport edge. */
+          left: clamp(2.5rem, 10vw, 4rem);
           top: auto;
           bottom: clamp(6rem, 16vh, 10rem);
           transform: none;
-          width: clamp(560px, 130vw, 920px);
-          height: clamp(560px, 130vw, 920px);
+          width: clamp(520px, 118vw, 860px);
+          height: clamp(520px, 118vw, 860px);
         }
 
         .logos-section .logo-slide img {
@@ -1370,7 +1372,7 @@
           /* Source JPEGs leave a generous padding around the trademark, so
              zoom the image inside the (already large) container — the actual
              visible logo grows roughly with this multiplier. */
-          transform: scale(1.25);
+          transform: scale(1.12);
           transform-origin: center center;
         }
 
