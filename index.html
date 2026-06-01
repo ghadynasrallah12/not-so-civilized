@@ -6541,6 +6541,73 @@
         detailFullscreenButton.setAttribute("aria-label", active ? "Exit fullscreen" : "Watch fullscreen");
       };
       if (detailFullscreenButton) {
+        // UA-sniff iOS specifically. iOS Safari is the one place the standard
+        // `Element.requestFullscreen()` on a wrapper div doesn't actually
+        // fullscreen the video — only the proprietary `video.webkitEnterFullscreen()`
+        // does. iPadOS reports MacIntel + touch points, so handle that too.
+        const isIosLike =
+          /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+        // Tries fullscreen and returns true if anything was attempted. iOS
+        // accepts `webkitEnterFullscreen` even while the video is still
+        // loading — the system player opens and renders the loading state
+        // until enough media is buffered. The important thing is that we
+        // call it synchronously within the user-tap gesture so the call
+        // is not blocked.
+        const enterDetailFullscreen = () => {
+          if (isIosLike && typeof detailVideo.webkitEnterFullscreen === "function") {
+            try {
+              // Kick off network bytes if the video element hasn't started
+              // loading yet — otherwise iOS shows a permanent spinner.
+              if (detailVideo.readyState === 0) {
+                try { detailVideo.load(); } catch (_) {}
+              }
+              detailVideo.webkitEnterFullscreen();
+              return true;
+            } catch (_) {}
+          }
+
+          const target = detailVideoWrap || detailVideo;
+          const req =
+            target.requestFullscreen ||
+            target.webkitRequestFullscreen ||
+            target.mozRequestFullScreen ||
+            target.msRequestFullscreen;
+          if (req) {
+            try {
+              const result = req.call(target);
+              if (result && typeof result.catch === "function") {
+                result.catch(() => {
+                  // Last-resort fallback to webkitEnterFullscreen if standard
+                  // FS rejected (some browsers reject because the video isn't
+                  // in a frame they trust, or because a parent has filter/transform).
+                  if (typeof detailVideo.webkitEnterFullscreen === "function") {
+                    try {
+                      if (detailVideo.readyState === 0) {
+                        try { detailVideo.load(); } catch (_) {}
+                      }
+                      detailVideo.webkitEnterFullscreen();
+                    } catch (_) {}
+                  }
+                });
+              }
+              return true;
+            } catch (_) {}
+          }
+
+          if (typeof detailVideo.webkitEnterFullscreen === "function") {
+            try {
+              if (detailVideo.readyState === 0) {
+                try { detailVideo.load(); } catch (_) {}
+              }
+              detailVideo.webkitEnterFullscreen();
+              return true;
+            } catch (_) {}
+          }
+          return false;
+        };
+
         detailFullscreenButton.addEventListener("click", (event) => {
           event.stopPropagation();
           if (isAnyFullscreen()) {
@@ -6552,28 +6619,7 @@
             if (exit) exit.call(document);
             return;
           }
-          // On iOS Safari the only path to true fullscreen video is the
-          // proprietary webkitEnterFullscreen() on the <video> element itself.
-          // Other browsers get the standard Fullscreen API on the wrapper so
-          // the controls (mute, progress) stay visible above the video.
-          if (typeof detailVideo.webkitEnterFullscreen === "function" && !detailVideoWrap.requestFullscreen) {
-            try { detailVideo.webkitEnterFullscreen(); } catch (_) {}
-            return;
-          }
-          const target = detailVideoWrap || detailVideo;
-          const req =
-            target.requestFullscreen ||
-            target.webkitRequestFullscreen ||
-            target.mozRequestFullScreen ||
-            target.msRequestFullscreen;
-          if (req) {
-            try {
-              const result = req.call(target);
-              if (result && typeof result.catch === "function") result.catch(() => {});
-            } catch (_) {}
-          } else if (typeof detailVideo.webkitEnterFullscreen === "function") {
-            try { detailVideo.webkitEnterFullscreen(); } catch (_) {}
-          }
+          enterDetailFullscreen();
         });
         document.addEventListener("fullscreenchange", syncDetailFullscreenUi);
         document.addEventListener("webkitfullscreenchange", syncDetailFullscreenUi);
