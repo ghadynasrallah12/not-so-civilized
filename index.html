@@ -653,6 +653,27 @@
         transform: translateZ(0);
       }
 
+      .standards-zoom-counter {
+        position: absolute;
+        left: 50%;
+        bottom: max(env(safe-area-inset-bottom, 0px), 1.25rem);
+        transform: translateX(-50%);
+        z-index: 2203;
+        color: rgba(255, 255, 255, 0.92);
+        font-family: "Andale Mono", "AndaleMono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.32s ease;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+      }
+
+      .standards-zoom-overlay.is-open .standards-zoom-counter {
+        opacity: 1;
+      }
+
       /* ±100vw motion: let layers extend past the frame while overlay clips to the screen. */
       .standards-zoom-viewport.is-sliding {
         overflow: visible;
@@ -2837,6 +2858,28 @@
           aspect-ratio: 1 / 1;
         }
 
+        /* Mobile zoom: hide the prev/next arrows (user can swipe) and let
+           the zoomed image use the full available width so it doesn't visibly
+           shrink to make room for arrow controls. A counter underneath
+           communicates the swipe affordance. */
+        .standards-zoom-nav {
+          display: none !important;
+        }
+
+        .standards-zoom-shell {
+          gap: 0;
+          padding: clamp(0.5rem, 2vw, 1rem);
+        }
+
+        .standards-zoom-viewport {
+          max-width: min(95vw, 1240px);
+        }
+
+        .standards-zoom-counter {
+          font-size: 11px;
+          bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+        }
+
         .about-layout {
           grid-template-columns: 1fr;
         }
@@ -3988,6 +4031,7 @@
           <div class="standards-zoom-viewport" id="standards-zoom-viewport"></div>
           <button type="button" class="standards-zoom-nav standards-zoom-nav--next" id="standards-zoom-next" aria-label="Next standard">&rarr;</button>
         </div>
+        <div class="standards-zoom-counter" id="standards-zoom-counter" aria-live="polite"></div>
       </div>
 
       <section class="section contact-section" id="contact" aria-label="Contact">
@@ -5557,6 +5601,12 @@
         const standardsZoomViewport = document.getElementById("standards-zoom-viewport");
         const standardsZoomPrev = document.getElementById("standards-zoom-prev");
         const standardsZoomNext = document.getElementById("standards-zoom-next");
+        const standardsZoomCounter = document.getElementById("standards-zoom-counter");
+        const updateStandardsZoomCounter = (idx) => {
+          if (!standardsZoomCounter) return;
+          const i = ((idx % standardsImages.length) + standardsImages.length) % standardsImages.length;
+          standardsZoomCounter.textContent = `${i + 1} / ${standardsImages.length}`;
+        };
         const ZOOM_MS = 520;
         const ZOOM_EASE = "cubic-bezier(0.42, 0, 0.58, 1)";
 
@@ -5566,7 +5616,11 @@
         const computeZoomFrame = (imgOrNatural) => {
           const naturalW = imgOrNatural.naturalWidth || 800;
           const naturalH = imgOrNatural.naturalHeight || 600;
-          const maxW = window.innerWidth * 0.88;
+          // Mobile gets more horizontal room since the prev/next arrows are
+          // hidden there; desktop keeps the 88% allowance to leave space for
+          // the arrows on either side.
+          const widthCap = isMobileStandards() ? 0.95 : 0.88;
+          const maxW = window.innerWidth * widthCap;
           const maxH = window.innerHeight * 0.88;
           const scale = Math.min(maxW / naturalW, maxH / naturalH, 1);
           const targetW = Math.max(320, naturalW * scale);
@@ -5692,6 +5746,7 @@
             isAnimating: false,
           };
           syncGridVisibilityForIndex(tileIndex);
+          updateStandardsZoomCounter(tileIndex);
 
           let openingSettled = false;
           let openingTimerId = null;
@@ -5848,6 +5903,7 @@
             currentZoom.index = nextIndex;
             currentZoom.sourceImg = getGridImageAtIndex(nextIndex) || currentZoom.sourceImg;
             syncGridVisibilityForIndex(nextIndex);
+            updateStandardsZoomCounter(nextIndex);
             return;
           }
 
@@ -5934,6 +5990,7 @@
             currentZoom.index = nextIndex;
             currentZoom.sourceImg = getGridImageAtIndex(nextIndex) || currentZoom.sourceImg;
             syncGridVisibilityForIndex(nextIndex);
+            updateStandardsZoomCounter(nextIndex);
             currentZoom.isAnimating = false;
           };
           newSlide.addEventListener("transitionend", finishSlide);
