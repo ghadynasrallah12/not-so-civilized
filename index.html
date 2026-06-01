@@ -2899,8 +2899,9 @@
           min-height: 0;
           padding-top: clamp(1rem, 3vh, 1.6rem);
           padding-bottom: clamp(1rem, 3vh, 1.6rem);
-          padding-right: var(--hero-side-gutter);
-          cursor: default;
+          padding-right: calc(var(--hero-side-gutter) + 2.5rem);
+          cursor: pointer;
+          -webkit-tap-highlight-color: transparent;
         }
 
         /* On mobile the desktop "100% auto" crop turns into a short letterbox
@@ -2917,13 +2918,34 @@
           margin-bottom: clamp(0.85rem, 2.6vh, 1.4rem);
         }
 
-        /* Always-open extras — no collapsed state, no toggle. */
-        .service-extra,
+        /* Paragraph collapsed by default; chevron toggle expands it with
+           animation. Each band keeps its 1/3-viewport height regardless. */
+        .service-extra {
+          max-height: 0;
+          opacity: 0;
+          padding-top: 0;
+          overflow: hidden;
+          transition:
+            max-height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.4s ease;
+        }
+
+        .service-band.is-open .service-extra {
+          max-height: 22rem;
+          opacity: 1;
+        }
+
+        /* Hover/focus must NOT auto-open on mobile (taps register as hover on
+           iOS and would lock the band open). The toggle drives it. */
         .service-band:hover .service-extra,
         .service-band:focus-within .service-extra {
-          max-height: none;
+          max-height: 0;
+          opacity: 0;
+        }
+        .service-band.is-open:hover .service-extra,
+        .service-band.is-open:focus-within .service-extra {
+          max-height: 22rem;
           opacity: 1;
-          padding-top: 0;
         }
 
         .service-line {
@@ -2935,21 +2957,49 @@
           margin-bottom: 0.45rem;
         }
 
-        /* Animation plays when the section scrolls into view (JS adds
-           `.is-visible` via IntersectionObserver). Cascade across all bands
-           using the global stagger index. */
-        .service-line.is-visible {
-          animation: service-fade-up 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          animation-delay: calc(var(--line-global-index, var(--line-index, 0)) * 0.09s + 0.08s);
+        /* Lines fade in one-by-one when the band opens. */
+        .service-band.is-open .service-line {
+          animation: service-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation-delay: calc(var(--line-index, 0) * 0.12s + 0.08s);
         }
 
         .service-line:last-child {
           margin-bottom: 0;
         }
 
-        /* No tap-to-toggle on mobile anymore, so hide the chevron entirely. */
+        /* Borderless chevron — points DOWN by default; rotates UP when the
+           band is open. Sits on the right of the band like a button. */
         .service-toggle {
-          display: none;
+          display: inline-flex;
+          position: absolute;
+          top: 50%;
+          right: var(--hero-side-gutter);
+          z-index: 2;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border: 0;
+          background: transparent;
+          transform: translateY(-50%);
+          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+          pointer-events: none;
+        }
+
+        .service-toggle::after {
+          content: "";
+          width: 13px;
+          height: 13px;
+          border-right: 1.8px solid #ffffff;
+          border-bottom: 1.8px solid #ffffff;
+          margin-top: -4px;
+          transform: rotate(45deg);
+          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .service-band.is-open .service-toggle::after {
+          margin-top: 4px;
+          transform: rotate(-135deg);
         }
 
         .project-card {
@@ -6804,29 +6854,16 @@
       const isMobileViewport = () => window.matchMedia("(max-width: 900px)").matches;
       if (servicesSection && serviceTitles.length) {
         let servicesInView = false;
-        const allServiceLines = [];
         const replayServicesTitles = () => {
           serviceTitles.forEach((title) => title.classList.remove("is-visible"));
           void servicesSection.offsetHeight;
           serviceTitles.forEach((title) => title.classList.add("is-visible"));
         };
-        const replayAllServiceLines = () => {
-          allServiceLines.forEach((line) => line.classList.remove("is-visible"));
-          void servicesSection.offsetHeight;
-          allServiceLines.forEach((line) => line.classList.add("is-visible"));
-        };
-        const resetAllServiceLines = () => {
-          allServiceLines.forEach((line) => line.classList.remove("is-visible"));
-        };
 
-        serviceBands.forEach((band, bandIdx) => {
+        serviceBands.forEach((band) => {
           const lines = Array.from(band.querySelectorAll(".service-line"));
           lines.forEach((line, idx) => {
             line.style.setProperty("--line-index", String(idx));
-            // Global stagger index so animations cascade across all bands in
-            // sequence when the whole section reveals on mobile.
-            line.style.setProperty("--line-global-index", String(bandIdx * 3 + idx));
-            allServiceLines.push(line);
           });
           const replayServiceLines = () => {
             lines.forEach((line) => line.classList.remove("is-visible"));
@@ -6836,8 +6873,8 @@
           const resetServiceLines = () => {
             lines.forEach((line) => line.classList.remove("is-visible"));
           };
-          // Desktop only — :hover triggers line replay. Mobile relies on the
-          // intersection observer below since all bands stay open by default.
+          // Desktop hover/focus reveal — does not fire on mobile (taps land
+          // as hover on iOS and would lock state).
           band.addEventListener("mouseenter", () => {
             if (!isMobileViewport()) replayServiceLines();
           });
@@ -6851,6 +6888,39 @@
             if (isMobileViewport()) return;
             if (!band.contains(event.relatedTarget)) resetServiceLines();
           });
+
+          // Mobile chevron tap-to-toggle. The CSS keeps the band's layout
+          // (still 1/3 viewport) regardless of open state; only the paragraph
+          // expands/collapses with animation when `.is-open` flips.
+          const toggleOpen = () => {
+            const willOpen = !band.classList.contains("is-open");
+            if (willOpen) {
+              serviceBands.forEach((other) => {
+                if (other !== band) {
+                  other.classList.remove("is-open");
+                  other.setAttribute("aria-expanded", "false");
+                }
+              });
+            }
+            band.classList.toggle("is-open", willOpen);
+            band.setAttribute("aria-expanded", willOpen ? "true" : "false");
+            if (willOpen) {
+              // Replay the staggered line animation by forcing a restart.
+              lines.forEach((line) => { line.style.animation = "none"; });
+              void band.offsetHeight;
+              lines.forEach((line) => { line.style.animation = ""; });
+            }
+          };
+          band.addEventListener("click", () => {
+            if (isMobileViewport()) toggleOpen();
+          });
+          band.addEventListener("keydown", (event) => {
+            if (!isMobileViewport()) return;
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              toggleOpen();
+            }
+          });
         });
 
         const servicesObserver = new IntersectionObserver(
@@ -6859,10 +6929,8 @@
             const nowInView = entry.isIntersecting && entry.intersectionRatio > 0.18;
             if (nowInView && !servicesInView) {
               replayServicesTitles();
-              if (isMobileViewport()) replayAllServiceLines();
             } else if (!nowInView && servicesInView) {
               serviceTitles.forEach((title) => title.classList.remove("is-visible"));
-              if (isMobileViewport()) resetAllServiceLines();
             }
             servicesInView = nowInView;
           },
@@ -6874,7 +6942,6 @@
           servicesLink.addEventListener("click", () => {
             requestAnimationFrame(() => {
               replayServicesTitles();
-              if (isMobileViewport()) replayAllServiceLines();
             });
           });
         });
