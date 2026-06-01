@@ -3089,6 +3089,14 @@
           contain-intrinsic-size: 120vw calc(120vw * 560 / 788);
         }
 
+        /* Stretch every photo slot wider on mobile — neighbours overlap a
+           bit, which is the explicit ask. scaleX keeps the height as
+           designed while widening each tile. */
+        .journal-slot {
+          transform: scaleX(1.22);
+          transform-origin: center center;
+        }
+
         .journal-footer-logo img {
           width: clamp(96px, 26vw, 140px);
         }
