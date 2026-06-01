@@ -3068,22 +3068,25 @@
            come out vertically squished. Force the frame to keep the design
            aspect ratio and let the strip height follow. */
         .journal-strip {
-          /* Pulled up so the photo cluster starts right under the
-             "(EXPLAIN)" line instead of leaving a big empty band. */
-          top: 46vh;
+          /* Anchored right under "(EXPLAIN)" so there's no empty band between
+             the headline and the photo cluster. */
+          top: 41vh;
           height: auto;
         }
 
         .journal-frame {
-          width: 92vw;
+          /* Make each photo cluster significantly WIDER (priority on width
+             per user). The frame spills past the viewport edges to let the
+             active photos read big and bold. */
+          width: 120vw;
           height: auto;
-          /* Taller ratio than the 788/373 source so the photo cluster has
-             more vertical presence, matching the desktop layout's feel. */
-          aspect-ratio: 788 / 640;
+          /* Less tall than before — the overall cluster is shorter so the
+             extra width can land without overflowing the section vertically. */
+          aspect-ratio: 788 / 560;
         }
 
         .journal-frame[data-loaded="false"] {
-          contain-intrinsic-size: 92vw calc(92vw * 640 / 788);
+          contain-intrinsic-size: 120vw calc(120vw * 560 / 788);
         }
 
         .journal-footer-logo img {
