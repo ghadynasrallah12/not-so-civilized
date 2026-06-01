@@ -1389,6 +1389,11 @@
         .logos-section .logos-those-line,
         .logos-section .logos-those-line--who {
           font-size: clamp(1.85rem, 9.5vw, 2.75rem);
+          /* Keep each line on its own row — no wrapping mid-string, no matter
+             how big the font gets at narrow widths. The 3-line stack
+             "- THOSE -" / "WHO" / "( DARED )" must always read top-to-bottom. */
+          display: block;
+          white-space: nowrap;
         }
 
         .logos-section .logos-those-line--who {
