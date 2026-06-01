@@ -1332,10 +1332,13 @@
 
       @media (max-width: 768px) {
         .logos-section .logos-lockup {
-          /* Two columns: smaller text on the left, the cycling logos beside it. */
+          /* Two columns: smaller text on the left, the cycling logos beside it.
+             Align text to the TOP of the lockup so it sits in the upper half
+             of the section while the logos cycler is anchored lower (see
+             `.logos-cycler` below) for a diagonal composition. */
           grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
           gap: clamp(0.85rem, 3.5vw, 1.5rem);
-          align-items: center;
+          align-items: start;
         }
 
         .logos-section .logos-lockup-spacer {
@@ -1348,16 +1351,16 @@
           gap: clamp(1rem, 3vh, 1.75rem);
         }
 
-        /* Big cycling logo panel beside the headline. The source JPEGs have
-           internal padding, so we both enlarge the container and scale the
-           image within it — otherwise the visible logo looks tiny inside a
-           large white frame. */
+        /* Big cycling logo panel anchored to the LOWER half of the section
+           (text sits in the upper-right via .logos-lockup align-items: start)
+           so the two read diagonally across the page. */
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
           left: clamp(1rem, 5vw, 2rem);
-          top: 50%;
-          transform: translateY(-50%);
+          top: auto;
+          bottom: clamp(4rem, 12vh, 8rem);
+          transform: none;
           width: clamp(380px, 93vw, 650px);
           height: clamp(380px, 93vw, 650px);
         }
