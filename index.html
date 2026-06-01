@@ -799,11 +799,16 @@
       .contact-details a {
         color: inherit;
         text-decoration: none;
+        transition: transform 0.22s ease;
       }
 
       .contact-details a:hover {
-        text-decoration: underline;
-        text-underline-offset: 3px;
+        text-decoration: none;
+        transform: scale(1.08);
+      }
+
+      .contact-details a.contact-line--social:hover {
+        transform: translateY(-10%) rotate(-5deg) scale(1.08);
       }
 
       .contact-footer-logo {
@@ -2779,6 +2784,10 @@
           transform: translateY(-4%) rotate(-5deg);
         }
 
+        .contact-details a.contact-line--social:hover {
+          transform: translateY(-4%) rotate(-5deg) scale(1.08);
+        }
+
         .contact-footer-logo {
           flex: 0 0 auto;
           padding: clamp(0.35rem, 1.2vh, 0.65rem) var(--hero-side-gutter) clamp(0.65rem, 2vh, 1rem);
@@ -2849,30 +2858,29 @@
           height: auto;
         }
 
+        /* All three bands open by default and split the full viewport height
+           equally — no tap-to-expand interaction on mobile anymore. */
         .services-section,
         section.section.services-section {
-          min-height: 0;
+          min-height: 100vh;
+          min-height: 100dvh;
         }
 
         .services-layout {
-          min-height: auto;
+          min-height: 100vh;
+          min-height: 100dvh;
+          display: flex;
+          flex-direction: column;
         }
 
         .service-band,
         .service-band:hover {
-          flex: none;
-          min-height: 18vh;
-          padding-top: 1.4rem;
-          padding-bottom: 1.4rem;
-          padding-right: calc(var(--hero-side-gutter) + 3.25rem);
-          transition: min-height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        /* Tapped band expands so the background image gets a taller, fuller
-           presence and the body copy has room to breathe. */
-        .service-band.is-open,
-        .service-band.is-open:hover {
-          min-height: 56vh;
+          flex: 1 1 33.3333%;
+          min-height: 0;
+          padding-top: clamp(1rem, 3vh, 1.6rem);
+          padding-bottom: clamp(1rem, 3vh, 1.6rem);
+          padding-right: var(--hero-side-gutter);
+          cursor: default;
         }
 
         /* On mobile the desktop "100% auto" crop turns into a short letterbox
@@ -2889,41 +2897,13 @@
           margin-bottom: clamp(0.85rem, 2.6vh, 1.4rem);
         }
 
-        /* Tap-to-reveal on mobile — extras stay collapsed until the band is
-           tapped. Hover styles (which fire on first touch on iOS) are disabled
-           by gating them under `(hover: hover)` further up the cascade; here we
-           drive the reveal off the `.is-open` class instead. */
-        .service-band {
-          cursor: pointer;
-          -webkit-tap-highlight-color: transparent;
-        }
-
-        .service-extra {
-          max-height: 0;
-          opacity: 0;
-          padding-top: 0;
-          transition:
-            max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.35s ease;
-        }
-
-        .service-band.is-open .service-extra {
-          max-height: 22rem;
-          opacity: 1;
-        }
-
-        /* On mobile we don't auto-reveal on :hover/:focus-within — taps land as
-           hover on iOS and the extras would stay stuck open without a toggle. */
+        /* Always-open extras — no collapsed state, no toggle. */
+        .service-extra,
         .service-band:hover .service-extra,
         .service-band:focus-within .service-extra {
-          max-height: 0;
-          opacity: 0;
-        }
-
-        .service-band.is-open:hover .service-extra,
-        .service-band.is-open:focus-within .service-extra {
-          max-height: 22rem;
+          max-height: none;
           opacity: 1;
+          padding-top: 0;
         }
 
         .service-line {
@@ -2935,50 +2915,21 @@
           margin-bottom: 0.45rem;
         }
 
-        .service-band.is-open .service-line {
-          animation: service-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          animation-delay: calc(var(--line-index, 0) * 0.12s + 0.08s);
+        /* Animation plays when the section scrolls into view (JS adds
+           `.is-visible` via IntersectionObserver). Cascade across all bands
+           using the global stagger index. */
+        .service-line.is-visible {
+          animation: service-fade-up 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation-delay: calc(var(--line-global-index, var(--line-index, 0)) * 0.09s + 0.08s);
         }
 
         .service-line:last-child {
           margin-bottom: 0;
         }
 
-        /* Borderless down-chevron on the right of each band — flips upward
-           when the band is open. No background, no circle, just the glyph. */
+        /* No tap-to-toggle on mobile anymore, so hide the chevron entirely. */
         .service-toggle {
-          position: absolute;
-          top: 50%;
-          right: var(--hero-side-gutter);
-          z-index: 2;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 28px;
-          height: 28px;
-          border: 0;
-          background: transparent;
-          transform: translateY(-50%);
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-          pointer-events: none;
-        }
-
-        .service-toggle::after {
-          content: "";
-          width: 12px;
-          height: 12px;
-          border-right: 1.6px solid #ffffff;
-          border-bottom: 1.6px solid #ffffff;
-          /* Sit a touch above the geometric center so the chevron looks
-             optically centered inside its bounding box. */
-          margin-top: -4px;
-          transform: rotate(45deg);
-          transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .service-band.is-open .service-toggle::after {
-          margin-top: 4px;
-          transform: rotate(-135deg);
+          display: none;
         }
 
         .project-card {
@@ -6775,18 +6726,32 @@
       const servicesSection = document.getElementById("services");
       const serviceTitles = Array.from(document.querySelectorAll(".service-band .service-title"));
       const serviceBands = Array.from(document.querySelectorAll(".service-band"));
+      const isMobileViewport = () => window.matchMedia("(max-width: 900px)").matches;
       if (servicesSection && serviceTitles.length) {
         let servicesInView = false;
+        const allServiceLines = [];
         const replayServicesTitles = () => {
           serviceTitles.forEach((title) => title.classList.remove("is-visible"));
           void servicesSection.offsetHeight;
           serviceTitles.forEach((title) => title.classList.add("is-visible"));
         };
+        const replayAllServiceLines = () => {
+          allServiceLines.forEach((line) => line.classList.remove("is-visible"));
+          void servicesSection.offsetHeight;
+          allServiceLines.forEach((line) => line.classList.add("is-visible"));
+        };
+        const resetAllServiceLines = () => {
+          allServiceLines.forEach((line) => line.classList.remove("is-visible"));
+        };
 
-        serviceBands.forEach((band) => {
+        serviceBands.forEach((band, bandIdx) => {
           const lines = Array.from(band.querySelectorAll(".service-line"));
           lines.forEach((line, idx) => {
             line.style.setProperty("--line-index", String(idx));
+            // Global stagger index so animations cascade across all bands in
+            // sequence when the whole section reveals on mobile.
+            line.style.setProperty("--line-global-index", String(bandIdx * 3 + idx));
+            allServiceLines.push(line);
           });
           const replayServiceLines = () => {
             lines.forEach((line) => line.classList.remove("is-visible"));
@@ -6796,46 +6761,20 @@
           const resetServiceLines = () => {
             lines.forEach((line) => line.classList.remove("is-visible"));
           };
-          band.addEventListener("mouseenter", replayServiceLines);
-          band.addEventListener("mouseleave", resetServiceLines);
-          band.addEventListener("focusin", replayServiceLines);
-          band.addEventListener("focusout", (event) => {
-            if (!band.contains(event.relatedTarget)) resetServiceLines();
+          // Desktop only — :hover triggers line replay. Mobile relies on the
+          // intersection observer below since all bands stay open by default.
+          band.addEventListener("mouseenter", () => {
+            if (!isMobileViewport()) replayServiceLines();
           });
-
-          // Tap-to-toggle. Desktop CSS uses :hover for the reveal, so the
-          // .is-open class is effectively a no-op there. On mobile (where the
-          // tap-affordance is shown) it drives the open/close state.
-          const toggleOpen = () => {
-            const willOpen = !band.classList.contains("is-open");
-            // Close any other open band so only one is expanded at a time.
-            if (willOpen) {
-              serviceBands.forEach((other) => {
-                if (other !== band) {
-                  other.classList.remove("is-open");
-                  other.setAttribute("aria-expanded", "false");
-                }
-              });
-            }
-            band.classList.toggle("is-open", willOpen);
-            band.setAttribute("aria-expanded", willOpen ? "true" : "false");
-            if (willOpen) {
-              // Replay the line stagger animation by toggling the class.
-              lines.forEach((line) => {
-                line.style.animation = "none";
-              });
-              void band.offsetHeight;
-              lines.forEach((line) => {
-                line.style.animation = "";
-              });
-            }
-          };
-          band.addEventListener("click", toggleOpen);
-          band.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              toggleOpen();
-            }
+          band.addEventListener("mouseleave", () => {
+            if (!isMobileViewport()) resetServiceLines();
+          });
+          band.addEventListener("focusin", () => {
+            if (!isMobileViewport()) replayServiceLines();
+          });
+          band.addEventListener("focusout", (event) => {
+            if (isMobileViewport()) return;
+            if (!band.contains(event.relatedTarget)) resetServiceLines();
           });
         });
 
@@ -6845,8 +6784,10 @@
             const nowInView = entry.isIntersecting && entry.intersectionRatio > 0.18;
             if (nowInView && !servicesInView) {
               replayServicesTitles();
+              if (isMobileViewport()) replayAllServiceLines();
             } else if (!nowInView && servicesInView) {
               serviceTitles.forEach((title) => title.classList.remove("is-visible"));
+              if (isMobileViewport()) resetAllServiceLines();
             }
             servicesInView = nowInView;
           },
@@ -6858,6 +6799,7 @@
           servicesLink.addEventListener("click", () => {
             requestAnimationFrame(() => {
               replayServicesTitles();
+              if (isMobileViewport()) replayAllServiceLines();
             });
           });
         });
