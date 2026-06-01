@@ -4884,10 +4884,24 @@
         projectsSection.classList.remove("detail-open");
         projectsSection.classList.remove("detail-flyer-landed");
         if (detailCopyScroll) detailCopyScroll.classList.remove("has-scroll-overflow");
-        document.documentElement.classList.remove("projects-detail-open");
+        // Restore the original scroll position WITHOUT the smooth-scroll
+        // animation that `scroll-behavior: smooth` (set globally on <html>)
+        // would otherwise apply. Without this override the browser visibly
+        // animates from scrollTop=0 (where the document lands when body
+        // loses position:fixed) back to the saved scroll position — looking
+        // like a quick flash of the homepage before snapping into place.
+        const htmlEl = document.documentElement;
+        const prevScrollBehavior = htmlEl.style.scrollBehavior;
+        htmlEl.style.scrollBehavior = "auto";
+        htmlEl.classList.remove("projects-detail-open");
         document.body.classList.remove("projects-detail-open");
         document.body.style.top = "";
         window.scrollTo(0, projectDetailScrollY);
+        // Restore on the next frame so any inline value the page set elsewhere
+        // is preserved.
+        requestAnimationFrame(() => {
+          htmlEl.style.scrollBehavior = prevScrollBehavior;
+        });
         try { detailVideo.pause(); } catch (_) {}
         try { detailVideo.currentTime = 0; } catch (_) {}
         // Hard-stop: clearing src + calling load() aborts any in-flight
