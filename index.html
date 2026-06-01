@@ -3143,17 +3143,19 @@
         }
 
         .project-detail-mute {
-          bottom: 0.6rem;
-          right: 0.6rem;
-          width: 2.5rem;
-          height: 2.5rem;
+          bottom: 0.5rem;
+          right: 0.55rem;
+          width: 1.7rem;
+          height: 1.7rem;
+          padding: 0.1rem;
         }
 
         .project-detail-fullscreen {
-          bottom: 0.6rem;
-          right: 3.3rem;
-          width: 2.5rem;
-          height: 2.5rem;
+          bottom: 0.5rem;
+          right: 2.45rem;
+          width: 1.7rem;
+          height: 1.7rem;
+          padding: 0.15rem;
         }
 
         .project-detail-play-toggle {
@@ -5429,9 +5431,9 @@
         const standardsZoomOverlay = document.getElementById("standards-zoom-overlay");
         if (!standardsGridEl) return;
 
-        // Mobile shows a tighter board of the first 15 standards in a 3×5
+        // Mobile shows a tighter board of the first 18 standards in a 3×6
         // grid; desktop keeps the full 27-image layout.
-        const MOBILE_STANDARDS_LIMIT = 15;
+        const MOBILE_STANDARDS_LIMIT = 18;
         const isMobileStandards = () => window.innerWidth <= 900;
         const getGridShape = (count) => {
           if (isMobileStandards()) return { cols: 3, rows: Math.ceil(count / 3) };
