@@ -1406,15 +1406,16 @@
         }
 
         .logos-section .logos-those {
-          /* Pulled ~10% left from the previous right-edge position so the
-             headline doesn't sit flush against the right gutter. */
+          /* Pulled ~10% left from the right-edge position so the headline
+             doesn't sit flush against the right gutter. Top margin bumped
+             so the stack reads lower in the upper-right quadrant. */
           grid-column: 1 / -1;
           justify-self: end;
           align-items: flex-end;
           text-align: right;
           margin-left: 0;
           margin-right: clamp(3.5rem, 16vw, 6rem);
-          margin-top: clamp(4rem, 14vh, 7.5rem);
+          margin-top: clamp(7rem, 22vh, 11rem);
           max-width: 100%;
           letter-spacing: -0.12em;
           line-height: 0.82;
@@ -1422,7 +1423,8 @@
 
         .logos-section .logos-those-line,
         .logos-section .logos-those-line--who {
-          font-size: clamp(1.85rem, 9.5vw, 2.75rem);
+          /* Bumped ~20% for more presence. */
+          font-size: clamp(2.25rem, 11.5vw, 3.35rem);
           /* Keep each line on its own row — no wrapping mid-string, no matter
              how big the font gets at narrow widths. The 3-line stack
              "- THOSE -" / "WHO" / "( DARED )" must always read top-to-bottom. */
