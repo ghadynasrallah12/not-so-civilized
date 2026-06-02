@@ -2981,19 +2981,13 @@
           margin-bottom: clamp(0.85rem, 2.6vh, 1.4rem);
         }
 
-        /* Industry-standard accordion reveal: JS sets explicit pixel heights
-           on open/close so the browser interpolates between two KNOWN values
-           instead of re-measuring `auto` content every frame.
-
-           iOS Safari throttles paint frequency when the device is idle to
-           save battery — that's the behavior the user noticed where the
-           animation looks smooth only during a screen recording (recording
-           forces full frame rate). The fix is to make every paint cheap.
-           By promoting each band to its own GPU compositor layer
-           (`translate3d(0,0,0)` + `contain` + `will-change`), the heavy
-           background-image + filter pseudo-elements paint ONCE and are then
-           just composited — internal height changes no longer trigger a
-           repaint of the band's whole box. */
+        /* iOS Safari throttles paint frequency when idle — the user observed
+           the animation only looks smooth when screen-recording (which forces
+           the system back to full frame rate). The fix is to animate ONLY
+           compositor-thread properties (transform, opacity, clip-path) so
+           the visible motion is rendered by the GPU compositor and bypasses
+           the throttled paint pipeline entirely. No height/max-height/grid
+           changes — those are layout-bound and force repaints. */
         .service-band {
           contain: layout paint style;
           transform: translate3d(0, 0, 0);
@@ -3001,22 +2995,29 @@
           -webkit-backface-visibility: hidden;
         }
 
+        /* Paragraph always takes its layout space (so we don't trigger any
+           height recompute). It's hidden via clip-path + translate + opacity
+           when closed, and tweens in via the same GPU-friendly properties
+           when open. The chevron is the explicit cue for state. */
         .service-extra {
-          height: 0;
-          opacity: 0;
           padding-top: 0;
-          overflow: hidden;
+          opacity: 0;
+          transform: translate3d(0, -10px, 0);
+          clip-path: inset(0 0 100% 0);
+          -webkit-clip-path: inset(0 0 100% 0);
           pointer-events: none;
+          will-change: transform, opacity, clip-path;
           transition:
-            height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.35s ease;
-          will-change: height, opacity;
-          /* Promote to its own GPU layer too, so opacity tweens compose
-             without invalidating the parent band's layer. */
-          transform: translate3d(0, 0, 0);
+            opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+            clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+            -webkit-clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .service-band.is-open .service-extra {
           opacity: 1;
+          transform: translate3d(0, 0, 0);
+          clip-path: inset(0 0 0 0);
+          -webkit-clip-path: inset(0 0 0 0);
           pointer-events: auto;
         }
 
@@ -3025,10 +3026,16 @@
         .service-band:hover .service-extra,
         .service-band:focus-within .service-extra {
           opacity: 0;
+          transform: translate3d(0, -10px, 0);
+          clip-path: inset(0 0 100% 0);
+          -webkit-clip-path: inset(0 0 100% 0);
         }
         .service-band.is-open:hover .service-extra,
         .service-band.is-open:focus-within .service-extra {
           opacity: 1;
+          transform: translate3d(0, 0, 0);
+          clip-path: inset(0 0 0 0);
+          -webkit-clip-path: inset(0 0 0 0);
         }
 
         .service-line {
@@ -7043,73 +7050,15 @@
             if (!band.contains(event.relatedTarget)) resetServiceLines();
           });
 
-          // Mobile chevron tap-to-toggle. Uses the industry-standard
-          // accordion pattern: measure the paragraph's natural height,
-          // set it as an explicit pixel value, then animate between two
-          // KNOWN pixel values (0 ↔ measured). After the transition ends
-          // we switch back to `height: auto` so the layout stays
-          // responsive. This is what Material / Apple / Stripe all do —
-          // it's the one thing iOS Safari can animate smoothly.
-          const extra = band.querySelector(".service-extra");
-          let pendingTransitionEnd = null;
-          const animateExtra = (open) => {
-            if (!extra) return;
-            if (pendingTransitionEnd) {
-              extra.removeEventListener("transitionend", pendingTransitionEnd);
-              pendingTransitionEnd = null;
-            }
-            // Always start from a fixed pixel value before transitioning.
-            const startHeight = extra.getBoundingClientRect().height;
-            extra.style.height = startHeight + "px";
-            // Force a synchronous layout so the browser commits the start
-            // value before we set the end value (otherwise the transition
-            // gets coalesced and skipped).
-            // eslint-disable-next-line no-unused-expressions
-            extra.offsetHeight;
-            if (open) {
-              // Need the natural height — temporarily allow auto, measure,
-              // then snap back to a pixel value to animate from.
-              extra.style.height = "auto";
-              const targetHeight = extra.getBoundingClientRect().height;
-              extra.style.height = startHeight + "px";
-              // eslint-disable-next-line no-unused-expressions
-              extra.offsetHeight;
-              extra.style.height = targetHeight + "px";
-              pendingTransitionEnd = (event) => {
-                if (event.propertyName !== "height") return;
-                extra.removeEventListener("transitionend", pendingTransitionEnd);
-                pendingTransitionEnd = null;
-                // Switch back to auto so resizes / orientation changes
-                // re-flow naturally.
-                extra.style.height = "auto";
-              };
-              extra.addEventListener("transitionend", pendingTransitionEnd);
-            } else {
-              extra.style.height = "0px";
-              pendingTransitionEnd = (event) => {
-                if (event.propertyName !== "height") return;
-                extra.removeEventListener("transitionend", pendingTransitionEnd);
-                pendingTransitionEnd = null;
-              };
-              extra.addEventListener("transitionend", pendingTransitionEnd);
-            }
-          };
-
+          // Mobile chevron tap-to-toggle. Pure class flip — the CSS handles
+          // the reveal using GPU-only properties (clip-path + transform +
+          // opacity), so there's no per-frame layout work for iOS to
+          // bottleneck on.
           const toggleOpen = () => {
             const willOpen = !band.classList.contains("is-open");
             if (willOpen) {
               serviceBands.forEach((other) => {
                 if (other !== band) {
-                  if (other.classList.contains("is-open")) {
-                    const otherExtra = other.querySelector(".service-extra");
-                    if (otherExtra) {
-                      const h = otherExtra.getBoundingClientRect().height;
-                      otherExtra.style.height = h + "px";
-                      // eslint-disable-next-line no-unused-expressions
-                      otherExtra.offsetHeight;
-                      otherExtra.style.height = "0px";
-                    }
-                  }
                   other.classList.remove("is-open");
                   other.setAttribute("aria-expanded", "false");
                 }
@@ -7117,7 +7066,6 @@
             }
             band.classList.toggle("is-open", willOpen);
             band.setAttribute("aria-expanded", willOpen ? "true" : "false");
-            if (isMobileViewport()) animateExtra(willOpen);
           };
           band.addEventListener("click", () => {
             if (isMobileViewport()) toggleOpen();
