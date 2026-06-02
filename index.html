@@ -1380,22 +1380,27 @@
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
-          /* Push the cycler hard past the right edge — most logos sit in the
-             LEFT half of their source JPEG, so shifting the container right
-             pulls the visible content into the right half of the viewport
-             instead of clipping it off the left. */
-          right: clamp(-22rem, -65vw, -10rem);
+          /* Cycler extends past the right edge so the centered source content
+             (logos sit in the left half of their JPEG) shifts toward the
+             viewport's right side. */
+          right: clamp(-17rem, -50vw, -8rem);
           left: auto;
           top: auto;
           bottom: clamp(5rem, 14vh, 9rem);
           transform: none;
-          width: clamp(470px, 120vw, 810px);
-          height: clamp(470px, 120vw, 810px);
+          width: clamp(510px, 130vw, 880px);
+          height: clamp(510px, 130vw, 880px);
         }
 
         .logos-section .logo-slide img {
           object-position: center center;
-          transform: scale(1.15);
+          /* IMPORTANT: scale 1.0 so the image fills the cycler exactly — any
+             scale > 1 makes the image extend past the cycler edges, and the
+             cycler's `overflow: hidden` then clips the left side of logos
+             that sit near the start of their source canvas (e.g. SARISTIQUE,
+             SOAR). At 1× there's no overflow on the cycler edges, and the
+             viewport's left edge picks up source x = 0 cleanly. */
+          transform: scale(1);
           transform-origin: center center;
         }
 
