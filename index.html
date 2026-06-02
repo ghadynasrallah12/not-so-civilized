@@ -1382,11 +1382,12 @@
           position: absolute;
           /* Cycler extends past the right edge so the centered source content
              (logos sit in the left half of their JPEG) shifts toward the
-             viewport's right side. */
-          right: clamp(-17rem, -50vw, -8rem);
+             viewport's right side. Now pulled ~20% left and dropped ~20%
+             closer to the bottom per design call. */
+          right: clamp(-10rem, -30vw, -4rem);
           left: auto;
           top: auto;
-          bottom: clamp(5rem, 14vh, 9rem);
+          bottom: clamp(1rem, 4vh, 3rem);
           transform: none;
           width: clamp(510px, 130vw, 880px);
           height: clamp(510px, 130vw, 880px);
@@ -1405,15 +1406,14 @@
         }
 
         .logos-section .logos-those {
-          /* Headline pinned to the upper-RIGHT; the smaller cycler now sits
-             below it, also right-anchored, for a stacked right-aligned
-             composition that mirrors image 2. */
+          /* Pulled ~10% left from the previous right-edge position so the
+             headline doesn't sit flush against the right gutter. */
           grid-column: 1 / -1;
           justify-self: end;
           align-items: flex-end;
           text-align: right;
           margin-left: 0;
-          margin-right: clamp(1.5rem, 6vw, 3rem);
+          margin-right: clamp(3.5rem, 16vw, 6rem);
           margin-top: clamp(4rem, 14vh, 7.5rem);
           max-width: 100%;
           letter-spacing: -0.12em;
