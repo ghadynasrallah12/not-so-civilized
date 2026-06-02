@@ -1380,7 +1380,11 @@
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
-          right: clamp(-7rem, -22vw, -4rem);
+          /* Push the cycler hard past the right edge — most logos sit in the
+             LEFT half of their source JPEG, so shifting the container right
+             pulls the visible content into the right half of the viewport
+             instead of clipping it off the left. */
+          right: clamp(-22rem, -65vw, -10rem);
           left: auto;
           top: auto;
           bottom: clamp(5rem, 14vh, 9rem);
