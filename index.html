@@ -1372,20 +1372,19 @@
           gap: clamp(1rem, 3vh, 1.75rem);
         }
 
-        /* Big cycling logo panel anchored to the LOWER half of the section
-           (text sits in the upper-right via .logos-lockup align-items: start)
-           so the two read diagonally across the page. */
+        /* Big cycling logo panel CENTERED horizontally and anchored to the
+           lower-middle of the section so the headline sits above and the
+           cycler sits below, both on the page's central axis. */
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
-          /* Shift right and tighten width so logos that sit on the left of
-             their source JPEG aren't clipped at the viewport edge. */
-          left: clamp(2.5rem, 10vw, 4rem);
+          left: 50%;
           top: auto;
-          bottom: clamp(6rem, 16vh, 10rem);
-          transform: none;
-          width: clamp(520px, 118vw, 860px);
-          height: clamp(520px, 118vw, 860px);
+          bottom: clamp(5rem, 14vh, 9rem);
+          transform: translateX(-50%);
+          /* ~30% bigger than the prior 118vw container. */
+          width: clamp(620px, 145vw, 1080px);
+          height: clamp(620px, 145vw, 1080px);
         }
 
         .logos-section .logo-slide img {
@@ -1393,20 +1392,20 @@
           /* Source JPEGs leave a generous padding around the trademark, so
              zoom the image inside the (already large) container — the actual
              visible logo grows roughly with this multiplier. */
-          transform: scale(1.12);
+          transform: scale(1.3);
           transform-origin: center center;
         }
 
         .logos-section .logos-those {
-          grid-column: 2;
-          justify-self: end;
-          align-items: flex-end;
-          text-align: right;
+          /* Center the headline on the page's horizontal axis so the text
+             and the (centered) cycler line up vertically. */
+          grid-column: 1 / -1;
+          justify-self: center;
+          align-items: center;
+          text-align: center;
           margin-left: 0;
-          /* Nudge the headline down from the very top edge and a touch in from
-             the right so it doesn't sit flush against either corner. */
+          margin-right: 0;
           margin-top: clamp(1.25rem, 5vh, 3rem);
-          margin-right: clamp(1.25rem, 5vw, 2.25rem);
           max-width: 100%;
           letter-spacing: -0.12em;
           line-height: 0.82;
@@ -1423,11 +1422,16 @@
         }
 
         .logos-section .logos-those-line--who {
-          align-self: flex-end;
+          align-self: center;
         }
 
         .logos-section .logos-bottom {
           align-items: center;
+        }
+
+        .logos-section .logos-wordmark img {
+          /* ~30% smaller — matches the rest of the mobile brand-logo pass. */
+          width: clamp(82px, 18vw, 104px);
         }
 
         .logos-section .logos-dare {
@@ -2829,7 +2833,8 @@
         }
 
         .contact-footer-logo img {
-          width: clamp(88px, 24vw, 112px);
+          /* ~30% smaller than before per design call. */
+          width: clamp(62px, 17vw, 78px);
           height: auto;
         }
 
@@ -2922,7 +2927,8 @@
         }
 
         .about-logo img {
-          width: clamp(104px, 28vw, var(--brand-logo-width));
+          /* ~30% smaller — matches the rest of the mobile brand-logo pass. */
+          width: clamp(73px, 20vw, 104px);
           height: auto;
         }
 
@@ -3146,7 +3152,8 @@
         }
 
         .journal-footer-logo img {
-          width: clamp(96px, 26vw, 140px);
+          /* ~30% smaller. */
+          width: clamp(67px, 18vw, 98px);
         }
 
         .journal-footer-dare {
