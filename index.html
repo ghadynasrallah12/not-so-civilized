@@ -1372,26 +1372,26 @@
           gap: clamp(1rem, 3vh, 1.75rem);
         }
 
-        /* Big cycling logo panel — sized to fit comfortably INSIDE the
-           viewport so logos never get clipped by overflow. Shifted right so
-           it doesn't compete with the headline on the left. */
+        /* Big cycling logo panel — ~30% larger and shifted further to the
+           right so the visible logo content lands in the right half of the
+           viewport (not clipped off the left side). The negative `right`
+           pushes the cycler's right edge past the viewport, which shifts
+           where the centered image content visually lands. */
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
-          right: clamp(0.5rem, 2vw, 1rem);
+          right: clamp(-7rem, -22vw, -4rem);
           left: auto;
           top: auto;
           bottom: clamp(5rem, 14vh, 9rem);
           transform: none;
-          width: clamp(360px, 92vw, 620px);
-          height: clamp(360px, 92vw, 620px);
+          width: clamp(470px, 120vw, 810px);
+          height: clamp(470px, 120vw, 810px);
         }
 
         .logos-section .logo-slide img {
           object-position: center center;
-          /* Modest zoom — keeps the visible logo prominent without scaling
-             past the cycler edges (where overflow:hidden would clip it). */
-          transform: scale(1.08);
+          transform: scale(1.15);
           transform-origin: center center;
         }
 
