@@ -1372,14 +1372,13 @@
           gap: clamp(1rem, 3vh, 1.75rem);
         }
 
-        /* Big cycling logo panel — shifted to the RIGHT of center so logos
-           that sit on the left of their source JPEG aren't clipped off the
-           viewport edge (the prior centered position lost the leftmost
-           glyphs entirely). */
+        /* Big cycling logo panel — pushed well to the RIGHT so the visible
+           logo content (often sitting in the left half of its source JPEG)
+           lands inside the viewport instead of being clipped off the left. */
         .logos-section .logos-cycler {
           inset: auto;
           position: absolute;
-          left: 65%;
+          left: 92%;
           top: auto;
           bottom: clamp(5rem, 14vh, 9rem);
           transform: translateX(-50%);
@@ -1398,15 +1397,14 @@
         }
 
         .logos-section .logos-those {
-          /* Shifted right (justify-self: end) and pushed down so the headline
-             sits in the upper-right quadrant — the cycler below is offset to
-             the right too, so the two read as a stacked right-aligned column. */
+          /* Headline pinned to the LEFT — the cycler now lives over on the
+             right, so the two read as a diagonal across the section again. */
           grid-column: 1 / -1;
-          justify-self: end;
-          align-items: flex-end;
-          text-align: right;
-          margin-left: 0;
-          margin-right: clamp(1.5rem, 6vw, 3rem);
+          justify-self: start;
+          align-items: flex-start;
+          text-align: left;
+          margin-left: clamp(1.5rem, 6vw, 3rem);
+          margin-right: 0;
           margin-top: clamp(4rem, 14vh, 7.5rem);
           max-width: 100%;
           letter-spacing: -0.12em;
@@ -1424,7 +1422,7 @@
         }
 
         .logos-section .logos-those-line--who {
-          align-self: flex-end;
+          align-self: flex-start;
         }
 
         .logos-section .logos-bottom {
