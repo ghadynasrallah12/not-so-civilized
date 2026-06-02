@@ -3154,11 +3154,12 @@
           contain-intrinsic-size: 120vw calc(120vw * 560 / 788);
         }
 
-        /* Stretch every photo slot wider on mobile — neighbours overlap a
-           bit, which is the explicit ask. scaleX keeps the height as
-           designed while widening each tile. */
+        /* Each photo slot scaled UNIFORMLY (both axes) so the photos keep
+           their natural aspect ratio. scaleX alone was stretching every
+           image horizontally, which made them look distorted and off-format
+           — clients should see the original framing. */
         .journal-slot {
-          transform: scaleX(1.22);
+          transform: scale(1.1);
           transform-origin: center center;
         }
 
