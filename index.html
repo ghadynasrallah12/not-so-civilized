@@ -2967,15 +2967,17 @@
         }
 
         /* Paragraph collapsed by default; chevron toggle expands it with
-           animation. Each band keeps its 1/3-viewport height regardless. */
+           animation. Each band keeps its 1/3-viewport height regardless.
+           Generous timings so the reveal feels considered and smooth rather
+           than snappy/glitchy. */
         .service-extra {
           max-height: 0;
           opacity: 0;
           padding-top: 0;
           overflow: hidden;
           transition:
-            max-height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.4s ease;
+            max-height 0.95s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.7s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
         .service-band.is-open .service-extra {
@@ -3005,10 +3007,11 @@
           margin-bottom: 0.45rem;
         }
 
-        /* Lines fade in one-by-one when the band opens. */
+        /* Lines fade in one-by-one when the band opens. Slowed + staggered
+           wider so the reveal reads as a calm cascade, not a snap. */
         .service-band.is-open .service-line {
-          animation: service-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          animation-delay: calc(var(--line-index, 0) * 0.12s + 0.08s);
+          animation: service-fade-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation-delay: calc(var(--line-index, 0) * 0.22s + 0.18s);
         }
 
         .service-line:last-child {
@@ -3030,7 +3033,7 @@
           border: 0;
           background: transparent;
           transform: translateY(-50%);
-          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+          transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
           pointer-events: none;
         }
 
@@ -3042,7 +3045,9 @@
           border-bottom: 1.8px solid #ffffff;
           margin-top: -4px;
           transform: rotate(45deg);
-          transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+          transition:
+            transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+            margin-top 0.65s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .service-band.is-open .service-toggle::after {
@@ -3251,8 +3256,10 @@
           bottom: max(env(safe-area-inset-bottom, 0px), 0.85rem);
         }
 
+        /* Lift mute + fullscreen above the timeline so they don't visually
+           touch the progress bar that sits at the bottom of the video. */
         .project-detail-mute {
-          bottom: 0.5rem;
+          bottom: 1.7rem;
           right: 0.55rem;
           width: 1.7rem;
           height: 1.7rem;
@@ -3260,7 +3267,7 @@
         }
 
         .project-detail-fullscreen {
-          bottom: 0.5rem;
+          bottom: 1.7rem;
           right: 2.45rem;
           width: 1.7rem;
           height: 1.7rem;
@@ -7009,7 +7016,10 @@
 
           // Mobile chevron tap-to-toggle. The CSS keeps the band's layout
           // (still 1/3 viewport) regardless of open state; only the paragraph
-          // expands/collapses with animation when `.is-open` flips.
+          // expands/collapses with animation when `.is-open` flips. The CSS
+          // line animation runs naturally when `.is-open` is added; no JS
+          // restart is needed (and forcing one used to cause a visible
+          // glitch / flash on each tap).
           const toggleOpen = () => {
             const willOpen = !band.classList.contains("is-open");
             if (willOpen) {
@@ -7022,12 +7032,6 @@
             }
             band.classList.toggle("is-open", willOpen);
             band.setAttribute("aria-expanded", willOpen ? "true" : "false");
-            if (willOpen) {
-              // Replay the staggered line animation by forcing a restart.
-              lines.forEach((line) => { line.style.animation = "none"; });
-              void band.offsetHeight;
-              lines.forEach((line) => { line.style.animation = ""; });
-            }
           };
           band.addEventListener("click", () => {
             if (isMobileViewport()) toggleOpen();
