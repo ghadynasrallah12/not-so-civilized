@@ -2981,24 +2981,28 @@
           margin-bottom: clamp(0.85rem, 2.6vh, 1.4rem);
         }
 
-        /* Slide-down reveal: paragraph collapses to height 0 when closed and
-           expands to its natural height when open. iOS Safari handles a
-           SINGLE max-height transition just fine — what was glitching it was
-           stacking that with 3+ per-line opacity/transform transitions, each
-           with its own stagger delay. Here we animate the band itself, then
-           do a quick parent fade — no per-line work. */
+        /* Industry-standard accordion reveal: JS sets explicit pixel heights
+           on open/close so the browser interpolates between two KNOWN values
+           instead of re-measuring `auto` content every frame. That's the
+           one fix iOS Safari really needs. Paint is isolated to each band
+           via `contain` so changes inside the band don't bleed out into
+           the parent (whose background-image pseudo-elements would otherwise
+           repaint each frame). */
+        .service-band {
+          contain: layout paint style;
+        }
+
         .service-extra {
-          max-height: 0;
+          height: 0;
           opacity: 0;
           padding-top: 0;
           overflow: hidden;
           pointer-events: none;
           transition:
-            max-height 0.55s ease,
-            opacity 0.4s ease;
+            height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.35s ease;
         }
         .service-band.is-open .service-extra {
-          max-height: 18rem;
           opacity: 1;
           pointer-events: auto;
         }
@@ -3007,17 +3011,13 @@
            after taps and would lock the band open otherwise). */
         .service-band:hover .service-extra,
         .service-band:focus-within .service-extra {
-          max-height: 0;
           opacity: 0;
         }
         .service-band.is-open:hover .service-extra,
         .service-band.is-open:focus-within .service-extra {
-          max-height: 18rem;
           opacity: 1;
         }
 
-        /* Lines reveal together with the parent — no individual transitions,
-           which is what was making iOS Safari stutter. */
         .service-line {
           opacity: 1;
           transform: none;
@@ -7030,17 +7030,73 @@
             if (!band.contains(event.relatedTarget)) resetServiceLines();
           });
 
-          // Mobile chevron tap-to-toggle. The CSS keeps the band's layout
-          // (still 1/3 viewport) regardless of open state; only the paragraph
-          // expands/collapses with animation when `.is-open` flips. The CSS
-          // line animation runs naturally when `.is-open` is added; no JS
-          // restart is needed (and forcing one used to cause a visible
-          // glitch / flash on each tap).
+          // Mobile chevron tap-to-toggle. Uses the industry-standard
+          // accordion pattern: measure the paragraph's natural height,
+          // set it as an explicit pixel value, then animate between two
+          // KNOWN pixel values (0 ↔ measured). After the transition ends
+          // we switch back to `height: auto` so the layout stays
+          // responsive. This is what Material / Apple / Stripe all do —
+          // it's the one thing iOS Safari can animate smoothly.
+          const extra = band.querySelector(".service-extra");
+          let pendingTransitionEnd = null;
+          const animateExtra = (open) => {
+            if (!extra) return;
+            if (pendingTransitionEnd) {
+              extra.removeEventListener("transitionend", pendingTransitionEnd);
+              pendingTransitionEnd = null;
+            }
+            // Always start from a fixed pixel value before transitioning.
+            const startHeight = extra.getBoundingClientRect().height;
+            extra.style.height = startHeight + "px";
+            // Force a synchronous layout so the browser commits the start
+            // value before we set the end value (otherwise the transition
+            // gets coalesced and skipped).
+            // eslint-disable-next-line no-unused-expressions
+            extra.offsetHeight;
+            if (open) {
+              // Need the natural height — temporarily allow auto, measure,
+              // then snap back to a pixel value to animate from.
+              extra.style.height = "auto";
+              const targetHeight = extra.getBoundingClientRect().height;
+              extra.style.height = startHeight + "px";
+              // eslint-disable-next-line no-unused-expressions
+              extra.offsetHeight;
+              extra.style.height = targetHeight + "px";
+              pendingTransitionEnd = (event) => {
+                if (event.propertyName !== "height") return;
+                extra.removeEventListener("transitionend", pendingTransitionEnd);
+                pendingTransitionEnd = null;
+                // Switch back to auto so resizes / orientation changes
+                // re-flow naturally.
+                extra.style.height = "auto";
+              };
+              extra.addEventListener("transitionend", pendingTransitionEnd);
+            } else {
+              extra.style.height = "0px";
+              pendingTransitionEnd = (event) => {
+                if (event.propertyName !== "height") return;
+                extra.removeEventListener("transitionend", pendingTransitionEnd);
+                pendingTransitionEnd = null;
+              };
+              extra.addEventListener("transitionend", pendingTransitionEnd);
+            }
+          };
+
           const toggleOpen = () => {
             const willOpen = !band.classList.contains("is-open");
             if (willOpen) {
               serviceBands.forEach((other) => {
                 if (other !== band) {
+                  if (other.classList.contains("is-open")) {
+                    const otherExtra = other.querySelector(".service-extra");
+                    if (otherExtra) {
+                      const h = otherExtra.getBoundingClientRect().height;
+                      otherExtra.style.height = h + "px";
+                      // eslint-disable-next-line no-unused-expressions
+                      otherExtra.offsetHeight;
+                      otherExtra.style.height = "0px";
+                    }
+                  }
                   other.classList.remove("is-open");
                   other.setAttribute("aria-expanded", "false");
                 }
@@ -7048,6 +7104,7 @@
             }
             band.classList.toggle("is-open", willOpen);
             band.setAttribute("aria-expanded", willOpen ? "true" : "false");
+            if (isMobileViewport()) animateExtra(willOpen);
           };
           band.addEventListener("click", () => {
             if (isMobileViewport()) toggleOpen();
