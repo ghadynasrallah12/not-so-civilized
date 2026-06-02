@@ -2981,69 +2981,44 @@
           margin-bottom: clamp(0.85rem, 2.6vh, 1.4rem);
         }
 
-        /* iOS-friendly reveal: grid-template-rows transition is much smoother
-           than max-height on Safari (max-height triggers expensive layout on
-           every frame; grid uses interpolated track sizes that the compositor
-           can handle without a paint storm). We animate the parent's grid
-           rows (0fr → 1fr) while the child fades opacity. No per-line
-           staggered transitions — that was multiplying the work iOS had to
-           do per frame and was the main source of the glitchy feel. */
+        /* iOS Safari was glitching on every other reveal mechanism we tried
+           (max-height, grid-template-rows, scale, clip-path). The only
+           mechanism that's truly smooth on every iOS version is plain
+           opacity — no layout work, no compositing storm, no per-frame
+           recompute. Tradeoff: the content always occupies its natural
+           layout space, even when "closed". With each band at 33vh there's
+           plenty of room for the text to live silently. The chevron is the
+           authoritative cue for open/closed state. */
         .service-left {
-          display: grid;
-          grid-template-rows: auto 0fr;
-          align-content: start;
-          row-gap: 0;
-          transition: grid-template-rows 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-          will-change: grid-template-rows;
-        }
-        .service-band.is-open .service-left {
-          grid-template-rows: auto 1fr;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
 
         .service-extra {
-          min-height: 0;
-          overflow: hidden;
           opacity: 0;
-          transform: translateY(6px);
           padding-top: 0;
-          transition:
-            opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-          transition-delay: 0s;
-          will-change: opacity, transform;
+          pointer-events: none;
+          transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .service-band.is-open .service-extra {
           opacity: 1;
-          transform: translateY(0);
-          /* Fade in slightly after the grid expansion starts so text isn't
-             revealed before the row has room. */
-          transition-delay: 0.12s;
+          pointer-events: auto;
         }
 
         /* Hover/focus must NOT auto-open on mobile (iOS makes hover sticky
            after taps and would lock the band open otherwise). */
-        .service-band:hover .service-left,
-        .service-band:focus-within .service-left {
-          grid-template-rows: auto 0fr;
-        }
         .service-band:hover .service-extra,
         .service-band:focus-within .service-extra {
           opacity: 0;
-          transform: translateY(6px);
-        }
-        .service-band.is-open:hover .service-left,
-        .service-band.is-open:focus-within .service-left {
-          grid-template-rows: auto 1fr;
         }
         .service-band.is-open:hover .service-extra,
         .service-band.is-open:focus-within .service-extra {
           opacity: 1;
-          transform: translateY(0);
         }
 
-        /* Lines are revealed together via the parent .service-extra fade.
-           No individual transitions or stagger delays — keeping things
-           lightweight is what fixes the iOS Safari glitch. */
+        /* Lines are revealed together via the parent .service-extra fade —
+           keeping things lightweight is what fixes the iOS Safari glitch. */
         .service-line {
           opacity: 1;
           transform: none;
