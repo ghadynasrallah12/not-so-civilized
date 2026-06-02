@@ -2981,71 +2981,52 @@
           margin-bottom: clamp(0.85rem, 2.6vh, 1.4rem);
         }
 
-        /* iOS Safari throttles paint frequency when idle — the user observed
-           the animation only looks smooth when screen-recording (which forces
-           the system back to full frame rate). The fix is to animate ONLY
-           compositor-thread properties (transform, opacity, clip-path) so
-           the visible motion is rendered by the GPU compositor and bypasses
-           the throttled paint pipeline entirely. No height/max-height/grid
-           changes — those are layout-bound and force repaints. */
-        .service-band {
-          contain: layout paint style;
-          transform: translate3d(0, 0, 0);
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
-        }
-
-        /* Paragraph always takes its layout space (so we don't trigger any
-           height recompute). It's hidden via clip-path + translate + opacity
-           when closed, and tweens in via the same GPU-friendly properties
-           when open. The chevron is the explicit cue for state. */
+        /* Paragraph collapsed by default; chevron toggle expands it with
+           animation. Each band keeps its 1/3-viewport height regardless.
+           Generous timings so the reveal feels considered and smooth rather
+           than snappy/glitchy. */
         .service-extra {
-          padding-top: 0;
+          max-height: 0;
           opacity: 0;
-          transform: translate3d(0, -10px, 0);
-          clip-path: inset(0 0 100% 0);
-          -webkit-clip-path: inset(0 0 100% 0);
-          pointer-events: none;
-          will-change: transform, opacity, clip-path;
+          padding-top: 0;
+          overflow: hidden;
           transition:
-            opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-            clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-            -webkit-clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .service-band.is-open .service-extra {
-          opacity: 1;
-          transform: translate3d(0, 0, 0);
-          clip-path: inset(0 0 0 0);
-          -webkit-clip-path: inset(0 0 0 0);
-          pointer-events: auto;
+            max-height 0.95s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.7s cubic-bezier(0.33, 1, 0.68, 1);
         }
 
-        /* Hover/focus must NOT auto-open on mobile (iOS makes hover sticky
-           after taps and would lock the band open otherwise). */
+        .service-band.is-open .service-extra {
+          max-height: 22rem;
+          opacity: 1;
+        }
+
+        /* Hover/focus must NOT auto-open on mobile (taps register as hover on
+           iOS and would lock the band open). The toggle drives it. */
         .service-band:hover .service-extra,
         .service-band:focus-within .service-extra {
+          max-height: 0;
           opacity: 0;
-          transform: translate3d(0, -10px, 0);
-          clip-path: inset(0 0 100% 0);
-          -webkit-clip-path: inset(0 0 100% 0);
         }
         .service-band.is-open:hover .service-extra,
         .service-band.is-open:focus-within .service-extra {
+          max-height: 22rem;
           opacity: 1;
-          transform: translate3d(0, 0, 0);
-          clip-path: inset(0 0 0 0);
-          -webkit-clip-path: inset(0 0 0 0);
         }
 
         .service-line {
-          opacity: 1;
-          transform: none;
+          opacity: 0;
+          transform: translateY(14px);
           animation: none;
           font-size: clamp(13px, 3.6vw, 16px);
           line-height: 1.3 !important;
           margin-bottom: 0.45rem;
-          transition: none;
+        }
+
+        /* Lines fade in one-by-one when the band opens. Slowed + staggered
+           wider so the reveal reads as a calm cascade, not a snap. */
+        .service-band.is-open .service-line {
+          animation: service-fade-up 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation-delay: calc(var(--line-index, 0) * 0.22s + 0.18s);
         }
 
         .service-line:last-child {
