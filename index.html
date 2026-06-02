@@ -2983,13 +2983,22 @@
 
         /* Industry-standard accordion reveal: JS sets explicit pixel heights
            on open/close so the browser interpolates between two KNOWN values
-           instead of re-measuring `auto` content every frame. That's the
-           one fix iOS Safari really needs. Paint is isolated to each band
-           via `contain` so changes inside the band don't bleed out into
-           the parent (whose background-image pseudo-elements would otherwise
-           repaint each frame). */
+           instead of re-measuring `auto` content every frame.
+
+           iOS Safari throttles paint frequency when the device is idle to
+           save battery — that's the behavior the user noticed where the
+           animation looks smooth only during a screen recording (recording
+           forces full frame rate). The fix is to make every paint cheap.
+           By promoting each band to its own GPU compositor layer
+           (`translate3d(0,0,0)` + `contain` + `will-change`), the heavy
+           background-image + filter pseudo-elements paint ONCE and are then
+           just composited — internal height changes no longer trigger a
+           repaint of the band's whole box. */
         .service-band {
           contain: layout paint style;
+          transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         .service-extra {
@@ -3001,6 +3010,10 @@
           transition:
             height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
             opacity 0.35s ease;
+          will-change: height, opacity;
+          /* Promote to its own GPU layer too, so opacity tweens compose
+             without invalidating the parent band's layer. */
+          transform: translate3d(0, 0, 0);
         }
         .service-band.is-open .service-extra {
           opacity: 1;
