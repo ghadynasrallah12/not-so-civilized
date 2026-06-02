@@ -2981,27 +2981,24 @@
           margin-bottom: clamp(0.85rem, 2.6vh, 1.4rem);
         }
 
-        /* iOS Safari was glitching on every other reveal mechanism we tried
-           (max-height, grid-template-rows, scale, clip-path). The only
-           mechanism that's truly smooth on every iOS version is plain
-           opacity — no layout work, no compositing storm, no per-frame
-           recompute. Tradeoff: the content always occupies its natural
-           layout space, even when "closed". With each band at 33vh there's
-           plenty of room for the text to live silently. The chevron is the
-           authoritative cue for open/closed state. */
-        .service-left {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-
+        /* Slide-down reveal: paragraph collapses to height 0 when closed and
+           expands to its natural height when open. iOS Safari handles a
+           SINGLE max-height transition just fine — what was glitching it was
+           stacking that with 3+ per-line opacity/transform transitions, each
+           with its own stagger delay. Here we animate the band itself, then
+           do a quick parent fade — no per-line work. */
         .service-extra {
+          max-height: 0;
           opacity: 0;
           padding-top: 0;
+          overflow: hidden;
           pointer-events: none;
-          transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+          transition:
+            max-height 0.55s ease,
+            opacity 0.4s ease;
         }
         .service-band.is-open .service-extra {
+          max-height: 18rem;
           opacity: 1;
           pointer-events: auto;
         }
@@ -3010,15 +3007,17 @@
            after taps and would lock the band open otherwise). */
         .service-band:hover .service-extra,
         .service-band:focus-within .service-extra {
+          max-height: 0;
           opacity: 0;
         }
         .service-band.is-open:hover .service-extra,
         .service-band.is-open:focus-within .service-extra {
+          max-height: 18rem;
           opacity: 1;
         }
 
-        /* Lines are revealed together via the parent .service-extra fade —
-           keeping things lightweight is what fixes the iOS Safari glitch. */
+        /* Lines reveal together with the parent — no individual transitions,
+           which is what was making iOS Safari stutter. */
         .service-line {
           opacity: 1;
           transform: none;
